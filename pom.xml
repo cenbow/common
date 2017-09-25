@@ -16,43 +16,30 @@
     <!-- maven-deploy-plugin  编译插件可以使用maven_deploy_skip 来指定是否把war发到仓库，默认为false，war工程显示覆盖这个变量为true表示不把war发到仓库-->
 
     <!--
-    <parent>
-        <artifactId>qunar-supom-generic</artifactId>
-        <groupId>qunar.common</groupId>
-        <version>1.3.5</version>
-    </parent>
+
 -->
     <modules>
-        <module>demo-guava</module>
-        <module>demo-maven</module>
-        <module>demo-log</module>
-        <module>demo-netty</module>
+        <module>algorithms</module>
+        <module>javacore</module>
+        <module>jvm</module>
+        <module>mybatis</module>
+        <module>springboot</module>
     </modules>
 
     <properties>
         <java_source_version>1.7</java_source_version>
         <java_target_version>1.7</java_target_version>
         <maven_deploy_skip>false</maven_deploy_skip>
-        <qunar.common.version>8.3.4</qunar.common.version>
         <guava.version>15.0</guava.version>
         <org.slf4j.version>1.7.5</org.slf4j.version>
         <logback.version>1.0.13</logback.version>
-
-        <qmq.version>2.1.3</qmq.version>
-        <common-zookeeper.version>1.1.4</common-zookeeper.version>
         <fastjson.version>1.1.35</fastjson.version>
-
         <tomcat-jdbc.version>7.0.42</tomcat-jdbc.version>
         <jackson.version>1.9.12</jackson.version>
         <mysqldriver.version>5.1.29</mysqldriver.version>
         <velocity.version>1.4</velocity.version>
-        <qsso.version>0.0.2</qsso.version>
-        <meerkat-monitor.version>1.3.9</meerkat-monitor.version>
-        <meerkat.web.version>2.2.3</meerkat.web.version>
-        <corppublicservice.version>1.1.9</corppublicservice.version>
-        <qconfig.version>1.1.12</qconfig.version>
         <org.springframework.version>4.0.3.RELEASE</org.springframework.version>
-        <qtracer.version>1.0.7</qtracer.version>
+
     </properties>
 
     <dependencies>
