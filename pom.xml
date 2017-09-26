@@ -24,6 +24,7 @@
         <module>jvm</module>
         <module>mybatis</module>
         <module>springboot</module>
+        <module>httpclient</module>
     </modules>
 
     <properties>
