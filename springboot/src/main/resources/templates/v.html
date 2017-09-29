@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+    #if($map && !$map.isEmpty())
+    <ul>
+        #foreach($mapEntry in $map.entrySet())
+            <li> $mapEntry.key = $mapEntry.value</li>
+        #end
+    </ul>
+    #end
+
+    #if(!$list || $list.isEmpty())
+    <div>list is empty</div>
+    #else
+    <ul>
+        #foreach($element in $list)
+            <li> $element</li>
+        #end
+    </ul>
+    #end
+</body>
+</html>

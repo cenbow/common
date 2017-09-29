@@ -1,5 +1,7 @@
 package kelly.springboot.schedule;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 
 import java.util.Date;
@@ -12,19 +14,22 @@ import java.util.Date;
 //@EnableScheduling
 public class SimpleTask {
 
+    private Logger logger = LoggerFactory.getLogger(DynamicTask.class);
+
+
     @Scheduled(fixedDelay = 60 * 1000)
     public void fixedDelayJob() {
-        System.out.println("fixed delay job:" + new Date());
+        logger.info("fixed delay job: {}", new Date());
     }
 
     @Scheduled(fixedRate = 10 * 1000)
     public void fixedRateJob() {
-        System.out.println("fixed rate job:" + new Date());
+        logger.info("fixed rate job: {}", new Date());
     }
 
     @Scheduled(cron = "0/10 * * * * *")
     public void doCronJob() {
-        System.out.println("do cron job:" + new Date());
+        logger.info("fdo cron job: {}", new Date());
     }
 
 

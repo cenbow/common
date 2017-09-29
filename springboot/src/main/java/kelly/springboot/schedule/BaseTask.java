@@ -35,7 +35,6 @@ public abstract class BaseTask implements Task {
                 return cronTrigger.nextExecutionTime(triggerContext);
             }
         };
-        System.out.println("*******************" + cron);
         scheduledFuture = threadPoolTaskScheduler.schedule(this, trigger);
     }
 

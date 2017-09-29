@@ -13,6 +13,10 @@ import org.springframework.test.context.web.WebAppConfiguration;
 
 import java.util.List;
 
+
+/**
+ * Created by kelly-lee on 2017/9/25.
+ */
 @RunWith(SpringJUnit4ClassRunner.class)
 //需要增加@WebAppConfiguration,否则接入swagger会报Error creating bean with name 'documentationPluginsBootstrapper'
 @WebAppConfiguration

@@ -1,5 +1,7 @@
 package kelly.springboot.schedule;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -8,7 +10,9 @@ import java.util.Date;
  * Created by kelly-lee on 2017/9/27.
  */
 @Component
-public class DynamicTask extends BaseTask{
+public class DynamicTask extends BaseTask {
+
+    private Logger logger = LoggerFactory.getLogger(DynamicTask.class);
 
     public DynamicTask() {
         setCron("0/10 * * * * *");
@@ -16,7 +20,7 @@ public class DynamicTask extends BaseTask{
 
     @Override
     public void run() {
-        System.out.println("task run on " + new Date());
+        logger.info("task run on {}", new Date());
     }
 
 
