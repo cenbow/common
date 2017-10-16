@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!--初始化移动浏览显示-->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bootstrap的HTML标准模板</title>
+    <!-- Bootstrap -->
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="http://cdn.bootcss.com/bootstrap-daterangepicker/2.1.25/daterangepicker.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcss.com/dropzone/5.2.0/min/dropzone.min.css" rel="stylesheet">
+    <link href="css/local.css" rel="stylesheet">
+
+    <!-- 解决ie9以下浏览器对html5新增标签的不识别，并导致CSS不起作用的问题。-->　
+    <script src="http://cdn.bootcss.com/respond.js/1.4.2/respond.js"></script>
+    <!-- 让不支持css3 Media Query的浏览器包括IE6-IE8等其他浏览器支持查询。-->
+    <script src="http://cdn.bootcss.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <!-- 如果要使用Bootstrap的js插件，必须先调入jQuery -->
+    <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+    <!-- 包括所有bootstrap的js插件或者可以根据需要使用的js插件调用　-->
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <script src="http://cdn.bootcss.com/bootstrap-daterangepicker/2.1.25/moment.min.js"></script>
+    <script src="http://cdn.bootcss.com/bootstrap-daterangepicker/2.1.25/daterangepicker.min.js"></script>
+    <script src="http://www.dropzonejs.com/js/dropzone.js?v=1507306640"></script>
+    <!--
+    <script src="https://cdn.bootcss.com/dropzone/5.2.0/min/dropzone.min.js"></script>
+    -->
+    <script src="js/dropzone.js"></script>
+    <script src="js/widgets.js"></script>
+
+</head>
+<body>
+
+<form role="form">
+    <div class="form-group">
+        <label for="name">名称</label>
+        <input type="text" class="form-control" id="name" placeholder="请输入名称">
+    </div>
+    <div class="form-group">
+        <label for="inputfile">文件输入</label>
+        <input type="file" id="inputfile">
+        <p class="help-block">这里是块级帮助文本的实例。</p>
+    </div>
+    <div class="checkbox">
+        <label>
+            <input type="checkbox">请打勾
+        </label>
+    </div>
+    <button type="submit" class="btn btn-default">提交</button>
+</form>
+
+<form class="form-inline" role="form">
+    <div class="form-group">
+        <label class="sr-only" for="name">名称</label>
+        <input type="text" class="form-control" id="name" placeholder="请输入名称">
+    </div>
+    <div class="form-group">
+        <label class="sr-only" for="inputfile">文件输入</label>
+        <input type="file" id="inputfile">
+    </div>
+    <div class="checkbox">
+        <label>
+            <input type="checkbox">请打勾
+        </label>
+    </div>
+
+
+    <button type="submit" class="btn btn-default">提交</button>
+</form>
+<hr/>
+
+
+<form class="form-inline" role="form">
+
+    <div class="input-group">
+        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+        <input class="form-control " id="daterange-singledate-text" style="width: 100px"/>
+    </div>
+
+    <div class="input-group">
+        <button type="button" class="btn btn-default pull-right" id="daterange-custom-btn">
+            <i class="fa fa-calendar"></i>
+            <span>时间</span>
+            <i class="fa fa-caret-down"></i>
+        </button>
+    </div>
+
+    <div class="input-group">
+        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+        <input class="form-control " id="daterange-text" style="width: 305px"/>
+    </div>
+</form>
+<hr/>
+
+<div class="row">
+    <div id="dropzone" class="col-md-5">
+        <form action="/upload" class="dropzone" id="demo-upload">
+
+            <div class="dz-message needsclick">
+                <i class="fa fa-cloud-upload fa-3x"></i><h5>将文件拖拽到此区域或者点击上传文件</h5>
+            </div>
+            <div class="fallback">
+                <input name="file" type="file" multiple/>
+            </div>
+        </form>
+    </div>
+</div>
+<!--文件上传开始
+<form class="form-inline dropzone" role="form" id="dropzoneForm" action="/#" method="post"
+      enctype="multipart/form-data">
+    <div class="message">
+    <i class="fa fa-cloud-upload"></i> 将文件拖拽到此区域
+    </div>
+   <div class="fallback">
+       <input name="file" type="file" multiple/>
+   </div>
+</form> -->
+<!--文件上传结束 -->
+<hr/>
+
+<form class="form-horizontal" role="form">
+
+    <div class="form-group">
+        <label class="col-sm-2 control-label">静态文本</label>
+        <div class="col-sm-3">
+            <p class="form-control-static">静态文本</p>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="" class="col-sm-2 control-label">文本框</label>
+        <div class="col-sm-3">
+            <input type="text" class="form-control" id="text" placeholder="请输入文字">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="" class="col-sm-2 control-label">文本框</label>
+        <div class="col-sm-3">
+            <textarea name="textarea" class="form-control col-sm-2" rows="3"></textarea>
+        </div>
+    </div>
+
+
+    <!-- for 属性规定 label 绑定到哪个表单元素。-->
+    <div class="form-group">
+        <label class="col-sm-2 control-label">单选框</label>
+        <div class="col-sm-3">
+            <label class="radio-inline">
+                <input type="radio" name="" id="optionsRadios3" value="option1" checked> 选项 1
+            </label>
+            <label class="radio-inline">
+                <input type="radio" name="" id="optionsRadios4" value="option2"> 选项 2
+            </label>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-sm-2 control-label">多选框</label>
+        <div class="col-sm-3">
+            <label class="checkbox-inline">
+                <input type="checkbox" id="inlineCheckbox1" value="option1"> 选项 1
+            </label>
+            <label class="checkbox-inline">
+                <input type="checkbox" id="inlineCheckbox2" value="option2"> 选项 2
+            </label>
+            <label class="checkbox-inline">
+                <input type="checkbox" id="inlineCheckbox3" value="option3"> 选项 3
+            </label>
+        </div>
+    </div>
+
+
+    <div class="form-group">
+        <label class="col-sm-2 control-label">选择列表</label>
+        <div class="col-sm-3">
+            <select class="form-control">
+                <option>1</option>
+                <option>2</option>
+                <option>3</option>
+                <option>4</option>
+                <option>5</option>
+            </select>
+        </div>
+    </div>
+
+
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox">请记住我
+                </label>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+            <button type="submit" class="btn btn-default">提交</button>
+        </div>
+    </div>
+</form>
+
+
+<script type="application/javascript">
+
+    function init_daterangepicker() {
+        $('#daterange-singledate-text').daterangepicker(daterangepicker_singleDate_options);
+        $('#daterange-custom-btn').daterangepicker(daterangepicker_custom_options,
+                function (start, end) {
+                    $('#daterange-custom-btn span').html(start.format('YYYY-MM-DD HH:mm') + ' - ' + end.format('YYYY-MM-DD HH:mm'));
+                });
+        //初始化显示当前时间
+        $('#daterange-custom-btn span').html(moment().subtract(1, 'hours').format('YYYY-MM-DD HH:mm') + ' - ' + moment().format('YYYY-MM-DD HH:mm'));
+        //日期控件初始化
+        $('#daterange-text').daterangepicker(daterangepicker_full_options);
+    }
+
+    function init_dropzone() {
+        //  alert($('#dropzoneForm .message').html());
+        $('#dropzoneForm').dropzone({
+            url: "#",
+            dictDefaultMessage: 'aa'
+            ,
+
+        });
+    }
+
+
+    $(document).ready(function () {
+        init_daterangepicker();
+        //init_dropzone();
+
+    });
+</script>
+
+
+</body>
+</html>
+

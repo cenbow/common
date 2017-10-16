@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!--初始化移动浏览显示-->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bootstrap的HTML标准模板</title>
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <!--
+    <link href="css/bootstrap-theme.css" rel="stylesheet">
+    -->
+    <link href="css/local.css" rel="stylesheet">
+    <!--你自己的样式文件 -->
+    <link href="css/font-awesome.min.css" rel="stylesheet">
+
+
+    <!-- 解决ie9以下浏览器对html5新增标签的不识别，并导致CSS不起作用的问题。-->　
+    <script src="http://cdn.bootcss.com/respond.js/1.4.2/respond.js"></script>
+    <!-- 让不支持css3 Media Query的浏览器包括IE6-IE8等其他浏览器支持查询。-->
+    <script src="http://cdn.bootcss.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <!-- 如果要使用Bootstrap的js插件，必须先调入jQuery -->
+    <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+    <!-- 包括所有bootstrap的js插件或者可以根据需要使用的js插件调用　-->
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <div class="col-md-9">
+
+            <form class="" role="form" style="margin: 20px 0px">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="input-group">
+                            <input type="text" class="form-control">
+                            <span class="input-group-btn">
+                                <button class="btn btn-default" type="button">搜索</button>
+                            </span>
+                        </div>
+
+                        <input type="text" class="form-control" placeholder="¥">-<input type="text" class="form-control" placeholder="¥">
+                    </div>
+
+
+
+
+                    <button class="btn btn-default" type="button">搜索</button>
+                </div>
+            </form>
+
+            <!--
+            <div>
+                <div class="btn-group btn-group-sm">
+                    <a class="btn btn-default" href="#">
+                        <i class="fa fa-align-left" title="左对齐"></i>
+                    </a>
+                    <a class="btn btn-default" href="#">
+                        <i class="fa fa-align-center" title="剧中对齐"></i>
+                    </a>
+                    <a class="btn btn-default" href="#">
+                        <i class="fa fa-align-right" title="右对齐"></i>
+                    </a>
+                    <a class="btn btn-default" href="#">
+                        <i class="fa fa-align-justify" title="平均分布"></i>
+                    </a>
+                </div>
+            </div>
+-->
+            <!--  查询列表 开始-->
+            <div class="table-responsive">
+                <table class="table  table-bordered table-hover ">
+                    <!--
+                    <caption>查询列表</caption>
+                    -->
+                    <thead>
+                    <tr>
+                        <th class="text-center text-middle"><input type="checkbox"/></th>
+                        <th width="30%">标题
+                            <a href="#" class="pull-right"><i class="fa fa-sort-asc fa-fw "></i></a>
+                        </th>
+                        <th><i class="fa fa-rmb fa-fw"></i>价格
+                            <a href="#" class="pull-right"><i class="fa fa-sort fa-fw "></i></a>
+                        </th>
+                        <th class="text-middle"><i class="fa fa-calendar fa-fw "></i>日期
+                            <a href="#" class="pull-right"><i class="fa fa-sort fa-fw "></i></a></th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr class="active">
+                        <td class="text-center text-middle">
+                            <input type="checkbox" id="ck_1" name="ck" value="1">
+                        </td>
+                        <td class="text-middle">title1</td>
+                        <td class="text-right  text-middle">34.5</td>
+                        <td class="text-center text-middle">17/10/13 14:00</td>
+                        <td>
+                            <a class="btn btn-default btn-sm" href="#"><i class="fa fa-info-circle fa-fw"></i>详情</a>
+                            <a class="btn btn-default btn-sm" href="#"><i class="fa fa-cog"></i> 修改</a>
+                            <a class="btn btn-default btn-sm" href="#"><i class="fa fa-trash-o"></i> 删除</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="text-center text-middle">
+                            <input type="checkbox" id="ck_1" name="ck" value="1">
+                        </td>
+                        <td class="text-middle">title1</td>
+                        <td class="text-right  text-middle danger">34.5</td>
+                        <td class="text-center text-middle">17/10/13 14:00</td>
+                        <td>
+                            <a class="btn btn-default btn-sm" href="#"><i class="fa fa-info-circle fa-fw"></i>详情</a>
+                            <a class="btn btn-default btn-sm" href="#"><i class="fa fa-cog"></i> 修改</a>
+                            <a class="btn btn-default btn-sm" href="#"><i class="fa fa-trash-o"></i> 删除</a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <!--  查询列表 结束-->
+
+            <!-- 分页 开始 -->
+            <div class="row-table" style="margin-top: -15px">
+
+                <div class="pull-middle">当前 1/100页</div>
+
+                <ul class="pagination pull-right pull-middle">
+                    <li class="disabled"><a href="#"><i class="fa fa-chevron-left"></i>上一页</a></li>
+                    <li class="active"><a href="#">1</a></li>
+                    <li><a href="#">2</a></li>
+                    <li><a href="#">3</a></li>
+                    <li><a href="#">4</a></li>
+                    <li><a href="#">5</a></li>
+                    <li><a href="#"><i class="fa fa-ellipsis-h"></i></a></li>
+                    <li><a href="#">下一页<i class="fa fa-chevron-right"></i></a></li>
+                </ul>
+                <div class="pull-middle">
+                    <a class="btn btn-default">确定</a>
+                </div>
+            </div>
+            <!-- 分页 结束 -->
+        </div>
+    </div>
+
+</div>
+</body>
+</html>
