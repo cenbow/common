@@ -8,6 +8,7 @@ public class User {
     private Long id;
     private String name;
     private Integer age;
+    private Long createTime;
 
     public User() {
         
@@ -40,6 +41,14 @@ public class User {
 
     public void setAge(Integer age) {
         this.age = age;
+    }
+
+    public Long getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Long createTime) {
+        this.createTime = createTime;
     }
 
     @Override

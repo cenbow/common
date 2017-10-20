@@ -49,4 +49,11 @@ public interface UserMapper extends UserDao {
 
     @SelectProvider(type = UserSqlProvider.class, method = "findUsersByExample")
     List<User> findUsersByExample(User user,  String order, Boolean isAsc);
+
+    @Delete("delete from user where id <= #{maxId} order by id limit #{limit}")
+    public int deleteUsers(@Param("maxId") long maxId, @Param("limit") int limit);
+
+
+    @Select("select max(id) from user where created_time < #{createdTime}")
+    public Long findMaxId(@Param("createdTime") long createdTime);
 }
