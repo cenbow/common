@@ -1,0 +1,44 @@
+.table tbody tr td.text-middle, .table tbody tr th.text-middle {
+    vertical-align: middle;
+}
+
+.row-table {
+    display: table;
+    width: 100%;
+}
+
+.row-table .pull-middle {
+    display: table-cell;
+    vertical-align: middle;
+}
+
+.center-vertical {
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.side-nav {
+    margin-left: -225px;
+    left: 225px;
+    width: 225px;
+    position: fixed;
+    top: 50px;
+    height: 100%;
+    border-radius: 0;
+    border: none;
+    background-color: #eee;
+    overflow-y: auto;
+}
+
+.side-nav > li > a {
+    width: 225px;
+}
+
+.fixed-btn {
+    position: fixed;
+    right: 2%;
+    bottom: 10%;
+    z-index: 1040;
+    -webkit-backface-visibility: hidden;
+}

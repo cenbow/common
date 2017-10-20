@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!--初始化移动浏览显示-->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bootstrap的HTML标准模板</title>
+    <!-- Bootstrap -->
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="http://cdn.bootcss.com/bootstrap-daterangepicker/2.1.25/daterangepicker.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcss.com/dropzone/5.2.0/min/dropzone.min.css" rel="stylesheet">
+    <link href="css/local.css" rel="stylesheet">
+
+    <!-- 解决ie9以下浏览器对html5新增标签的不识别，并导致CSS不起作用的问题。-->　
+    <script src="http://cdn.bootcss.com/respond.js/1.4.2/respond.js"></script>
+    <!-- 让不支持css3 Media Query的浏览器包括IE6-IE8等其他浏览器支持查询。-->
+    <script src="http://cdn.bootcss.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <!-- 如果要使用Bootstrap的js插件，必须先调入jQuery -->
+    <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+    <!-- 包括所有bootstrap的js插件或者可以根据需要使用的js插件调用　-->
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <script src="http://cdn.bootcss.com/bootstrap-daterangepicker/2.1.25/moment.min.js"></script>
+    <script src="http://cdn.bootcss.com/bootstrap-daterangepicker/2.1.25/daterangepicker.min.js"></script>
+    <script src="http://www.dropzonejs.com/js/dropzone.js?v=1507306640"></script>
+    <!--
+    <script src="https://cdn.bootcss.com/dropzone/5.2.0/min/dropzone.min.js"></script>
+    -->
+    <script src="js/dropzone.js"></script>
+    <script src="js/widgets.js"></script>
+
+</head>
+<body>
+
+<!-- 按钮触发模态框
+ data-target="#modal" 是您想要在页面上加载的模态框的目标
+ data-toggle="modal"，用于打开模态窗口。-->
+<button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#modal">开始演示模态框</button>
+<a data-toggle="modal" data-remote="modal-remote.html" data-target="#modal-remote">请点击我</a>
+
+<button class="btn btn-primary btn-lg" id="alertBtn">警告</button>
+
+
+<!-- 模态框（Modal）
+.modal，用来把 <div> 的内容识别为模态框
+.fade 模态框被切换时，它会引起内容淡入淡出
+aria-labelledby="myModalLabel"，该属性引用模态框的标题
+aria-hidden="true" 用于保持模态窗口不可见，直到触发器被触发为止-->
+<div class="modal fade" id="modal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="width: 1000px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabel">模态框（Modal）标题</h4>
+            </div>
+            <div class="modal-body">在这里添加一些文本</div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary">提交更改</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+
+
+
+
+<div class="modal fade" id="modal-remote" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="width: 1000px;">
+        <div class="modal-content">
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+
+
+
+
+
+
+<div class="modal fade" id="modal2" tabindex="-1" role="dialog" aria-labelledby="modalLabel2" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <!-- .modal-body模态窗口的主体设置样式 -->
+            <div class="modal-body">在这里添加一些文本
+
+                <button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#modal">开始演示模态框</button>
+
+
+            </div>
+            <!-- .modal-footer模态窗口的底部设置样式-->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary">提交更改</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+
+
+<div class="alert alert-warning in" aria-hidden="true">
+    <a href="#" class="close" data-dismiss="alert">
+        &times;
+    </a>
+    <strong>警告！</strong>您的网络连接有问题。
+</div>
+
+PNotify
+
+<script>
+    $(function () {
+        $('#modal').on('hidden.bs.modal', function () {
+            // 执行一些动作...
+         //   alert('aa');
+        });
+
+        $('#alertBtn').click(function(){
+            $('.alert').alert();
+        });
+    });
+
+
+</script>
+
+</body>
+</html>
