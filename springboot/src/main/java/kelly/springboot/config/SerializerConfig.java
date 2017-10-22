@@ -8,11 +8,16 @@ import org.springframework.context.annotation.Configuration;
  */
 
 @Configuration
-public class JsonConfig {
+public class SerializerConfig {
 
     @Bean
     public JacksonSerializer jacksonSerializer() {
         return new JacksonSerializer();
     }
 
+
+    @Bean
+    public JacksonXmlSerializer jacksonXmlSerializer() {
+        return new JacksonXmlSerializer();
+    }
 }

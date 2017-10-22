@@ -10,7 +10,7 @@ import java.util.Date;
  * Created by kelly-lee on 2017/9/27.
  */
 @Component
-public class DynamicTask extends BaseTask {
+public class DynamicTask extends BaseTask{
 
     private Logger logger = LoggerFactory.getLogger(DynamicTask.class);
 

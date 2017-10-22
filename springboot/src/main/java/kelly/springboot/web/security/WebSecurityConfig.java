@@ -1,11 +1,13 @@
 //package kelly.springboot.web.security;
 //
 //import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.context.annotation.Configuration;
 //import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 //import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+//import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 //import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 //
-////@Configuration
+//@Configuration
 ////开启Spring Security的功能
 ////@EnableWebSecurity
 //public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
@@ -15,7 +17,7 @@
 //                //authorizeRequests哪些URL需要被保护、哪些不需要被保护
 //                .authorizeRequests()
 //                // /和/user不需要任何认证就可以访问
-//                .antMatchers("/", "/user", "/v").permitAll()
+//                .antMatchers("/", "/user").permitAll()
 //                //其他的路径都必须通过身份验证。
 //                .anyRequest().authenticated()
 //                .and()
