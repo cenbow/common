@@ -5,10 +5,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Created by zhanxixu on 2017/10/12.
@@ -23,7 +25,9 @@ public class RestConfig {
 //        template.getMessageConverters().add(converter);
 //        template.getMessageConverters().add(new StringHttpMessageConverter(Charset.forName("UTF-8")));
 //        template.setErrorHandler(new ErrorHandler());
-        return new RestTemplate();
+        RestTemplate restTemplate = new RestTemplate();
+        restTemplate.getMessageConverters().set(1, new StringHttpMessageConverter(StandardCharsets.UTF_8));
+        return restTemplate;
     }
 
 

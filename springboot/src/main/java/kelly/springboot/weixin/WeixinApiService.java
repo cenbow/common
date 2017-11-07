@@ -18,7 +18,7 @@ public class WeixinApiService {
     @Autowired
     private RestTemplate restTemplate;
 
-    private String accessToken = "lJKSQCK0yvUlWMpbO07kkvHVlWZtG9TwGkyeQS2vqpUm-x7Fb0a44FrPhT5dHy-l2oG9FA2xIO8oEkZElm5XK23bZLJbdiQQmI5NHALkSkiFnfd0qTdcs4yRpTExUTpIFPRcACAXHJ";
+    private String accessToken = "wYaEkk50nAPXgeiF1SJkmaMoBNNT7LIAca3_iZ5SgodOctDUOREOeJdXtUZPJA9AQdVvn33NjwIrgbfql2rNsVWhQBViYi69_7YJ77DWkJAQ-WC9ENWaeiRsPITEs55pSIYeADADTJ";
 
 
     private String tokenUrl = "https://api.weixin.qq.com/cgi-bin/token?grant_type={grantType}&appid={appid}&secret={secret}";
@@ -44,5 +44,26 @@ public class WeixinApiService {
         return restTemplate.getForObject(callbackipUrl, String.class, accessToken);
     }
 
+    //https://api.weixin.qq.com/cgi-bin/user/info?access_token=ACCESS_TOKEN&openid=OPENID&lang=zh_CN
+    private String userInfoUrl = "https://api.weixin.qq.com/cgi-bin/user/info?access_token={accessToken}&openid={openId}&lang=zh_CN";
 
+    public String userInfo() {
+        Map<String, String> param = ImmutableMap.of("accessToken", accessToken, "openId", Constants.OPENID);
+        return restTemplate.getForObject(userInfoUrl, String.class, param);
+    }
+
+    private String userInfoBatchgetUrl = "https://api.weixin.qq.com/cgi-bin/user/info/batchget?access_token={accessToken}";
+
+    public String userInfoBatchget() {
+        Map<String, String> param = ImmutableMap.of("accessToken", accessToken);
+        return restTemplate.getForObject(userInfoBatchgetUrl, String.class, param);
+    }
+
+    private String menuGetUrl="https://api.weixin.qq.com/cgi-bin/menu/get?access_token={accessToken}";
+//{"menu":{"button":[{"name":"服务列表","sub_button":[{"type":"view","name":"绑卡","url":"http:\/\/www.soso.com\/","sub_button":[]},{"type":"view","name":"查看信息","url":"http:\/\/v.qq.com\/","sub_button":[]},{"type":"click","name":"赞一下我们","key":"V1001_GOOD","sub_button":[]}]},{"type":"click","name":"活动","key":"V1001_TODAY_MUSIC","sub_button":[]}]}}
+
+    public String menuGet() {
+        Map<String, String> param = ImmutableMap.of("accessToken", accessToken);
+        return restTemplate.getForObject(menuGetUrl, String.class, param);
+    }
 }
