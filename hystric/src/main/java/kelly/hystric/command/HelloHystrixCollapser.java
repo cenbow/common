@@ -9,11 +9,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class CommandCollapserGetValueForKey extends HystrixCollapser<List<String>, String, Integer> {
+public class HelloHystrixCollapser extends HystrixCollapser<List<String>, String, Integer> {
 
     private final Integer key;
 
-    public CommandCollapserGetValueForKey(Integer key) {
+    public HelloHystrixCollapser(Integer key) {
         this.key = key;
     }
 
