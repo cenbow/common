@@ -24,12 +24,13 @@
         <module>jvm</module>
         <module>mybatis</module>
         <module>springboot</module>
+        <module>hystric</module>
         <module>httpclient</module>
     </modules>
 
     <properties>
-        <java_source_version>1.7</java_source_version>
-        <java_target_version>1.7</java_target_version>
+        <java_source_version>1.8</java_source_version>
+        <java_target_version>1.8</java_target_version>
         <maven_deploy_skip>false</maven_deploy_skip>
         <guava.version>15.0</guava.version>
         <org.slf4j.version>1.7.5</org.slf4j.version>
