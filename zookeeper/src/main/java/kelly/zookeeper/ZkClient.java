@@ -1,107 +1,52 @@
 package kelly.zookeeper;
 
-import org.apache.curator.RetryPolicy;
-import org.apache.curator.framework.CuratorFramework;
-import org.apache.curator.framework.CuratorFrameworkFactory;
-import org.apache.curator.framework.api.ACLProvider;
-import org.apache.curator.framework.state.ConnectionState;
+import org.apache.curator.framework.recipes.cache.NodeCacheListener;
+import org.apache.curator.framework.recipes.cache.PathChildrenCacheListener;
+import org.apache.curator.framework.recipes.cache.TreeCacheListener;
 import org.apache.curator.framework.state.ConnectionStateListener;
-import org.apache.curator.retry.ExponentialBackoffRetry;
-import org.apache.curator.retry.RetryNTimes;
-import org.apache.curator.retry.RetryUntilElapsed;
 import org.apache.zookeeper.CreateMode;
-import org.apache.zookeeper.ZooDefs;
-import org.apache.zookeeper.data.ACL;
-import org.apache.zookeeper.data.Id;
+import org.apache.zookeeper.data.Stat;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
 
 /**
- * Created by kelly.li on 17/11/14.
+ * Created by kelly-lee on 2017/11/16.
  */
-//异步
-//授权
-//限制
-public class ZkClient {
+public interface ZkClient {
 
-    CuratorFramework curatorFramework;
-    //重试3次,第一次间隔1s,往后间隔时间递增
-    RetryPolicy exponentialBackoffRetry = new ExponentialBackoffRetry(1000, 3);
-    //重试5次,每次间隔1s
-    RetryPolicy retryNTimes = new RetryNTimes(5, 1000);
-    //重试5s,每次间隔1s
-    RetryPolicy retryUntilElapsed = new RetryUntilElapsed(5000, 1000);
+    public void start();
 
-    ACLProvider aclProvider = new ACLProvider() {
-        private List<ACL> acl ;
+    public void addConnectionStateListener(ConnectionStateListener connectionStateListener);
 
-        public List<ACL> getDefaultAcl() {
-            if(acl ==null){
-                ArrayList<ACL> acl = ZooDefs.Ids.CREATOR_ALL_ACL;
-                acl.clear();
-                acl.add(new ACL(ZooDefs.Perms.ALL, new Id("auth", "admin:admin") ));
-                this.acl = acl;
-            }
-            return acl;
-        }
+    public void create(String path) throws Exception;
 
-        public List<ACL> getAclForPath(String path) {
-            return acl;
-        }
-    };
+    public void createEphemeral(String path) throws Exception;
 
-    public ZkClient(String connectString) {
-        //this(connectString, "", 5000, 5000, new ExponentialBackoffRetry(1000, 3));
-    }
+    public void create(String path, CreateMode createMode, byte[] data) throws Exception;
 
-    public ZkClient(String connectString, String namespace) {
-       // this(connectString, namespace, 5000, 5000, new ExponentialBackoffRetry(1000, 3));
-    }
+    public Stat setData(String path, byte[] data) throws Exception;
 
+    public Stat setData(String path, byte[] data, int version) throws Exception;
 
-    public ZkClient(String connectString, String namespace, String scheme, String auth, int sessionTimeoutMs, int connectionTimeoutMs, RetryPolicy retryPolicy) {
-        CuratorFramework curatorFramework = CuratorFrameworkFactory.builder()
-                .connectString(connectString).namespace(namespace).authorization(scheme, auth.getBytes()).
-                        connectionTimeoutMs(connectionTimeoutMs).sessionTimeoutMs(sessionTimeoutMs).retryPolicy(retryPolicy)
-                .build();
+    public void delele(String path) throws Exception;
 
-        final CountDownLatch countDownLatch = new CountDownLatch(1);
-        curatorFramework.getConnectionStateListenable().addListener(new ConnectionStateListener() {
-            public void stateChanged(CuratorFramework curatorFramework, ConnectionState connectionState) {
-                if (connectionState == ConnectionState.CONNECTED) {
-                    countDownLatch.countDown();
-                }
-            }
-        });
-        ///异步,可以根据ConnectionStateListener得到连接状态
-        curatorFramework.start();
-        try {
-            countDownLatch.await();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
+    public void delele(String path, int version) throws Exception;
 
-    public void createPersistentPath(String path) {
-        try {
-            curatorFramework.create().compressed().creatingParentsIfNeeded().withMode(CreateMode.PERSISTENT).forPath(path);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+    public byte[] getData(String path) throws Exception;
 
-    public void createPath(String path, CreateMode createMode) throws Exception {
-        curatorFramework.create().creatingParentsIfNeeded().withMode(CreateMode.EPHEMERAL).forPath(path);
-    }
+    public String getStringData(String path) throws Exception;
 
+    public List<String> getChildren(String path) throws Exception;
 
-    public void delelePath(String path) {
-        try {
-            curatorFramework.delete().guaranteed().deletingChildrenIfNeeded().withVersion(-1).forPath(path);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+    public boolean checkExist(String path) throws Exception;
+
+    public Stat stat(String path) throws Exception;
+
+    public void addNodeCacheListener(String path, NodeCacheListener nodeCacheListener) throws Exception;
+
+    public void addPathChildrenCacheListener(String path, PathChildrenCacheListener pathChildrenCacheListener) throws Exception;
+
+    public void addTreeCacheListener(String path, TreeCacheListener treeCacheListener) throws Exception;
+
+    public void close();
 }
