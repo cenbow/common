@@ -1,8 +1,10 @@
 package kelly.zookeeper;
 
+import kelly.zookeeper.leader.LeaderLatchClient;
 import org.apache.curator.framework.recipes.cache.NodeCacheListener;
 import org.apache.curator.framework.recipes.cache.PathChildrenCacheListener;
 import org.apache.curator.framework.recipes.cache.TreeCacheListener;
+import org.apache.curator.framework.recipes.leader.LeaderLatchListener;
 import org.apache.curator.framework.state.ConnectionStateListener;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.data.Stat;
@@ -47,6 +49,8 @@ public interface ZkClient {
     public void addPathChildrenCacheListener(String path, PathChildrenCacheListener pathChildrenCacheListener) throws Exception;
 
     public void addTreeCacheListener(String path, TreeCacheListener treeCacheListener) throws Exception;
+
+    public LeaderLatchClient addLeaderLatchListener(String path, String id, LeaderLatchListener leaderLatchListener) throws Exception;
 
     public void close();
 }

@@ -1,11 +1,19 @@
 package kelly.zookeeper;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.Maps;
+import kelly.zookeeper.leader.LeaderLatchClient;
+import kelly.zookeeper.watcher.NodeCacheWatcher;
+import kelly.zookeeper.watcher.PathChildrenCacheWatcher;
+import kelly.zookeeper.watcher.TreeCacheWatcher;
 import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.api.ACLProvider;
-import org.apache.curator.framework.recipes.cache.*;
+import org.apache.curator.framework.recipes.cache.NodeCacheListener;
+import org.apache.curator.framework.recipes.cache.PathChildrenCacheListener;
+import org.apache.curator.framework.recipes.cache.TreeCacheListener;
+import org.apache.curator.framework.recipes.leader.LeaderLatchListener;
 import org.apache.curator.framework.state.ConnectionState;
 import org.apache.curator.framework.state.ConnectionStateListener;
 import org.apache.curator.retry.ExponentialBackoffRetry;
@@ -20,9 +28,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -59,6 +66,12 @@ public class DefaultZkClient implements ZkClient {
             return ZooDefs.Ids.CREATOR_ALL_ACL;
         }
     };
+
+
+    private ConcurrentMap<String, NodeCacheWatcher> nodeCacheWatchers = Maps.newConcurrentMap();
+    private ConcurrentMap<String, PathChildrenCacheWatcher> pathChildrenCacheWatchers = Maps.newConcurrentMap();
+    private ConcurrentMap<String, TreeCacheWatcher> treeCacheWatchers = Maps.newConcurrentMap();
+    private ConcurrentMap<String, LeaderLatchClient> leaderLatchClients = Maps.newConcurrentMap();
 
     public DefaultZkClient(String connectString) {
         curatorFramework = CuratorFrameworkFactory.newClient(connectString, RETRY_INFINITY);
@@ -188,22 +201,29 @@ public class DefaultZkClient implements ZkClient {
     }
 
     public void addNodeCacheListener(String path, NodeCacheListener nodeCacheListener) throws Exception {
-        NodeCache nodeCache = new NodeCache(curatorFramework, path, false);
-        nodeCache.getListenable().addListener(nodeCacheListener);
-        nodeCache.start();
+        NodeCacheWatcher nodeCacheWatcher = nodeCacheWatchers.getOrDefault(path, new NodeCacheWatcher(curatorFramework, path));
+        nodeCacheWatchers.putIfAbsent(path, nodeCacheWatcher);
+        nodeCacheWatcher.addListener(nodeCacheListener);
+
     }
 
     public void addPathChildrenCacheListener(String path, PathChildrenCacheListener pathChildrenCacheListener) throws Exception {
-        PathChildrenCache childrenCache = new PathChildrenCache(curatorFramework, path, true);
-        childrenCache.getListenable().addListener(pathChildrenCacheListener);
-        childrenCache.start(PathChildrenCache.StartMode.POST_INITIALIZED_EVENT);
+        PathChildrenCacheWatcher pathChildrenCacheWatcher = pathChildrenCacheWatchers.getOrDefault(path, new PathChildrenCacheWatcher(curatorFramework, path));
+        pathChildrenCacheWatchers.putIfAbsent(path, pathChildrenCacheWatcher);
+        pathChildrenCacheWatcher.addListener(pathChildrenCacheListener);
     }
 
     public void addTreeCacheListener(String path, TreeCacheListener treeCacheListener) throws Exception {
-        ExecutorService pool = Executors.newCachedThreadPool();
-        TreeCache treeCache = new TreeCache(curatorFramework, path);
-        treeCache.getListenable().addListener(treeCacheListener);
-        treeCache.start();
+        TreeCacheWatcher treeCacheWatcher = treeCacheWatchers.getOrDefault(path, new TreeCacheWatcher(curatorFramework, path));
+        treeCacheWatchers.putIfAbsent(path, treeCacheWatcher);
+        treeCacheWatcher.addListener(treeCacheListener);
+    }
+
+    public LeaderLatchClient addLeaderLatchListener(String path, String id, LeaderLatchListener leaderLatchListener) throws Exception {
+        LeaderLatchClient leaderLatchClient = leaderLatchClients.getOrDefault(path, new LeaderLatchClient(curatorFramework, path, id));
+        leaderLatchClients.putIfAbsent(path, leaderLatchClient);
+        leaderLatchClient.addListener(leaderLatchListener);
+        return leaderLatchClient;
     }
 
 

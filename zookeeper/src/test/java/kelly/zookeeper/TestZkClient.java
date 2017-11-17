@@ -1,9 +1,12 @@
 package kelly.zookeeper;
 
+import com.google.common.collect.Lists;
+import kelly.zookeeper.leader.LeaderLatchClient;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.cache.ChildData;
 import org.apache.curator.framework.recipes.cache.TreeCacheEvent;
 import org.apache.curator.framework.recipes.cache.TreeCacheListener;
+import org.apache.curator.framework.recipes.leader.LeaderLatchListener;
 import org.apache.zookeeper.data.Stat;
 import org.junit.After;
 import org.junit.Before;
@@ -16,7 +19,8 @@ import java.util.List;
  */
 public class TestZkClient {
 
-    String connectString = "10.141.6.139:2181,10.141.6.140:2181,10.141.6.141:2181";
+    //String connectString = "10.141.6.139:2181,10.141.6.140:2181,10.141.6.141:2181";
+    String connectString = "192.168.99.100:2181";
     String namespace = "test";
     String username = "admin";
     String password = "123";
@@ -82,7 +86,6 @@ public class TestZkClient {
     @Test
     public void testAddTreeCacheListener() throws Exception {
         curZkClient.addTreeCacheListener("/", new TreeCacheListener() {
-            @Override
             public void childEvent(CuratorFramework curatorFramework, TreeCacheEvent treeCacheEvent) throws Exception {
                 ChildData data = treeCacheEvent.getData();
                 switch (treeCacheEvent.getType()) {
@@ -90,7 +93,7 @@ public class TestZkClient {
                         System.out.println("NODE_ADDED : " + data.getPath() + "  数据:" + new String(data.getData()));
                         break;
                     case NODE_REMOVED:
-                        System.out.println("NODE_REMOVED : " + data.getPath() );
+                        System.out.println("NODE_REMOVED : " + data.getPath());
                         break;
                     case NODE_UPDATED:
                         System.out.println("NODE_UPDATED : " + data.getPath() + "  数据:" + new String(data.getData()));
@@ -101,6 +104,33 @@ public class TestZkClient {
                 }
             }
         });
+        System.in.read();
+    }
+
+    @Test
+    public void test1() throws Exception {
+        List<ZkClient> zkClients = Lists.newArrayList();
+        for (int i = 1; i < 4; i++) {
+            zkClients.add(new DefaultZkClient(connectString, namespace, username, password));
+            zkClients.add(zkClient);
+        }
+        for(ZkClient curZkClient :zkClients) {
+            LeaderLatchClient leaderLatchClient = curZkClient.addLeaderLatchListener("/leader", "id1", new LeaderLatchListener() {
+                @Override
+                public void isLeader() {
+                    System.out.println("isLeader");
+                }
+
+                @Override
+                public void notLeader() {
+                    System.out.println("notLeader");
+                }
+            });
+            Thread.sleep(2000);
+            System.out.println(leaderLatchClient.hasLeadership());
+            System.out.println(leaderLatchClient.getId());
+            System.out.println("----------------------------");
+        }
         System.in.read();
     }
 
