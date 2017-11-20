@@ -4,6 +4,7 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Maps;
 import kelly.zookeeper.leader.LeaderLatchSelector;
 import kelly.zookeeper.leader.LeaderSelector;
+import kelly.zookeeper.lock.InterProcessMutexLock;
 import kelly.zookeeper.observer.EventResolver;
 import kelly.zookeeper.observer.ZkObserver;
 import kelly.zookeeper.watcher.NodeCacheWatcher;
@@ -49,6 +50,8 @@ public class DefaultZkClient implements ZkClient {
     private ConcurrentMap<String, LeaderLatchSelector> leaderLatchSeletors = Maps.newConcurrentMap();
     private ConcurrentMap<String, ZkObserver> zkObservers = Maps.newConcurrentMap();
     private ConcurrentMap<String, LeaderSelector> leaderSelectors = Maps.newConcurrentMap();
+    private ConcurrentMap<String, LeaderLatchSelector> leaderLatchSelectors = Maps.newConcurrentMap();
+    private ConcurrentMap<String, InterProcessMutexLock> interProcessMutexLocks = Maps.newConcurrentMap();
 
     public DefaultZkClient(String connectString) {
         curatorFramework = CuratorFrameworkFactory.newClient(connectString, RETRY_INFINITY);
@@ -65,10 +68,6 @@ public class DefaultZkClient implements ZkClient {
         curatorFramework = CuratorFrameworkFactory.builder().connectString(connectString).namespace(namespace)
                 .authorization(SCHEME_DIGEST, auth.getBytes()).aclProvider(CREATOR_ALL_ACL_PROVIDER).retryPolicy(RETRY_INFINITY).build();
         start();
-    }
-
-    public CuratorFramework getCuratorFramework() {
-        return curatorFramework;
     }
 
     @Override
@@ -233,6 +232,21 @@ public class DefaultZkClient implements ZkClient {
         LeaderSelector leaderSelector = leaderSelectors.getOrDefault(path, new LeaderSelector(curatorFramework, path, id));
         leaderSelectors.putIfAbsent(path, leaderSelector);
         return leaderSelector;
+    }
+
+    public InterProcessMutexLock acquire(String path) throws Exception {
+        InterProcessMutexLock interProcessMutexLock = interProcessMutexLocks.getOrDefault(path, new InterProcessMutexLock(curatorFramework, path));
+        interProcessMutexLocks.putIfAbsent(path, interProcessMutexLock);
+        interProcessMutexLock.acquire();
+        return interProcessMutexLock;
+    }
+
+    public LeaderLatchSelector getLeaderLatchSelector(String path) {
+        return leaderLatchSelectors.get(path);
+    }
+
+    public CuratorFramework getCuratorFramework() {
+        return curatorFramework;
     }
 
 

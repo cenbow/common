@@ -1,8 +1,9 @@
 package kelly.zookeeper;
 
 import com.google.common.base.Splitter;
-import kelly.zookeeper.leader.LeaderLatchSelector;
 import kelly.zookeeper.leader.LeaderSelector;
+import kelly.zookeeper.leader.LeaderLatchSelector;
+import kelly.zookeeper.lock.InterProcessMutexLock;
 import kelly.zookeeper.observer.EventResolver;
 import kelly.zookeeper.observer.ZkObserver;
 import kelly.zookeeper.watcher.NodeCacheWatcher;
@@ -54,8 +55,6 @@ public interface ZkClient {
 
     public final Splitter PATH_SPLITTER = Splitter.on("/").omitEmptyStrings().trimResults();
 
-    public CuratorFramework getCuratorFramework();
-
     public void start();
 
     public void addConnectionStateListener(ConnectionStateListener connectionStateListener);
@@ -95,6 +94,12 @@ public interface ZkClient {
     public LeaderSelector addLeaderSelectorListener(String path, String id) throws Exception;
 
     public ZkObserver addObserver(String path, EventResolver eventResolver) throws Exception;
+
+    public LeaderLatchSelector getLeaderLatchSelector(String path);
+
+    public InterProcessMutexLock acquire(String path) throws Exception;
+
+    public CuratorFramework getCuratorFramework();
 
     public void close();
 }

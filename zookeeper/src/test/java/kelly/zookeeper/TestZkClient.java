@@ -2,6 +2,7 @@ package kelly.zookeeper;
 
 import com.google.common.collect.Lists;
 import kelly.zookeeper.leader.LeaderLatchSelector;
+import kelly.zookeeper.lock.InterProcessMutexLock;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.cache.ChildData;
 import org.apache.curator.framework.recipes.cache.TreeCacheEvent;
@@ -12,6 +13,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.EOFException;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -110,6 +113,7 @@ public class TestZkClient {
                     case NODE_UPDATED:
                         System.out.println("NODE_UPDATED : " + data.getPath() + "  数据:" + new String(data.getData()));
                         break;
+
                     default:
                         break;
                 }
@@ -119,22 +123,44 @@ public class TestZkClient {
     }
 
     @Test
-    public void test1() throws Exception {
+    public void testLeader() throws Exception {
+        String path = "/leader";
         List<ZkClient> zkClients = Lists.newArrayList();
         for (int i = 1; i < 4; i++) {
             zkClients.add(new DefaultZkClient(connectString, namespace, username, password));
-            zkClients.add(zkClient);
         }
+        int j = 0;
         for (ZkClient curZkClient : zkClients) {
-            LeaderLatchSelector leaderLatchSelector = curZkClient.addLeaderLatchListener("/leader", "id1", new LeaderLatchListener() {
+            LeaderLatchSelector leaderLatchSelector = curZkClient.addLeaderLatchListener(path, "id" + j++, new LeaderLatchListener() {
+
+
                 @Override
                 public void isLeader() {
-                    System.out.println("isLeader");
+
+
+                    LeaderLatchSelector selector = curZkClient.getLeaderLatchSelector(path);
+                    String id = selector.getId();
+                    System.out.println(id + " isLeader");
+                    try {
+                        Thread.sleep(5000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    selector.close();
+                    try {
+                        zkClients.get((Integer.valueOf(id.substring(2)) + 2) % 3).getLeaderLatchSelector(path).await();
+                    } catch (EOFException e) {
+                        e.printStackTrace();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
 
                 @Override
                 public void notLeader() {
-                    System.out.println("notLeader");
+                    LeaderLatchSelector selector = curZkClient.getLeaderLatchSelector(path);
+                    String id = selector.getId();
+                    System.out.println(id + " notLeader");
                 }
             });
             Thread.sleep(2000);
@@ -145,9 +171,51 @@ public class TestZkClient {
         System.in.read();
     }
 
+    @Test
+    public void testLock() throws IOException {
+        String path = "/lock";
+        List<ZkClient> zkClients = Lists.newArrayList();
+        for (int i = 1; i < 4; i++) {
+            zkClients.add(new DefaultZkClient(connectString, namespace, username, password));
+        }
+        int j = 0;
+        for (ZkClient curZkClient : zkClients) {
+            ZkLockThread zkLockThread = new ZkLockThread(++j, curZkClient, path);
+            new Thread(zkLockThread).start();
+        }
+        System.in.read();
+    }
+
+    class ZkLockThread implements Runnable {
+
+        private int id;
+        private ZkClient zkClient;
+        private String path;
+
+        public ZkLockThread(int id, ZkClient zkClient, String path) {
+            this.id = id;
+            this.zkClient = zkClient;
+            this.path = path;
+        }
+
+        @Override
+        public void run() {
+            try {
+                InterProcessMutexLock interProcessMutexLock = zkClient.acquire(path);
+                System.out.println(id + "ac");
+                Thread.sleep(5000);
+                interProcessMutexLock.release();
+                System.out.println(id + "release");
+            } catch (Exception e) {
+            }
+        }
+    }
+
+
     @After
     public void after() {
         zkClient.close();
         zkClientWithNs.close();
     }
 }
+
