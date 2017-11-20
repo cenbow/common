@@ -1,20 +1,60 @@
 package kelly.zookeeper;
 
-import kelly.zookeeper.leader.LeaderLatchClient;
+import com.google.common.base.Splitter;
+import kelly.zookeeper.leader.LeaderLatchSelector;
+import kelly.zookeeper.leader.LeaderSelector;
+import kelly.zookeeper.observer.EventResolver;
+import kelly.zookeeper.observer.ZkObserver;
+import kelly.zookeeper.watcher.NodeCacheWatcher;
+import kelly.zookeeper.watcher.PathChildrenCacheWatcher;
+import kelly.zookeeper.watcher.TreeCacheWatcher;
+import org.apache.curator.RetryPolicy;
+import org.apache.curator.framework.CuratorFramework;
+import org.apache.curator.framework.api.ACLProvider;
 import org.apache.curator.framework.recipes.cache.NodeCacheListener;
 import org.apache.curator.framework.recipes.cache.PathChildrenCacheListener;
 import org.apache.curator.framework.recipes.cache.TreeCacheListener;
 import org.apache.curator.framework.recipes.leader.LeaderLatchListener;
 import org.apache.curator.framework.state.ConnectionStateListener;
+import org.apache.curator.retry.ExponentialBackoffRetry;
+import org.apache.curator.retry.RetryNTimes;
 import org.apache.zookeeper.CreateMode;
+import org.apache.zookeeper.ZooDefs;
+import org.apache.zookeeper.data.ACL;
 import org.apache.zookeeper.data.Stat;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by kelly-lee on 2017/11/16.
  */
 public interface ZkClient {
+
+    public static final String EMPTY_STRING = "";
+    public static final byte[] DEFAULT_DATA = new byte[0];
+    public static final int DEFAULT_VERSION = -1;
+    public static final int EXPONENTIAL_BACKOFF_MAX_RETRIES = 29;
+    public static final String SCHEME_DIGEST = "digest";
+    public static final String SCHEME_IP = "ip";
+    public static final String SCHEME_AUTH = "auth";
+    public static final String SCHEME_WORLD = "world";
+    public static final RetryPolicy RETRY_INFINITY = new RetryNTimes(Integer.MAX_VALUE, (int) TimeUnit.SECONDS.toMillis(5));
+    public static final RetryPolicy EXPONENTIAL_BACKOFF_RETRY_INFINITY = new ExponentialBackoffRetry((int) TimeUnit.SECONDS.toMillis(1), EXPONENTIAL_BACKOFF_MAX_RETRIES);
+
+    public static final ACLProvider CREATOR_ALL_ACL_PROVIDER = new ACLProvider() {
+        public List<ACL> getDefaultAcl() {
+            return ZooDefs.Ids.CREATOR_ALL_ACL;
+        }
+
+        public List<ACL> getAclForPath(String path) {
+            return ZooDefs.Ids.CREATOR_ALL_ACL;
+        }
+    };
+
+    public final Splitter PATH_SPLITTER = Splitter.on("/").omitEmptyStrings().trimResults();
+
+    public CuratorFramework getCuratorFramework();
 
     public void start();
 
@@ -44,13 +84,17 @@ public interface ZkClient {
 
     public Stat stat(String path) throws Exception;
 
-    public void addNodeCacheListener(String path, NodeCacheListener nodeCacheListener) throws Exception;
+    public NodeCacheWatcher addNodeCacheListener(String path, NodeCacheListener nodeCacheListener) throws Exception;
 
-    public void addPathChildrenCacheListener(String path, PathChildrenCacheListener pathChildrenCacheListener) throws Exception;
+    public PathChildrenCacheWatcher addPathChildrenCacheListener(String path, PathChildrenCacheListener pathChildrenCacheListener) throws Exception;
 
-    public void addTreeCacheListener(String path, TreeCacheListener treeCacheListener) throws Exception;
+    public TreeCacheWatcher addTreeCacheListener(String path, TreeCacheListener treeCacheListener) throws Exception;
 
-    public LeaderLatchClient addLeaderLatchListener(String path, String id, LeaderLatchListener leaderLatchListener) throws Exception;
+    public LeaderLatchSelector addLeaderLatchListener(String path, String id, LeaderLatchListener leaderLatchListener) throws Exception;
+
+    public LeaderSelector addLeaderSelectorListener(String path, String id) throws Exception;
+
+    public ZkObserver addObserver(String path, EventResolver eventResolver) throws Exception;
 
     public void close();
 }

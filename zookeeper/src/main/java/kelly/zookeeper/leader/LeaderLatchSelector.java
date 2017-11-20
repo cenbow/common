@@ -3,19 +3,22 @@ package kelly.zookeeper.leader;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.leader.LeaderLatch;
 import org.apache.curator.framework.recipes.leader.LeaderLatchListener;
+import org.apache.curator.utils.CloseableUtils;
 
 import java.io.EOFException;
-import java.io.IOException;
 
 /**
  * Created by kelly.li on 17/11/16.
  */
-public class LeaderLatchClient {
+public class LeaderLatchSelector {
 
     LeaderLatch leaderLatch;
 
-    public LeaderLatchClient(CuratorFramework curatorFramework, String path, String id) throws Exception {
+    public LeaderLatchSelector(CuratorFramework curatorFramework, String path, String id) {
         this.leaderLatch = new LeaderLatch(curatorFramework, path, id);
+    }
+
+    public void start() throws Exception {
         leaderLatch.start();
     }
 
@@ -36,10 +39,6 @@ public class LeaderLatchClient {
     }
 
     public void close() {
-        try {
-            leaderLatch.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        CloseableUtils.closeQuietly(leaderLatch);
     }
 }

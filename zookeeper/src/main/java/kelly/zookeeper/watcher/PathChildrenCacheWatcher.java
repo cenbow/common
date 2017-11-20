@@ -5,8 +5,8 @@ import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.cache.ChildData;
 import org.apache.curator.framework.recipes.cache.PathChildrenCache;
 import org.apache.curator.framework.recipes.cache.PathChildrenCacheListener;
+import org.apache.curator.utils.CloseableUtils;
 
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -17,8 +17,11 @@ public class PathChildrenCacheWatcher {
     private CuratorFramework curatorFramework;
     private PathChildrenCache pathChildrenCache;
 
-    public PathChildrenCacheWatcher(CuratorFramework curatorFramework, String path) throws Exception {
+    public PathChildrenCacheWatcher(CuratorFramework curatorFramework, String path) {
         pathChildrenCache = new PathChildrenCache(curatorFramework, path, true);
+    }
+
+    public void start() throws Exception {
         pathChildrenCache.start();
     }
 
@@ -47,10 +50,6 @@ public class PathChildrenCacheWatcher {
     }
 
     public void close() {
-        try {
-            pathChildrenCache.close();
-        } catch (IOException e) {
-
-        }
+        CloseableUtils.closeQuietly(pathChildrenCache);
     }
 }

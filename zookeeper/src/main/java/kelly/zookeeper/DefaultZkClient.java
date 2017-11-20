@@ -2,26 +2,24 @@ package kelly.zookeeper;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Maps;
-import kelly.zookeeper.leader.LeaderLatchClient;
+import kelly.zookeeper.leader.LeaderLatchSelector;
+import kelly.zookeeper.leader.LeaderSelector;
+import kelly.zookeeper.observer.EventResolver;
+import kelly.zookeeper.observer.ZkObserver;
 import kelly.zookeeper.watcher.NodeCacheWatcher;
 import kelly.zookeeper.watcher.PathChildrenCacheWatcher;
 import kelly.zookeeper.watcher.TreeCacheWatcher;
-import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
-import org.apache.curator.framework.api.ACLProvider;
 import org.apache.curator.framework.recipes.cache.NodeCacheListener;
 import org.apache.curator.framework.recipes.cache.PathChildrenCacheListener;
 import org.apache.curator.framework.recipes.cache.TreeCacheListener;
 import org.apache.curator.framework.recipes.leader.LeaderLatchListener;
 import org.apache.curator.framework.state.ConnectionState;
 import org.apache.curator.framework.state.ConnectionStateListener;
-import org.apache.curator.retry.ExponentialBackoffRetry;
-import org.apache.curator.retry.RetryNTimes;
+import org.apache.curator.utils.CloseableUtils;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.KeeperException;
-import org.apache.zookeeper.ZooDefs;
-import org.apache.zookeeper.data.ACL;
 import org.apache.zookeeper.data.Stat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +28,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Created by kelly.li on 17/11/14.
@@ -45,33 +42,13 @@ public class DefaultZkClient implements ZkClient {
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultZkClient.class);
 
     CuratorFramework curatorFramework;
-    public static final String EMPTY_STRING = "";
-    public static final byte[] DEFAULT_DATA = new byte[0];
-    public static final int DEFAULT_VERSION = -1;
-    public static final int EXPONENTIAL_BACKOFF_MAX_RETRIES = 29;
-    public static final String SCHEME_DIGEST = "digest";
-    public static final String SCHEME_IP = "ip";
-    public static final String SCHEME_AUTH = "auth";
-    public static final String SCHEME_WORLD = "world";
-
-    public static final RetryPolicy RETRY_INFINITY = new RetryNTimes(Integer.MAX_VALUE, (int) TimeUnit.SECONDS.toMillis(5));
-    public static final RetryPolicy EXPONENTIAL_BACKOFF_RETRY_INFINITY = new ExponentialBackoffRetry((int) TimeUnit.SECONDS.toMillis(1), EXPONENTIAL_BACKOFF_MAX_RETRIES);
-
-    public static final ACLProvider CREATOR_ALL_ACL_PROVIDER = new ACLProvider() {
-        public List<ACL> getDefaultAcl() {
-            return ZooDefs.Ids.CREATOR_ALL_ACL;
-        }
-
-        public List<ACL> getAclForPath(String path) {
-            return ZooDefs.Ids.CREATOR_ALL_ACL;
-        }
-    };
-
 
     private ConcurrentMap<String, NodeCacheWatcher> nodeCacheWatchers = Maps.newConcurrentMap();
     private ConcurrentMap<String, PathChildrenCacheWatcher> pathChildrenCacheWatchers = Maps.newConcurrentMap();
     private ConcurrentMap<String, TreeCacheWatcher> treeCacheWatchers = Maps.newConcurrentMap();
-    private ConcurrentMap<String, LeaderLatchClient> leaderLatchClients = Maps.newConcurrentMap();
+    private ConcurrentMap<String, LeaderLatchSelector> leaderLatchSeletors = Maps.newConcurrentMap();
+    private ConcurrentMap<String, ZkObserver> zkObservers = Maps.newConcurrentMap();
+    private ConcurrentMap<String, LeaderSelector> leaderSelectors = Maps.newConcurrentMap();
 
     public DefaultZkClient(String connectString) {
         curatorFramework = CuratorFrameworkFactory.newClient(connectString, RETRY_INFINITY);
@@ -90,6 +67,11 @@ public class DefaultZkClient implements ZkClient {
         start();
     }
 
+    public CuratorFramework getCuratorFramework() {
+        return curatorFramework;
+    }
+
+    @Override
     public void start() {
         final CountDownLatch countDownLatch = new CountDownLatch(1);
         addConnectionStateListener(new ConnectionStateListener() {
@@ -108,14 +90,17 @@ public class DefaultZkClient implements ZkClient {
         }
     }
 
+    @Override
     public void create(String path) throws Exception {
         create(path, CreateMode.PERSISTENT, DEFAULT_DATA);
     }
 
+    @Override
     public void createEphemeral(String path) throws Exception {
         create(path, CreateMode.EPHEMERAL, DEFAULT_DATA);
     }
 
+    @Override
     public void create(String path, CreateMode createMode, byte[] data) throws Exception {
         try {
             curatorFramework.create().creatingParentsIfNeeded().withMode(createMode).forPath(path, data);
@@ -124,10 +109,12 @@ public class DefaultZkClient implements ZkClient {
         }
     }
 
+    @Override
     public Stat setData(String path, byte[] data) throws Exception {
         return setData(path, data, DEFAULT_VERSION);
     }
 
+    @Override
     public Stat setData(String path, byte[] data, int version) throws Exception {
         try {
             return curatorFramework.setData().withVersion(version).forPath(path, data);
@@ -143,10 +130,12 @@ public class DefaultZkClient implements ZkClient {
         }
     }
 
+    @Override
     public void delele(String path) throws Exception {
         delele(path, DEFAULT_VERSION);
     }
 
+    @Override
     public void delele(String path, int version) throws Exception {
         try {
             curatorFramework.delete().guaranteed().deletingChildrenIfNeeded().withVersion(version).forPath(path);
@@ -159,6 +148,7 @@ public class DefaultZkClient implements ZkClient {
         }
     }
 
+    @Override
     public byte[] getData(String path) throws Exception {
         try {
             return curatorFramework.getData().forPath(path);
@@ -171,11 +161,13 @@ public class DefaultZkClient implements ZkClient {
         }
     }
 
+    @Override
     public String getStringData(String path) throws Exception {
         byte[] data = getData(path);
         return data == null ? EMPTY_STRING : new String(getData(path));
     }
 
+    @Override
     public List<String> getChildren(String path) throws Exception {
         try {
             return curatorFramework.getChildren().forPath(path);
@@ -188,48 +180,72 @@ public class DefaultZkClient implements ZkClient {
         }
     }
 
+    @Override
     public boolean checkExist(String path) throws Exception {
         return stat(path) != null;
     }
 
+    @Override
     public Stat stat(String path) throws Exception {
         return curatorFramework.checkExists().forPath(path);
     }
 
+    @Override
     public void addConnectionStateListener(ConnectionStateListener connectionStateListener) {
         curatorFramework.getConnectionStateListenable().addListener(connectionStateListener);
     }
 
-    public void addNodeCacheListener(String path, NodeCacheListener nodeCacheListener) throws Exception {
+    @Override
+    public NodeCacheWatcher addNodeCacheListener(String path, NodeCacheListener nodeCacheListener) throws Exception {
         NodeCacheWatcher nodeCacheWatcher = nodeCacheWatchers.getOrDefault(path, new NodeCacheWatcher(curatorFramework, path));
         nodeCacheWatchers.putIfAbsent(path, nodeCacheWatcher);
         nodeCacheWatcher.addListener(nodeCacheListener);
+        return nodeCacheWatcher;
 
     }
 
-    public void addPathChildrenCacheListener(String path, PathChildrenCacheListener pathChildrenCacheListener) throws Exception {
+    @Override
+    public PathChildrenCacheWatcher addPathChildrenCacheListener(String path, PathChildrenCacheListener pathChildrenCacheListener) throws Exception {
         PathChildrenCacheWatcher pathChildrenCacheWatcher = pathChildrenCacheWatchers.getOrDefault(path, new PathChildrenCacheWatcher(curatorFramework, path));
         pathChildrenCacheWatchers.putIfAbsent(path, pathChildrenCacheWatcher);
         pathChildrenCacheWatcher.addListener(pathChildrenCacheListener);
+        return pathChildrenCacheWatcher;
     }
 
-    public void addTreeCacheListener(String path, TreeCacheListener treeCacheListener) throws Exception {
+    @Override
+    public TreeCacheWatcher addTreeCacheListener(String path, TreeCacheListener treeCacheListener) throws Exception {
         TreeCacheWatcher treeCacheWatcher = treeCacheWatchers.getOrDefault(path, new TreeCacheWatcher(curatorFramework, path));
         treeCacheWatchers.putIfAbsent(path, treeCacheWatcher);
         treeCacheWatcher.addListener(treeCacheListener);
+        return treeCacheWatcher;
     }
 
-    public LeaderLatchClient addLeaderLatchListener(String path, String id, LeaderLatchListener leaderLatchListener) throws Exception {
-        LeaderLatchClient leaderLatchClient = leaderLatchClients.getOrDefault(path, new LeaderLatchClient(curatorFramework, path, id));
-        leaderLatchClients.putIfAbsent(path, leaderLatchClient);
-        leaderLatchClient.addListener(leaderLatchListener);
-        return leaderLatchClient;
+    @Override
+    public LeaderLatchSelector addLeaderLatchListener(String path, String id, LeaderLatchListener leaderLatchListener) throws Exception {
+        LeaderLatchSelector leaderLatchSelector = leaderLatchSeletors.getOrDefault(path, new LeaderLatchSelector(curatorFramework, path, id));
+        leaderLatchSeletors.putIfAbsent(path, leaderLatchSelector);
+        leaderLatchSelector.addListener(leaderLatchListener);
+        return leaderLatchSelector;
+    }
+
+    @Override
+    public LeaderSelector addLeaderSelectorListener(String path, String id) throws Exception {
+        LeaderSelector leaderSelector = leaderSelectors.getOrDefault(path, new LeaderSelector(curatorFramework, path, id));
+        leaderSelectors.putIfAbsent(path, leaderSelector);
+        return leaderSelector;
     }
 
 
+    @Override
+    public ZkObserver addObserver(String path, EventResolver eventResolver) throws Exception {
+        TreeCacheWatcher treeCacheWatcher = treeCacheWatchers.getOrDefault(path, new TreeCacheWatcher(curatorFramework, path));
+        ZkObserver zkObserver = zkObservers.getOrDefault(path, new ZkObserver(treeCacheWatcher));
+        zkObserver.registerEventListener(eventResolver);
+        return zkObserver;
+    }
+
+    @Override
     public void close() {
-        if (curatorFramework != null) {
-            curatorFramework.close();
-        }
+        CloseableUtils.closeQuietly(curatorFramework);
     }
 }

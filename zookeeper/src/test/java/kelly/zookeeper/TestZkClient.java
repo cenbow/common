@@ -1,7 +1,7 @@
 package kelly.zookeeper;
 
 import com.google.common.collect.Lists;
-import kelly.zookeeper.leader.LeaderLatchClient;
+import kelly.zookeeper.leader.LeaderLatchSelector;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.cache.ChildData;
 import org.apache.curator.framework.recipes.cache.TreeCacheEvent;
@@ -89,6 +89,18 @@ public class TestZkClient {
             public void childEvent(CuratorFramework curatorFramework, TreeCacheEvent treeCacheEvent) throws Exception {
                 ChildData data = treeCacheEvent.getData();
                 switch (treeCacheEvent.getType()) {
+                    case CONNECTION_SUSPENDED:
+                        System.out.println("CONNECTION_SUSPENDED");
+                        break;
+                    case CONNECTION_RECONNECTED:
+                        System.out.println("CONNECTION_RECONNECTED");
+                        break;
+                    case CONNECTION_LOST:
+                        System.out.println("CONNECTION_LOST");
+                        break;
+                    case INITIALIZED:
+                        System.out.println("INITIALIZED : " + data);
+                        break;
                     case NODE_ADDED:
                         System.out.println("NODE_ADDED : " + data.getPath() + "  数据:" + new String(data.getData()));
                         break;
@@ -98,7 +110,6 @@ public class TestZkClient {
                     case NODE_UPDATED:
                         System.out.println("NODE_UPDATED : " + data.getPath() + "  数据:" + new String(data.getData()));
                         break;
-
                     default:
                         break;
                 }
@@ -114,8 +125,8 @@ public class TestZkClient {
             zkClients.add(new DefaultZkClient(connectString, namespace, username, password));
             zkClients.add(zkClient);
         }
-        for(ZkClient curZkClient :zkClients) {
-            LeaderLatchClient leaderLatchClient = curZkClient.addLeaderLatchListener("/leader", "id1", new LeaderLatchListener() {
+        for (ZkClient curZkClient : zkClients) {
+            LeaderLatchSelector leaderLatchSelector = curZkClient.addLeaderLatchListener("/leader", "id1", new LeaderLatchListener() {
                 @Override
                 public void isLeader() {
                     System.out.println("isLeader");
@@ -127,8 +138,8 @@ public class TestZkClient {
                 }
             });
             Thread.sleep(2000);
-            System.out.println(leaderLatchClient.hasLeadership());
-            System.out.println(leaderLatchClient.getId());
+            System.out.println(leaderLatchSelector.hasLeadership());
+            System.out.println(leaderLatchSelector.getId());
             System.out.println("----------------------------");
         }
         System.in.read();

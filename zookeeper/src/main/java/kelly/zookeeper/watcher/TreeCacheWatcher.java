@@ -15,8 +15,11 @@ public class TreeCacheWatcher {
     private CuratorFramework curatorFramework;
     private TreeCache treeCache;
 
-    public TreeCacheWatcher(CuratorFramework curatorFramework, String path) throws Exception {
+    public TreeCacheWatcher(CuratorFramework curatorFramework, String path) {
         treeCache = new TreeCache(curatorFramework, path);
+    }
+
+    public void start() throws Exception {
         treeCache.start();
     }
 
