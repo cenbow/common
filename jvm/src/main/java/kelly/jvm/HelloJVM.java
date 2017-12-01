@@ -15,7 +15,7 @@ package kelly.jvm;
  *  student.sayHello();
  *
  *
- * Created by kelly.li on 17/8/2.
+ * Created by kelly-lee on 17/8/2.
  */
 public class HelloJVM {
     /**

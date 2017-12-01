@@ -4,7 +4,7 @@ import java.util.concurrent.locks.LockSupport;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * Created by kelly.li on 17/7/31.
+ * Created by kelly-lee on 17/7/31.
  */
 public class MyThread extends Thread {
 

@@ -4,7 +4,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 /**
- * Created by kelly.li on 17/8/31.
+ * Created by kelly-lee on 17/8/31.
  */
 public class A08_Maze {
 

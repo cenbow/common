@@ -1,9 +1,9 @@
-package kelly.lintcode;
+package kelly-leentcode;
 
 import org.junit.Test;
 
 /**
- * Created by kelly.li on 17/7/18.
+ * Created by kelly-lee on 17/7/18.
  */
 public class TestLintCode {
 

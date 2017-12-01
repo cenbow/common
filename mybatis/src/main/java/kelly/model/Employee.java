@@ -1,7 +1,7 @@
 package kelly.model;
 
 /**
- * Created by kelly.li on 17/9/10.
+ * Created by kelly-lee on 17/9/10.
  */
 public class Employee {
 

@@ -6,6 +6,8 @@ import com.googlecode.concurrenttrees.radix.node.concrete.DefaultCharArrayNodeFa
 import com.googlecode.concurrenttrees.radixinverted.ConcurrentInvertedRadixTree;
 import com.googlecode.concurrenttrees.radixreversed.ConcurrentReversedRadixTree;
 import kelly.zookeeper.observer.EventResolver;
+import kelly.zookeeper.observer.NodeAddedEvent;
+import kelly.zookeeper.observer.NodeRemovedEvent;
 import kelly.zookeeper.observer.ZkObserver;
 import org.junit.After;
 import org.junit.Before;
@@ -15,7 +17,7 @@ import org.junit.Test;
  * Created by kelly.li on 17/11/18.
  */
 public class TestObserver {
-    String connectString = "192.168.99.100:2181";
+    String connectString = "10.141.6.139:2181,10.141.6.140:2181,10.141.6.141:2181";
     String namespace = "test";
     String username = "admin";
     String password = "123";
@@ -34,7 +36,18 @@ public class TestObserver {
 
     @Test
     public void test1() throws Exception {
-        ZkObserver zkObserver = curZkClient.addObserver("/", new EventResolver());
+        ZkObserver zkObserver = curZkClient.addObserver("/", new EventResolver(){
+
+            @Override
+            public void handle(NodeAddedEvent event) {
+                System.out.println("add " + event.getPath() + "," + event.getEndpoint() + "," + event.getLayer());
+            }
+
+            @Override
+            public void handle(NodeRemovedEvent event) {
+                System.out.println("remove " + event.getPath() + "," + event.getEndpoint() + "," + event.getLayer());
+            }
+        });
         zkObserver.start();
         System.in.read();
     }

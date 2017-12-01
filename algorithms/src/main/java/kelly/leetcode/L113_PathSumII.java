@@ -1,7 +1,7 @@
 package kelly.leetcode;
 
 /**
- * Created by kelly.li on 17/7/16.
+ * Created by kelly-lee on 17/7/16.
  */
 
 import java.util.ArrayList;

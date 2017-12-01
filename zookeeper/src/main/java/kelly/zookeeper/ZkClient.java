@@ -1,18 +1,18 @@
 package kelly.zookeeper;
 
 import com.google.common.base.Splitter;
-import kelly.zookeeper.leader.LeaderSelector;
 import kelly.zookeeper.leader.LeaderLatchSelector;
+import kelly.zookeeper.leader.LeaderSelector;
 import kelly.zookeeper.lock.InterProcessMutexLock;
 import kelly.zookeeper.observer.EventResolver;
 import kelly.zookeeper.observer.ZkObserver;
+import kelly.zookeeper.watcher.NodeCacheListener;
 import kelly.zookeeper.watcher.NodeCacheWatcher;
 import kelly.zookeeper.watcher.PathChildrenCacheWatcher;
 import kelly.zookeeper.watcher.TreeCacheWatcher;
 import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.api.ACLProvider;
-import org.apache.curator.framework.recipes.cache.NodeCacheListener;
 import org.apache.curator.framework.recipes.cache.PathChildrenCacheListener;
 import org.apache.curator.framework.recipes.cache.TreeCacheListener;
 import org.apache.curator.framework.recipes.leader.LeaderLatchListener;

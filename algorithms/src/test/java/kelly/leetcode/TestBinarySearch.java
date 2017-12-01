@@ -5,7 +5,7 @@ import org.junit.Test;
 import java.util.Arrays;
 
 /**
- * Created by kelly.li on 17/7/18.
+ * Created by kelly-lee on 17/7/18.
  */
 public class TestBinarySearch {
 

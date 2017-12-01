@@ -1,7 +1,7 @@
 package kelly.amazon;
 
 /**
- * Created by kelly.li on 17/7/20.
+ * Created by kelly-lee on 17/7/20.
  */
 public class ListNode {
     int val;

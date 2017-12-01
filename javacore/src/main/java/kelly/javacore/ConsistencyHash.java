@@ -7,7 +7,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 /**
- * Created by kelly.li on 17/8/19.
+ * Created by kelly-lee on 17/8/19.
  * 一致性hash
  */
 public class ConsistencyHash {

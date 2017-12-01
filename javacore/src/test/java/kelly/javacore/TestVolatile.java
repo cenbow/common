@@ -3,7 +3,7 @@ package kelly.javacore;
 import org.junit.Test;
 
 /**
- * Created by kelly.li on 17/8/11.
+ * Created by kelly-lee on 17/8/11.
  * <p>
  * 内存可见性问题,当多个线程操作共享数据时,彼此不可见
  * volatile 关键字:当多个线程进行操作共享数据时,可以保证内存中的数据可见。相当于synchronized 是一种较为轻量级的同步策略。

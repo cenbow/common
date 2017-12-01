@@ -3,7 +3,7 @@ package kelly.amazon;
 import java.util.Stack;
 
 /**
- * Created by kelly.li on 17/8/27.
+ * Created by kelly-lee on 17/8/27.
  */
 public class A03_Baseball {
 

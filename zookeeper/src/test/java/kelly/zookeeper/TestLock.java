@@ -6,6 +6,7 @@ import org.apache.curator.framework.recipes.locks.*;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.curator.test.TestingServer;
 import org.apache.curator.utils.CloseableUtils;
+import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -59,8 +60,8 @@ public class TestLock {
         }
     }
 
-
-    public static void test2() throws Exception {
+    @Test
+    public void test2() throws Exception {
         FakeLimitedResource resource = new FakeLimitedResource();
         try (TestingServer server = new TestingServer()) {
             CuratorFramework client = CuratorFrameworkFactory.newClient(server.getConnectString(), new ExponentialBackoffRetry(1000, 3));
@@ -89,7 +90,6 @@ public class TestLock {
             System.out.println("has the lock2: " + lock2.isAcquiredInThisProcess());
         }
     }
-
 
 
     public static class FakeLimitedResource {

@@ -4,7 +4,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 /**
- * Created by kelly.li on 17/7/19.
+ * Created by kelly-lee on 17/7/19.
  */
 public class L225_ImplementStackUsingQueues {
 

@@ -5,7 +5,7 @@ import org.junit.Test;
 import java.util.List;
 
 /**
- * Created by kelly.li on 17/7/16.
+ * Created by kelly-lee on 17/7/16.
  */
 public class TestBinaryTree {
 

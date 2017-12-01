@@ -1,7 +1,7 @@
 package kelly.jvm;
 
 /**
- * Created by kelly.li on 17/8/2.
+ * Created by kelly-lee on 17/8/2.
  */
 //-verbose:gc -Xms10M -Xmx10M -XX:MaxDirectMemorySize=5M -Xss160k -XX:+PrintGCDetails
 public class HelloStackOverFlow {

@@ -3,7 +3,7 @@ package kelly.leetcode;
 import java.util.Stack;
 
 /**
- * Created by kelly.li on 17/7/19.
+ * Created by kelly-lee on 17/7/19.
  */
 public class L331_VerifyPreorderSerializationOfABinaryTree {
 

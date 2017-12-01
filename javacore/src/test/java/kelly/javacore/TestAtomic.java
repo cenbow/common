@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Created by kelly.li on 17/8/11.
+ * Created by kelly-lee on 17/8/11.
  * <p>
  * 一、i++ 的原子性问题: i++ 的操作实际上分为三个步骤"读-改-写"
  * int i = 10;

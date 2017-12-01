@@ -6,21 +6,31 @@ import org.apache.curator.framework.recipes.cache.ChildData;
 import org.apache.curator.framework.recipes.cache.NodeCache;
 import org.apache.curator.framework.recipes.cache.NodeCacheListener;
 import org.apache.curator.utils.CloseableUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by kelly.li on 17/11/16.
  */
 public class NodeCacheWatcher {
+    private static final Logger LOGGER = LoggerFactory.getLogger(NodeCacheWatcher.class);
 
     private CuratorFramework curatorFramework;
+    private String path;
     private NodeCache nodeCache;
 
     public NodeCacheWatcher(CuratorFramework curatorFramework, String path) {
+        this.curatorFramework = curatorFramework;
+        this.path = path;
         nodeCache = new NodeCache(curatorFramework, path);
     }
 
-    public void start() throws Exception {
-        nodeCache.start();
+    public void start() {
+        try {
+            nodeCache.start();
+        } catch (Exception e) {
+            LOGGER.warn("NodeCache[{},{}] {}", new Object[]{curatorFramework.getZookeeperClient().getCurrentConnectionString(), path, e.getMessage()});
+        }
     }
 
     public void addListener(NodeCacheListener nodeCacheListener) {

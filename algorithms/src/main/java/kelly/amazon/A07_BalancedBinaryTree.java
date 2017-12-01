@@ -3,7 +3,7 @@ package kelly.amazon;
 
 
 /**
- * Created by kelly.li on 17/8/15.
+ * Created by kelly-lee on 17/8/15.
  * 判断一颗树是否是平衡树。
  */
 public class A07_BalancedBinaryTree {

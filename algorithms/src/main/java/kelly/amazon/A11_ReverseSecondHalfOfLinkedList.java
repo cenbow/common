@@ -1,7 +1,7 @@
 package kelly.amazon;
 
 /**
- * Created by kelly.li on 17/9/1.
+ * Created by kelly-lee on 17/9/1.
  */
 public class A11_ReverseSecondHalfOfLinkedList {
 

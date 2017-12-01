@@ -1,7 +1,7 @@
 package kelly.leetcode;
 
 /**
- * Created by kelly.li on 17/9/5.
+ * Created by kelly-lee on 17/9/5.
  */
 public class L108_ConvertSortedArrayToBinarySearchTree {
 

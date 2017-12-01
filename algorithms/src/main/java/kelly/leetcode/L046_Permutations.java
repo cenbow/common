@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by kelly.li on 17/8/16.
+ * Created by kelly-lee on 17/8/16.
  */
 public class L046_Permutations {
 

@@ -1,7 +1,7 @@
 package kelly.amazon;
 
 /**
- * Created by kelly.li on 17/8/15.
+ * Created by kelly-lee on 17/8/15.
  */
 public class A12_BestTimeToBuyAndSellStock {
 

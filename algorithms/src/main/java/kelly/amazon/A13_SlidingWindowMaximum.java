@@ -4,7 +4,7 @@ import java.util.Deque;
 import java.util.LinkedList;
 
 /**
- * Created by kelly.li on 17/9/3.
+ * Created by kelly-lee on 17/9/3.
  */
 public class A13_SlidingWindowMaximum {
 

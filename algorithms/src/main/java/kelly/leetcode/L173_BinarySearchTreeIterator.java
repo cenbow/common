@@ -3,7 +3,7 @@ package kelly.leetcode;
 import java.util.Stack;
 
 /**
- * Created by kelly.li on 17/7/17.
+ * Created by kelly-lee on 17/7/17.
  */
 
 /**

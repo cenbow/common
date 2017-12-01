@@ -1,7 +1,7 @@
 package kelly.amazon;
 
 /**
- * Created by kelly.li on 17/8/26.
+ * Created by kelly-lee on 17/8/26.
  */
 public class A01_OverlapRectangle {
 

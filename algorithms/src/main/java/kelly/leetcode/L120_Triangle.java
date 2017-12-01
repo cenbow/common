@@ -3,7 +3,7 @@ package kelly.leetcode;
 import java.util.List;
 
 /**
- * Created by kelly.li on 17/8/30.
+ * Created by kelly-lee on 17/8/30.
  */
 public class L120_Triangle {
 

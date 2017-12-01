@@ -1,7 +1,7 @@
 package kelly.leetcode;
 
 /**
- * Created by kelly.li on 17/8/15.
+ * Created by kelly-lee on 17/8/15.
  */
 public class L121_BestTimeToBuyAndSellStock {
 

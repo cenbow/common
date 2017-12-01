@@ -1,7 +1,7 @@
 package kelly.jvm;
 
 /**
- * Created by kelly.li on 17/8/3.
+ * Created by kelly-lee on 17/8/3.
  */
 public class JVMDoEscape {
 

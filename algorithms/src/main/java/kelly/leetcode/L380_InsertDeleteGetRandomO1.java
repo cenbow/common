@@ -3,7 +3,7 @@ package kelly.leetcode;
 import java.util.*;
 
 /**
- * Created by kelly.li on 17/7/29.
+ * Created by kelly-lee on 17/7/29.
  */
 public class L380_InsertDeleteGetRandomO1 {
 

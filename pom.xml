@@ -15,9 +15,6 @@
     <!-- maven-compiler-plugin  编译插件可以使用java_source_version，java_target_version 来指定jdk版本-->
     <!-- maven-deploy-plugin  编译插件可以使用maven_deploy_skip 来指定是否把war发到仓库，默认为false，war工程显示覆盖这个变量为true表示不把war发到仓库-->
 
-    <!--
-
--->
     <modules>
         <module>algorithms</module>
         <module>javacore</module>
@@ -26,6 +23,13 @@
         <module>springboot</module>
         <module>hystric</module>
         <module>httpclient</module>
+        <module>json</module>
+        <module>hystric</module>
+        <module>zookeeper</module>
+        <module>springboot-dubbo-api</module>
+        <module>springboot-dubbo-consumer</module>
+        <module>springboot-dubbo-provider</module>
+
     </modules>
 
     <properties>
@@ -41,7 +45,6 @@
         <mysqldriver.version>5.1.29</mysqldriver.version>
         <velocity.version>1.4</velocity.version>
         <org.springframework.version>4.0.3.RELEASE</org.springframework.version>
-
     </properties>
 
     <dependencies>
@@ -231,6 +234,7 @@
             <version>4.10</version>
             <scope>test</scope>
         </dependency>
+
 
     </dependencies>
 

@@ -1,7 +1,7 @@
 package kelly.lintcode;
 
 /**
- * Created by kelly.li on 17/7/22.
+ * Created by kelly-lee on 17/7/22.
  */
 public class L158_TwoStringsAreAnagrams {
 

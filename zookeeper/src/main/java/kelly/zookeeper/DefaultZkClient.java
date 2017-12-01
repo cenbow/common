@@ -7,12 +7,9 @@ import kelly.zookeeper.leader.LeaderSelector;
 import kelly.zookeeper.lock.InterProcessMutexLock;
 import kelly.zookeeper.observer.EventResolver;
 import kelly.zookeeper.observer.ZkObserver;
-import kelly.zookeeper.watcher.NodeCacheWatcher;
-import kelly.zookeeper.watcher.PathChildrenCacheWatcher;
-import kelly.zookeeper.watcher.TreeCacheWatcher;
+import kelly.zookeeper.watcher.*;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
-import org.apache.curator.framework.recipes.cache.NodeCacheListener;
 import org.apache.curator.framework.recipes.cache.PathChildrenCacheListener;
 import org.apache.curator.framework.recipes.cache.TreeCacheListener;
 import org.apache.curator.framework.recipes.leader.LeaderLatchListener;
@@ -198,7 +195,12 @@ public class DefaultZkClient implements ZkClient {
     public NodeCacheWatcher addNodeCacheListener(String path, NodeCacheListener nodeCacheListener) throws Exception {
         NodeCacheWatcher nodeCacheWatcher = nodeCacheWatchers.getOrDefault(path, new NodeCacheWatcher(curatorFramework, path));
         nodeCacheWatchers.putIfAbsent(path, nodeCacheWatcher);
-        nodeCacheWatcher.addListener(nodeCacheListener);
+        nodeCacheWatcher.addListener(new org.apache.curator.framework.recipes.cache.NodeCacheListener() {
+            @Override
+            public void nodeChanged() throws Exception {
+                nodeCacheListener.nodeChanged(curatorFramework, new NodeCacheEvent(nodeCacheWatcher.getCurrentData()));
+            }
+        });
         return nodeCacheWatcher;
 
     }
@@ -240,6 +242,7 @@ public class DefaultZkClient implements ZkClient {
         interProcessMutexLock.acquire();
         return interProcessMutexLock;
     }
+
 
     public LeaderLatchSelector getLeaderLatchSelector(String path) {
         return leaderLatchSelectors.get(path);

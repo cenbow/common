@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.PriorityQueue;
 
 /**
- * Created by kelly.li on 17/8/28.
+ * Created by kelly-lee on 17/8/28.
  */
 public class L612_KClosestPoints {
 

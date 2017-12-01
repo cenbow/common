@@ -1,7 +1,7 @@
 package kelly.javacore;
 
 /**
- * Created by kelly.li on 17/8/11.
+ * Created by kelly-lee on 17/8/11.
  * <p>
  * HashMap 线程不安全
  * Hashtable 内部采用独占锁，线程安全，但效率低

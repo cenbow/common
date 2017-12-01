@@ -3,10 +3,6 @@ package kelly.zookeeper;
 import com.google.common.collect.Lists;
 import kelly.zookeeper.leader.LeaderLatchSelector;
 import kelly.zookeeper.lock.InterProcessMutexLock;
-import org.apache.curator.framework.CuratorFramework;
-import org.apache.curator.framework.recipes.cache.ChildData;
-import org.apache.curator.framework.recipes.cache.TreeCacheEvent;
-import org.apache.curator.framework.recipes.cache.TreeCacheListener;
 import org.apache.curator.framework.recipes.leader.LeaderLatchListener;
 import org.apache.zookeeper.data.Stat;
 import org.junit.After;
@@ -22,8 +18,8 @@ import java.util.List;
  */
 public class TestZkClient {
 
-    //String connectString = "10.141.6.139:2181,10.141.6.140:2181,10.141.6.141:2181";
-    String connectString = "192.168.99.100:2181";
+    String connectString = "10.141.6.139:2181,10.141.6.140:2181,10.141.6.141:2181";
+   // String connectString = "192.168.99.100:2181";
     String namespace = "test";
     String username = "admin";
     String password = "123";
@@ -86,41 +82,7 @@ public class TestZkClient {
         curZkClient.delele("/");
     }
 
-    @Test
-    public void testAddTreeCacheListener() throws Exception {
-        curZkClient.addTreeCacheListener("/", new TreeCacheListener() {
-            public void childEvent(CuratorFramework curatorFramework, TreeCacheEvent treeCacheEvent) throws Exception {
-                ChildData data = treeCacheEvent.getData();
-                switch (treeCacheEvent.getType()) {
-                    case CONNECTION_SUSPENDED:
-                        System.out.println("CONNECTION_SUSPENDED");
-                        break;
-                    case CONNECTION_RECONNECTED:
-                        System.out.println("CONNECTION_RECONNECTED");
-                        break;
-                    case CONNECTION_LOST:
-                        System.out.println("CONNECTION_LOST");
-                        break;
-                    case INITIALIZED:
-                        System.out.println("INITIALIZED : " + data);
-                        break;
-                    case NODE_ADDED:
-                        System.out.println("NODE_ADDED : " + data.getPath() + "  数据:" + new String(data.getData()));
-                        break;
-                    case NODE_REMOVED:
-                        System.out.println("NODE_REMOVED : " + data.getPath());
-                        break;
-                    case NODE_UPDATED:
-                        System.out.println("NODE_UPDATED : " + data.getPath() + "  数据:" + new String(data.getData()));
-                        break;
 
-                    default:
-                        break;
-                }
-            }
-        });
-        System.in.read();
-    }
 
     @Test
     public void testLeader() throws Exception {

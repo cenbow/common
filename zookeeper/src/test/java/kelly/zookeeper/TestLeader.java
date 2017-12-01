@@ -94,6 +94,8 @@ public class TestLeader {
     }
 
 
+
+
     class ZkLeaderSelectionThread implements Runnable {
         private ZkClient zkClient;
         private String path;
@@ -143,7 +145,6 @@ public class TestLeader {
                 leaderLatchSelector = zkClient.addLeaderLatchListener(path, id, new LeaderLatchListener() {
                     @Override
                     public void isLeader() {
-
                         System.out.println(id + " isLeader");
                     }
 

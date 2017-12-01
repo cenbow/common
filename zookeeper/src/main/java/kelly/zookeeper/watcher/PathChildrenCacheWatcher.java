@@ -6,6 +6,8 @@ import org.apache.curator.framework.recipes.cache.ChildData;
 import org.apache.curator.framework.recipes.cache.PathChildrenCache;
 import org.apache.curator.framework.recipes.cache.PathChildrenCacheListener;
 import org.apache.curator.utils.CloseableUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -14,15 +16,23 @@ import java.util.List;
  */
 public class PathChildrenCacheWatcher {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(NodeCacheWatcher.class);
     private CuratorFramework curatorFramework;
+    private String path;
     private PathChildrenCache pathChildrenCache;
 
     public PathChildrenCacheWatcher(CuratorFramework curatorFramework, String path) {
+        this.curatorFramework = curatorFramework;
+        this.path = path;
         pathChildrenCache = new PathChildrenCache(curatorFramework, path, true);
     }
 
-    public void start() throws Exception {
-        pathChildrenCache.start();
+    public void start() {
+        try {
+            pathChildrenCache.start();
+        } catch (Exception e) {
+            LOGGER.warn("PathChildrenCache[{},{}] {}", new Object[]{curatorFramework.getZookeeperClient().getCurrentConnectionString(), path, e.getMessage()});
+        }
     }
 
     public void addListener(PathChildrenCacheListener pathChildrenCacheListener) {
