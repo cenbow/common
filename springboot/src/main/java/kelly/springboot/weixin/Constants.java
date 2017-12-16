@@ -1,5 +1,6 @@
 package kelly.springboot.weixin;
 
+<<<<<<< Updated upstream
 public class Constants {
 
     public static final String OPENID = "gh_220bca1475e4";
@@ -12,6 +13,17 @@ public class Constants {
     public static final String TOKEN = "yirenhua2017";
 
 
+=======
+/**
+ * Created by kelly.li on 17/10/22.
+ */
+public class Constants {
+
+    public static final String OPENID = "gh_220bca1475e4";
+    public static final String APPID = "wx10e5a795ae97da4b";
+    public static final String APPSECRET = "e4b1baebda0e33f83804d6a2d9a76881";
+    public static final String TOKEN = "285022";
+>>>>>>> Stashed changes
     public static final String STRING_EMPTY = "";
     public static final String XPATH_MSGTYPE = "//MsgType";
     public static final String XPATH_EVENT = "//Event";

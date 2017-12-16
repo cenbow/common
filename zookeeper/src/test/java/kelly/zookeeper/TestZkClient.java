@@ -18,8 +18,14 @@ import java.util.List;
  */
 public class TestZkClient {
 
+<<<<<<< Updated upstream
     String connectString = "10.141.6.139:2181,10.141.6.140:2181,10.141.6.141:2181";
    // String connectString = "192.168.99.100:2181";
+=======
+    //String connectString = "10.141.6.139:2181,10.141.6.140:2181,10.141.6.141:2181";
+    //String connectString = "192.168.99.100:2181";
+    String connectString = "47.95.230.71:2181";
+>>>>>>> Stashed changes
     String namespace = "test";
     String username = "admin";
     String password = "123";
@@ -51,6 +57,12 @@ public class TestZkClient {
 //            curZkClient.create("/node_e", CreateMode.EPHEMERAL_SEQUENTIAL, DefaultZkClient.DEFAULT_DATA);
 //        }
         testGetChildren();
+    }
+
+
+    @Test
+    public void testA() throws Exception {
+        System.out.println(curZkClient.getChildren("/"));
     }
 
     @Test
