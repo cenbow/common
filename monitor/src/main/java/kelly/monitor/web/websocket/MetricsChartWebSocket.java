@@ -37,6 +37,10 @@ public class MetricsChartWebSocket {
 
     private Session session;
 
+
+    @Autowired
+    private OpenTsdbs openTsdbs;
+
     @OnOpen
     public void onOpen(Session session) throws IOException {
         logger.info("MetricsChartWebSocket onOpen");
@@ -57,7 +61,7 @@ public class MetricsChartWebSocket {
         //MetricsChart metricsChart = metricsService.findMetricsRealTimeChat(name);
         MetricsChart metricsChart = null;
         try {
-            metricsChart = OpenTsdbs.initMetricsChart();
+            metricsChart = openTsdbs.initMetricsChart();
         } catch (Exception e) {
             e.printStackTrace();
         }

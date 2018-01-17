@@ -8,6 +8,7 @@ import kelly.monitor.web.websocket.MetricsChartWebSocket;
 import net.opentsdb.core.OpenTsdbs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -26,6 +27,9 @@ public class MetricChartTask extends BaseTask {
     private String cron;
 
     private EventBus eventBus;
+
+    @Autowired
+    private OpenTsdbs openTsdbs;
 
 
     @PostConstruct
@@ -55,7 +59,7 @@ public class MetricChartTask extends BaseTask {
         for (String name : names) {
             MetricsChart metricsChart = null;
             try {
-                metricsChart = OpenTsdbs.initMetricsChart();
+                metricsChart = openTsdbs.initMetricsChart();
             } catch (Exception e) {
                 e.printStackTrace();
             }

@@ -131,17 +131,17 @@
             series: series
         };
 
-        if (name == 'proc.loadavg.1m') {
+        if (name == 'TOMCAT_ACTIVE_THREADS') {
             tomcatChart.hideLoading();
             tomcatChart.setOption(option);
         }
 
-        if (name == 'session_th') {
+        if (name == 'TOMCAT_CURRENT_THREADS') {
             sessionChart.hideLoading();
             sessionChart.setOption(option);
         }
 
-        if (name == 'mysql_th') {
+        if (name == 'TOMCAT_MAX_THREADS') {
             mysqlChart.hideLoading();
             mysqlChart.setOption(option);
         }
