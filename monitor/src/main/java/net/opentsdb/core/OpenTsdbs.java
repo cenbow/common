@@ -34,7 +34,7 @@ public class OpenTsdbs implements InitializingBean {
         System.out.println(dataPoint.getMetric() + "," + dataPoint.getValue() + "," + dataPoint.getTimestamp());
         if(dataPoint.getTags()==null){
             HashMap<String,String> tags = new HashMap<String,String>();
-            tags.put("name=","_ajp-bio-8009_");
+            tags.put("name","_ajp-bio-8009_");
             dataPoint.setTags(tags);
         }
         return tsdb.addPoint(dataPoint.getMetric(), dataPoint.getTimestamp(), Float.valueOf(dataPoint.getValue()), dataPoint.getTags());
@@ -45,7 +45,6 @@ public class OpenTsdbs implements InitializingBean {
         Object result = addPointAsync(dataPoint).join();
         System.out.println("----" + result);
     }
-
 
     public  MetricsChart initMetricsChart() throws Exception {
         TsdbQuery query = new TsdbQuery(tsdb);

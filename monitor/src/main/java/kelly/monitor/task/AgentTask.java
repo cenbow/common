@@ -13,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.PostConstruct;
@@ -24,7 +23,7 @@ import java.util.List;
 /**
  * Created by kelly-lee on 2018/1/17.
  */
-@Component
+//@Component
 public class AgentTask extends BaseTask {
 
     private static final Logger logger = LoggerFactory.getLogger(AgentTask.class);
