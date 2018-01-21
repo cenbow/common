@@ -1,8 +1,11 @@
-package kelly.monitor.core;
+package kelly.monitor.metric.gauge;
 
 import com.google.common.util.concurrent.AtomicDouble;
+import kelly.monitor.metric.Delta;
+import kelly.monitor.metric.Gauge;
 
-class DeltaGauge implements com.codahale.metrics.Gauge<Double>, Delta {
+
+public class DeltaGauge implements com.codahale.metrics.Gauge<Double>, Delta {
 
     // last, value
     private AtomicDouble[] value = new AtomicDouble[2];
@@ -10,6 +13,20 @@ class DeltaGauge implements com.codahale.metrics.Gauge<Double>, Delta {
     private final Gauge gauge;
     // keep value if delta=0?
     private final boolean keep;
+
+    public DeltaGauge(Double value, boolean keep) {
+        this(new Gauge() {
+            @Override
+            public Object[] values() {
+                return new Object[]{value};
+            }
+
+            @Override
+            public double getValue() {
+                return value;
+            }
+        }, keep);
+    }
 
     public DeltaGauge(Gauge gauge, boolean keep) {
         this.gauge = gauge;

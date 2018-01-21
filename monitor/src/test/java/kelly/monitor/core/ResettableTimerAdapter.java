@@ -1,6 +1,7 @@
 package kelly.monitor.core;
 
 import com.codahale.metrics.Clock;
+import com.google.common.primitives.Doubles;
 
 import java.util.concurrent.TimeUnit;
 
@@ -20,6 +21,30 @@ public class ResettableTimerAdapter implements Timer {
     @Override
     public Context time() {
         return new ResettableTimerContext(record, Clock.defaultClock());
+    }
+
+    @Override
+    public Object[] values() {
+        StatsBuffer buffer = record.getBuffer();
+        buffer.computeStats();
+        double[] percentileValues = buffer.getPercentileValues();
+        double[] percentiles = buffer.getPercentiles();
+        buffer.reset();
+        return new Object[]{
+                (float) record.getMeanRate(),
+                (float) record.getOneMinuteRate(),
+                (float) record.getFiveMinuteRate(),
+                (float) buffer.getMean(),
+                (float) buffer.getStdDev(),
+                (float) percentileValues[percentilesIndex(ResettableTimer.P75, percentiles)],
+                (float) percentileValues[percentilesIndex(ResettableTimer.P98, percentiles)]
+        };
+
+    }
+
+    private static int percentilesIndex(double percentile, double[] percentiles) {
+        int indexOf = Doubles.indexOf(percentiles, percentile);
+        return indexOf == -1 ? 0 : indexOf;
     }
 
     private class ResettableTimerContext implements Context {

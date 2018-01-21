@@ -7,6 +7,10 @@ public class MeterAdapter implements Meter {
 
     private final com.codahale.metrics.Meter _meter;
 
+    public MeterAdapter() {
+        this._meter = new com.codahale.metrics.Meter();
+    }
+
     public MeterAdapter(com.codahale.metrics.Meter meter) {
         this._meter = meter;
     }

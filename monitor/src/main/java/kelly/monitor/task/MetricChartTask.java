@@ -38,6 +38,8 @@ public class MetricChartTask extends BaseTask {
         start();
     }
 
+
+
     public void register(MetricsChartWebSocket metricsChartWebSocket) {
         logger.info("MetricChartTask register");
         eventBus.register(metricsChartWebSocket);

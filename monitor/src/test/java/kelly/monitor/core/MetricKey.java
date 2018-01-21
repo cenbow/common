@@ -21,7 +21,7 @@ public class MetricKey {
 
     /**
      * 添加标签（最多可设置6个自定义标签）
-     * 
+     *
      * @param key 标签名
      * @param value 标签值
      * @return

@@ -1,8 +1,10 @@
 package kelly.monitor.core;
 
+import kelly.monitor.metric.Metric;
+
 import java.util.concurrent.TimeUnit;
 
-public interface Timer {
+public interface Timer extends Metric{
 
     interface Context {
         long stop();

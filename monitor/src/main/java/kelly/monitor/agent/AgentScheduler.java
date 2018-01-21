@@ -51,29 +51,26 @@ public class AgentScheduler implements InitializingBean, DisposableBean {
                 .setNameFormat("AgentScheduler-%d")
                 .setDaemon(true)
                 .build());
-        scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
-            @Override
-            public void run() {
-                LOGGER.info("AgentScheduler schedule begin");
-                try {
-                    if (!enableAgent) {
-                        return;
-                    }
-                    List<String> apps = getApps();
-                    if (CollectionUtils.isEmpty(apps)) {
-                        return;
-                    }
-                    for (String app : apps) {
-                        executorService.submit(new AgentTask(app, asyncHttpClient, openTsdbs));
-                    }
-                } catch (Throwable t) {
-                    LOGGER.error("agent fail ", t);
-                    if (t instanceof Error) {
-                        disableAgent();
-                    }
+        scheduledExecutorService.scheduleAtFixedRate(() -> {
+            LOGGER.info("AgentScheduler schedule begin");
+            try {
+                if (!enableAgent) {
+                    return;
                 }
-                LOGGER.info("AgentScheduler schedule end");
+                List<String> apps = getApps();
+                if (CollectionUtils.isEmpty(apps)) {
+                    return;
+                }
+                for (String app : apps) {
+                    executorService.submit(new AgentTask(app, asyncHttpClient, openTsdbs));
+                }
+            } catch (Throwable t) {
+                LOGGER.error("agent fail ", t);
+                if (t instanceof Error) {
+                    disableAgent();
+                }
             }
+            LOGGER.info("AgentScheduler schedule end");
         }, initialDelay, period, TimeUnit.MILLISECONDS);
         LOGGER.info("AgentScheduler init end");
     }

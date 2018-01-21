@@ -11,6 +11,7 @@ import net.opentsdb.core.OpenTsdbs;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 /**
  * Created by kelly-lee on 2018/1/18.
@@ -36,11 +37,14 @@ public class AgentTask implements Runnable {
 
         //使用AsyncHttpClient并发请求agen_url,返回ListenableFuture
         //ListenableFuture -> SettableFuture
-        List<ListenableFuture<Packet>> futureList = Lists.newArrayListWithCapacity(applicationServers.size());
-        for (ApplicationServer applicationServer : applicationServers) {
-            ListenableFuture<Packet> future = agentApplicationServer(applicationServer);
-            futureList.add(agentApplicationServer(applicationServer));
-        }
+
+        List<ListenableFuture<Packet>> futureList = applicationServers.stream()
+                .map(applicationServer -> agentApplicationServer(applicationServer)).collect(Collectors.toList());
+//        List<ListenableFuture<Packet>> futureList = Lists.newArrayListWithCapacity(applicationServers.size());
+//        for (ApplicationServer applicationServer : applicationServers) {
+//            ListenableFuture<Packet> future = agentApplicationServer(applicationServer);
+//            futureList.add(agentApplicationServer(applicationServer));
+//        }
         //ListenableFuture<List<Packet>> -> List<ListenableFuture<Packet>> futureList
         ListenableFuture<List<Packet>> listListenableFuture = Futures.successfulAsList(futureList);
 

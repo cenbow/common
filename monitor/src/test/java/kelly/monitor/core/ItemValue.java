@@ -28,15 +28,15 @@ public class ItemValue extends Item {
 
         switch (type) {
         case GAUGE:
-            Gauge<Double> gauge = (com.codahale.metrics.Gauge<Double>) value;
+            Gauge<Double> gauge = (Gauge<Double>) value;
             return new float[] { value(gauge.getValue()) };
 
         case COUNTER:
-            Counter counter = (com.codahale.metrics.Counter) value;
+            Counter counter = (Counter) value;
             return new float[] { value(counter.getCount()) };
 
         case METER:
-            Meter meter = (com.codahale.metrics.Meter) value;
+            Meter meter = (Meter) value;
             return new float[] {
                     value(meter.getMeanRate()),
                     value(meter.getOneMinuteRate()),

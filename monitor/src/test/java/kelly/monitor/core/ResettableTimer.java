@@ -1,6 +1,7 @@
 package kelly.monitor.core;
-import com.codahale.metrics.Meter;
+
 import com.codahale.metrics.Clock;
+import com.codahale.metrics.Meter;
 import com.codahale.metrics.Metric;
 import com.google.common.primitives.Ints;
 

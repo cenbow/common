@@ -1,6 +1,6 @@
 package kelly.monitor.core;
 
-interface Delta {
+public interface Delta {
 
     void tick();
 }
