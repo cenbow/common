@@ -25,7 +25,7 @@
 <nav class="navbar navbar-default" role="navigation">
     <div class="container-fluid">
         <div class="navbar-header">
-            <a class="navbar-brand" href="#"><i class="fa fa-line-chart fa-1x fa-fw"></i>呼叫中心监控平台</a>
+            <a class="navbar-brand" href="#"><i class="fa fa-line-chart fa-1x fa-fw"></i>监控平台</a>
         </div>
     </div>
 </nav>
@@ -131,10 +131,10 @@
             series: series
         };
 
-        if (name == 'TOMCAT_ACTIVE_THREADS') {
+//        if (name == 'TOMCAT_ACTIVE_THREADS') {
             tomcatChart.hideLoading();
             tomcatChart.setOption(option);
-        }
+//        }
 
         if (name == 'TOMCAT_CURRENT_THREADS') {
             sessionChart.hideLoading();

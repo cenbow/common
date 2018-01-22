@@ -1,7 +1,7 @@
 package kelly.monitor.agent;
 
 import com.google.common.collect.Lists;
-import net.opentsdb.core.IncomingDataPoint;
+import kelly.monitor.opentsdb.core.IncomingDataPoint;
 
 import java.util.List;
 

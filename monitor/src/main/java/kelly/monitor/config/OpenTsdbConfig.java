@@ -1,6 +1,6 @@
 package kelly.monitor.config;
 
-import net.opentsdb.core.OpenTsdbs;
+import kelly.monitor.opentsdb.OpenTsdbs;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

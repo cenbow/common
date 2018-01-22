@@ -21,15 +21,17 @@ public class MetricsReportor {
      * @param out
      */
     public void report(PrintWriter out) {
+
         out.println(System.currentTimeMillis());
         out.println();
         Map<MetricKey, Metric> metricMap = Metrics.INSTANCE.cache.asMap();
+
         if (!metricMap.isEmpty()) {
             for (Map.Entry<MetricKey, Metric> metricEntry : metricMap.entrySet()) {
                 MetricKey metricKey = metricEntry.getKey();
                 Metric metric = metricEntry.getValue();
                 String metricName = metricKey.getMetricName();
-                int merticTypeCode = MetricType.typeOf(metric).code();
+                int merticTypeCode = Metrics.INSTANCE.typeOf(metric).code();
                 String metricTags = metricKey.getMetricTags().format();
                 Object[] values = metric.values();
                 String line = JOINER.join(metricName, merticTypeCode, metricTags, JOINER_VALUES.join(values));

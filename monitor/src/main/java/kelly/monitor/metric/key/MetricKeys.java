@@ -86,7 +86,7 @@ public class MetricKeys {
     public static String cacheKey(String metricName, String... metricTags) {
         StringBuilder builder = new StringBuilder();
         builder.append(metricName).append("|");
-        Map<String, String> metricTagMap = Maps.newHashMap();
+        Map<String, String> metricTagMap = Maps.newTreeMap();
         if (metricTags != null && metricTags.length > 0) {
             for (int i = 0; i < metricTags.length / 2; i++) {
                 metricTagMap.put(metricTags[i * 2], metricTags[i * 2 + 1]);

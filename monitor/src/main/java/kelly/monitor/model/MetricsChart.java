@@ -11,7 +11,7 @@ public class MetricsChart {
     private String name;
     private Set<String> date = new LinkedHashSet<String>();
     private Map<String, List<Integer>> data = new HashMap<String, List<Integer>>();
-    private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm");
+    private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yy-MM-dd HH:mm:ss");
 
 
     public MetricsChart() {

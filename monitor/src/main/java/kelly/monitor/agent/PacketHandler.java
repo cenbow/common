@@ -5,7 +5,7 @@ import com.google.common.collect.Maps;
 import com.ning.http.client.AsyncCompletionHandler;
 import com.ning.http.client.HttpResponseStatus;
 import com.ning.http.client.Response;
-import net.opentsdb.core.IncomingDataPoint;
+import kelly.monitor.opentsdb.core.IncomingDataPoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,7 +54,6 @@ public class PacketHandler extends AsyncCompletionHandler<Packet> {
         packet.setStatus(response.getStatusCode());
         if (response.getStatusCode() == HttpServletResponse.SC_OK) {
             handleSuccess(response, packet);
-            System.out.println(packet.getPoints().size());
         } else {
             handleFailed(response, packet);
         }
@@ -87,7 +86,6 @@ public class PacketHandler extends AsyncCompletionHandler<Packet> {
                     String[] tags = items.get(2).split(",");
                     for (String tag : tags) {
                         List<String> kv = SPLITTER_EQUAL.splitToList(tag);
-                        System.out.println(kv);
                         tagMap.put(kv.get(0), kv.get(1));
                     }
                     point.setTags(tagMap);

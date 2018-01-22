@@ -5,7 +5,7 @@ import kelly.monitor.config.CustomSpringConfigurator;
 import kelly.monitor.config.JacksonSerializer;
 import kelly.monitor.model.MetricsChart;
 import kelly.monitor.task.MetricChartTask;
-import net.opentsdb.core.OpenTsdbs;
+import kelly.monitor.opentsdb.OpenTsdbs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

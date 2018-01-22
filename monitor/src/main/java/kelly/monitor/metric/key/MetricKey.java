@@ -5,9 +5,6 @@ import com.google.common.base.Objects;
 import com.google.common.collect.Interner;
 import com.google.common.collect.Interners;
 
-import java.io.IOException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.regex.Pattern;
 
 /**
@@ -21,7 +18,7 @@ public class MetricKey {
     private static final Interner<String> interner = Interners.newStrongInterner();
 
     public MetricKey(String name) {
-        System.out.println("new MetricKey");
+        System.out.println("new MetricKey(" + name + ")");
         this.metricName = interner.intern(normalize(name));
     }
 
@@ -73,22 +70,6 @@ public class MetricKey {
 
     public MetricTags getMetricTags() {
         return metricTags;
-    }
-
-
-    public static void main(String[] args) throws IOException {
-        ExecutorService service = Executors.newFixedThreadPool(100);
-        for (int i = 0; i < 1; i++) {
-            service.submit(new Runnable() {
-                @Override
-                public void run() {
-                    // MetricKey metricKey = new MetricKey("counter").tag("k1", "v1").tag("k2", "v2").tag("k1", "v11").tag("k2", "v2");
-                    MetricKey metricKey = MetricKeys.of("counter", "k1", "v1", "k1", "v11", "k2", "v2", "k2", "v2");
-                    System.out.println(metricKey);
-                }
-            });
-        }
-        System.in.read();
     }
 
 

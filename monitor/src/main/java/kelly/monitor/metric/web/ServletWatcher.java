@@ -1,6 +1,7 @@
 package kelly.monitor.metric.web;
 
 import com.google.common.base.Strings;
+import kelly.monitor.metric.Metrics;
 import org.springframework.core.annotation.Order;
 
 import javax.servlet.*;
@@ -27,6 +28,7 @@ public class ServletWatcher implements Filter {
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
+        Metrics.INSTANCE.afterPropertiesSet();
         handlers.put(Pattern.compile(addContextPath("^/_/metrics([^?]*)(.*)")), new MetricsHandler());
     }
 

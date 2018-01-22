@@ -7,7 +7,7 @@ import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Request;
-import net.opentsdb.core.OpenTsdbs;
+import kelly.monitor.opentsdb.OpenTsdbs;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;

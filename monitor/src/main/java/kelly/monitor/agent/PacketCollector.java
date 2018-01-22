@@ -2,8 +2,8 @@ package kelly.monitor.agent;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import net.opentsdb.core.IncomingDataPoint;
-import net.opentsdb.core.OpenTsdbs;
+import kelly.monitor.opentsdb.core.IncomingDataPoint;
+import kelly.monitor.opentsdb.OpenTsdbs;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;

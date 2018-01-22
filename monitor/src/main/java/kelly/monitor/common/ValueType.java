@@ -1,6 +1,6 @@
-package kelly.monitor.metric;
+package kelly.monitor.common;
 
-enum MetricValueType {
+public enum ValueType {
 
     VALUE("数值"),
     MIN("最小值"),
@@ -16,7 +16,7 @@ enum MetricValueType {
 
     private final String text;
 
-    private MetricValueType(String text) {
+    private ValueType(String text) {
         this.text = text;
     }
 
