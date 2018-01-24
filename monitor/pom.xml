@@ -24,6 +24,8 @@
 
     <dependencies>
 
+
+
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-ribbon</artifactId>
@@ -147,7 +149,6 @@
 
         <!-- https://mvnrepository.com/artifact/org.asynchttpclient/async-http-client -->
 
-
         <!-- https://mvnrepository.com/artifact/com.ning/async-http-client -->
         <dependency>
             <groupId>com.ning</groupId>
@@ -155,9 +156,17 @@
             <version>1.9.40</version>
         </dependency>
 
+        <!---->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-jdbc</artifactId>
+        </dependency>
 
-
-
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>5.1.39</version>
+        </dependency>
 
     </dependencies>
 

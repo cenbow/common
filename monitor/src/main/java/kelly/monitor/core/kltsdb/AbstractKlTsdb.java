@@ -16,10 +16,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.PostConstruct;
-import java.sql.Timestamp;
 import java.util.*;
 import java.util.Map.Entry;
-
 
 
 public abstract class AbstractKlTsdb implements Constant, KlTsdb, QueryRunner {
@@ -561,8 +559,4 @@ public abstract class AbstractKlTsdb implements Constant, KlTsdb, QueryRunner {
         }
     }
 
-    public static void main(String[] arg) {
-        System.out.println(new Timestamp(1420372800000l));
-        System.out.println(new Timestamp(1420459200000l));
-    }
 }

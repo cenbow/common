@@ -47,4 +47,8 @@ public class TagUtil {
         tags.put(TAG_NAME_HOST, server.getIp());
         return tags;
     }
+
+    public static void main(String[] args) {
+        System.out.println(TagUtil.parse("app:monitor;host:127.0.0.1"));
+    }
 }

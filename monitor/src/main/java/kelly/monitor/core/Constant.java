@@ -3,7 +3,7 @@ package kelly.monitor.core;
 
 public interface Constant {
 
-    static final byte[] FAMILY = { 'q' };
+    static final byte[] FAMILY = { 'k' };
 
     /** 指标名 */
     static final short METRIC_WIDTH = 3;
