@@ -1,6 +1,6 @@
 package kelly.monitor.config;
 
-import kelly.monitor.opentsdb.OpenTsdbs;
+import kelly.monitor.core.KlTsdbs;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -11,14 +11,21 @@ import org.springframework.context.annotation.Configuration;
 public class OpenTsdbConfig {
 
     //LoginService loginService = SpringContextHolder.getBean("loginService");
+//    @Bean
+//    public OpenTsdbs openTsdbs() {
+//        OpenTsdbs openTsdbs = new OpenTsdbs();
+//        try {
+//            openTsdbs.afterPropertiesSet();
+//        } catch (Exception e) {
+//        }
+//        return openTsdbs;
+//    }
+
+
     @Bean
-    public OpenTsdbs openTsdbs() {
-        OpenTsdbs openTsdbs = new OpenTsdbs();
-        try {
-            openTsdbs.afterPropertiesSet();
-        } catch (Exception e) {
-        }
-        return openTsdbs;
+    public KlTsdbs klTsdbs() {
+        KlTsdbs klTsdbs = new KlTsdbs();
+        return klTsdbs;
     }
 
 }

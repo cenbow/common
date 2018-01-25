@@ -1,7 +1,7 @@
-package kelly.monitor.agent;
+package kelly.monitor.common;
 
 import com.google.common.collect.Lists;
-import kelly.monitor.opentsdb.core.IncomingDataPoint;
+import kelly.monitor.agent.ApplicationServer;
 
 import java.util.List;
 
@@ -11,19 +11,19 @@ import java.util.List;
 public class Packet {
 
     // 数据来源服务器
-    private ApplicationServer applicationServer;
+    private kelly.monitor.agent.ApplicationServer applicationServer;
     // 抓取结果状态
     private int status;
     // 抓取耗时
     private long duration;
     // 结果数据
-    private List<IncomingDataPoint> points = Lists.newArrayList();
+    private List<IncomingPoint> points = Lists.newArrayList();
 
-    public Packet(ApplicationServer applicationServer) {
+    public Packet(kelly.monitor.agent.ApplicationServer applicationServer) {
         this.applicationServer = applicationServer;
     }
 
-    public ApplicationServer getApplicationServer() {
+    public kelly.monitor.agent.ApplicationServer getApplicationServer() {
         return applicationServer;
     }
 
@@ -47,11 +47,11 @@ public class Packet {
         this.duration = duration;
     }
 
-    public List<IncomingDataPoint> getPoints() {
+    public List<IncomingPoint> getPoints() {
         return points;
     }
 
-    public void setPoints(List<IncomingDataPoint> points) {
+    public void setPoints(List<IncomingPoint> points) {
         this.points = points;
     }
 

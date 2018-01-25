@@ -3,7 +3,7 @@ package kelly.monitor.agent;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.ning.http.client.AsyncHttpClient;
-import kelly.monitor.opentsdb.OpenTsdbs;
+import kelly.monitor.core.KlTsdbs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
@@ -36,7 +36,7 @@ public class AgentScheduler implements InitializingBean, DisposableBean {
     @Autowired
     private AsyncHttpClient asyncHttpClient;
     @Autowired
-    private OpenTsdbs openTsdbs;
+    private KlTsdbs klTsdbs;
 
 
     @Override

@@ -2,8 +2,9 @@ package kelly.monitor.agent;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import kelly.monitor.opentsdb.core.IncomingDataPoint;
-import kelly.monitor.opentsdb.OpenTsdbs;
+import kelly.monitor.common.IncomingPoint;
+import kelly.monitor.common.Packet;
+import kelly.monitor.core.KlTsdbs;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
@@ -16,28 +17,28 @@ import java.util.concurrent.ExecutionException;
 public class PacketCollector {
 
 
-    private OpenTsdbs openTsdbs;
+    private KlTsdbs klTsdbs;
 
     private String appCode;
 
-    private PacketCollector(String appCode, OpenTsdbs openTsdbs) {
+    private PacketCollector(String appCode, KlTsdbs klTsdbs) {
         this.appCode = appCode;
         //SpringContextHolder.getBean("openTsdb");
-        this.openTsdbs = openTsdbs;
+        this.klTsdbs = klTsdbs;
     }
 
     private static Cache<String, PacketCollector> collectors = CacheBuilder.newBuilder().build();
 
-    public static PacketCollector getOrCreate(String appCode, OpenTsdbs openTsdbs) {
+    public static PacketCollector getOrCreate(String appCode, KlTsdbs klTsdbs) {
         try {
             return collectors.get(appCode, new Callable<PacketCollector>() {
                 @Override
                 public PacketCollector call() throws Exception {
-                    return new PacketCollector(appCode, openTsdbs);
+                    return new PacketCollector(appCode, klTsdbs);
                 }
             });
         } catch (ExecutionException e) {
-            return new PacketCollector(appCode, openTsdbs);
+            return new PacketCollector(appCode, klTsdbs);
         }
     }
 
@@ -52,9 +53,9 @@ public class PacketCollector {
         //https://www.cnblogs.com/java-zhao/p/5929723.html
         System.out.println("-----------------------" + packets.get(0).getPoints().size());
         for (Packet packet : packets) {
-            for (IncomingDataPoint point : packet.getPoints()) {
+            for (IncomingPoint point : packet.getPoints()) {
                 try {
-                    openTsdbs.addPointAsync(point);
+                    klTsdbs.addPointAsync(point);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

@@ -5,7 +5,8 @@ import com.google.common.collect.Maps;
 import com.ning.http.client.AsyncCompletionHandler;
 import com.ning.http.client.HttpResponseStatus;
 import com.ning.http.client.Response;
-import kelly.monitor.opentsdb.core.IncomingDataPoint;
+import kelly.monitor.common.IncomingPoint;
+import kelly.monitor.common.Packet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,8 +14,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.HashMap;
 import java.util.List;
+import java.util.TreeMap;
 
 import static kelly.monitor.util.Constants.SPLITTER_EQUAL;
 import static kelly.monitor.util.Constants.SPLITTER_OR;
@@ -77,11 +78,11 @@ public class PacketHandler extends AsyncCompletionHandler<Packet> {
             String line = reader.readLine();
             while (!Strings.isNullOrEmpty(line)) {
                 List<String> items = SPLITTER_OR.splitToList(line);
-                IncomingDataPoint point = new IncomingDataPoint();
-                point.setMetric(items.get(0));
+                IncomingPoint point = new IncomingPoint();
+                point.setName(items.get(0));
                 point.setTimestamp(timestamp);
-                point.setValue(items.get(3));
-                HashMap<String, String> tagMap = Maps.newHashMap();
+//                point.setValues(items.get(3));
+                TreeMap<String, String> tagMap = Maps.newTreeMap();
                 if (!Strings.isNullOrEmpty(items.get(2))) {
                     String[] tags = items.get(2).split(",");
                     for (String tag : tags) {

@@ -7,7 +7,8 @@ import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Request;
-import kelly.monitor.opentsdb.OpenTsdbs;
+import kelly.monitor.common.Packet;
+import kelly.monitor.core.KlTsdbs;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -21,12 +22,12 @@ public class AgentTask implements Runnable {
 
     private String appCode;
     private AsyncHttpClient asyncHttpClient;
-    private OpenTsdbs openTsdbs;
+    private KlTsdbs klTsdbs;
 
-    public AgentTask(String appCode, AsyncHttpClient asyncHttpClient, OpenTsdbs openTsdbs) {
+    public AgentTask(String appCode, AsyncHttpClient asyncHttpClient, KlTsdbs klTsdbs) {
         this.appCode = appCode;
         this.asyncHttpClient = asyncHttpClient;
-        this.openTsdbs = openTsdbs;
+        this.klTsdbs = klTsdbs;
     }
 
     @Override
@@ -51,7 +52,7 @@ public class AgentTask implements Runnable {
         List<Packet> packets = null;
         try {
             //调用Collector收集Packet
-            PacketCollector packetCollector = PacketCollector.getOrCreate(appCode, openTsdbs);
+            PacketCollector packetCollector = PacketCollector.getOrCreate(appCode, klTsdbs);
             packetCollector.addPoints(listListenableFuture.get());
         } catch (InterruptedException e) {
             e.printStackTrace();

@@ -2,8 +2,8 @@ package kelly.monitor.task;
 
 
 import com.google.common.eventbus.EventBus;
+import kelly.monitor.core.KlTsdbs;
 import kelly.monitor.model.MetricsChart;
-import kelly.monitor.opentsdb.OpenTsdbs;
 import kelly.monitor.util.Constants;
 import kelly.monitor.web.websocket.MetricsChartWebSocket;
 import org.slf4j.Logger;
@@ -29,7 +29,7 @@ public class MetricChartTask extends BaseTask {
     private EventBus eventBus;
 
     @Autowired
-    private OpenTsdbs openTsdbs;
+    private KlTsdbs klTsdbs;
 
 
     @PostConstruct
@@ -61,7 +61,7 @@ public class MetricChartTask extends BaseTask {
         for (String name : names) {
             MetricsChart metricsChart = null;
             try {
-                metricsChart = openTsdbs.initMetricsChart();
+                metricsChart = klTsdbs.initMetricsChart();
             } catch (Exception e) {
                 e.printStackTrace();
             }

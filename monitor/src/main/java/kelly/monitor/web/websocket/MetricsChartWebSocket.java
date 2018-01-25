@@ -3,9 +3,9 @@ package kelly.monitor.web.websocket;
 import com.google.common.eventbus.Subscribe;
 import kelly.monitor.config.CustomSpringConfigurator;
 import kelly.monitor.config.JacksonSerializer;
+import kelly.monitor.core.KlTsdbs;
 import kelly.monitor.model.MetricsChart;
 import kelly.monitor.task.MetricChartTask;
-import kelly.monitor.opentsdb.OpenTsdbs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +39,7 @@ public class MetricsChartWebSocket {
 
 
     @Autowired
-    private OpenTsdbs openTsdbs;
+    private KlTsdbs klTsdbs;
 
     @OnOpen
     public void onOpen(Session session) throws IOException {
@@ -61,7 +61,7 @@ public class MetricsChartWebSocket {
         //MetricsChart metricsChart = metricsService.findMetricsRealTimeChat(name);
         MetricsChart metricsChart = null;
         try {
-            metricsChart = openTsdbs.initMetricsChart();
+            metricsChart = klTsdbs.initMetricsChart();
         } catch (Exception e) {
             e.printStackTrace();
         }
