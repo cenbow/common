@@ -20,7 +20,7 @@ public class IncomingPoint implements Serializable {
 
     private long timestamp;
 
-    private float[] values;
+    private Float[] values;
 
     public String getName() {
         return name;
@@ -54,11 +54,11 @@ public class IncomingPoint implements Serializable {
         this.timestamp = timestamp;
     }
 
-    public float[] getValues() {
+    public Float[] getValues() {
         return values;
     }
 
-    public void setValues(float[] values) {
+    public void setValues(Float[] values) {
         this.values = values;
     }
 

@@ -83,7 +83,7 @@ public abstract class AbstractKlTsdb implements Constant, KlTsdb, QueryRunner {
     }
 
     @Override
-    public Deferred<Object> addPoints(final String metricName, final MetricType type, final long timestamp, final float[] values, final Map<String, String> tags) {
+    public Deferred<Object> addPoints(final String metricName, final MetricType type, final long timestamp, final Float[] values, final Map<String, String> tags) {
         if (logger.isDebugEnabled()) {
             logger.debug("### metric={}, type={}, timestamp={}, values={}, tags={}", metricName, type, timestamp, values, tags);
         }
@@ -103,7 +103,7 @@ public abstract class AbstractKlTsdb implements Constant, KlTsdb, QueryRunner {
         }
     }
 
-    protected byte[] buildValueBytes(float[] values) {
+    protected byte[] buildValueBytes(Float[] values) {
         byte[] value_byte = new byte[values.length * ONE_VALUE_WIDTH];
         int pos = 0;
         for (float value : values) {
@@ -113,7 +113,7 @@ public abstract class AbstractKlTsdb implements Constant, KlTsdb, QueryRunner {
         return value_byte;
     }
 
-    protected void validateBeforeAddPoint(String metric, MetricType type, float[] values, Map<String, String> tags) {
+    protected void validateBeforeAddPoint(String metric, MetricType type, Float[] values, Map<String, String> tags) {
         if (metric == null || metric.isEmpty()) {
             throw new IllegalArgumentException("metrics name required.");
         }

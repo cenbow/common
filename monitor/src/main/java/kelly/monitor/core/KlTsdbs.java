@@ -47,7 +47,7 @@ public class KlTsdbs {
     }
 
     public MetricsChart initMetricsChart() throws Exception {
-        return null;
+        return new MetricsChart();
     }
 
 

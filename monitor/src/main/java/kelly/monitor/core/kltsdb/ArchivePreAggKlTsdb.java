@@ -21,7 +21,7 @@ public class ArchivePreAggKlTsdb extends AbstractKlTsdb {
         super(client, table, uniqueId, 4, rowTimeSpan);
     }
 
-    protected void validateBeforeAddPoint(String metricName, MetricType type, float[] values, Map<String, String> tags) {
+    protected void validateBeforeAddPoint(String metricName, MetricType type, Float[] values, Map<String, String> tags) {
         super.validateBeforeAddPoint(metricName, type, values, tags);
         int expected = type.sequence().length * AggregatorType.values().length * AggregatorType.values().length;
         if (expected != values.length) {

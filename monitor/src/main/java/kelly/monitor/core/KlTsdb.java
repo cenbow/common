@@ -32,7 +32,7 @@ public interface KlTsdb {
      * of it as {@code Deferred<Void>}). But you probably want to attach at
      * least an errback to this {@code Deferred} to handle failures.
      */
-    Deferred<Object> addPoints(String metric, MetricType type, long timestamp, float[] values, Map<String, String> tags);
+    Deferred<Object> addPoints(String metric, MetricType type, long timestamp, Float[] values, Map<String, String> tags);
 
     /**
      * Forces a flush of any un-committed in memory data.

@@ -23,7 +23,6 @@ public class PacketCollector {
 
     private PacketCollector(String appCode, KlTsdbs klTsdbs) {
         this.appCode = appCode;
-        //SpringContextHolder.getBean("openTsdb");
         this.klTsdbs = klTsdbs;
     }
 
@@ -51,8 +50,11 @@ public class PacketCollector {
         //指标名转换
 
         //https://www.cnblogs.com/java-zhao/p/5929723.html
-        System.out.println("-----------------------" + packets.get(0).getPoints().size());
+      //  System.out.println("-----------------------" + packets.get(0).getPoints().size());
         for (Packet packet : packets) {
+            if (packet.getStatus() == 404) {
+                continue;
+            }
             for (IncomingPoint point : packet.getPoints()) {
                 try {
                     klTsdbs.addPointAsync(point);

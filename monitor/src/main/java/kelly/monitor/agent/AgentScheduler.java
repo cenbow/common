@@ -10,6 +10,7 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 import java.util.concurrent.*;
@@ -30,14 +31,13 @@ public class AgentScheduler implements InitializingBean, DisposableBean {
     private boolean enableAgent = true;
     private int corePoolSize = 16;
     private long initialDelay = 2000;
-    private long period = 200;
+    private long period = 1000;
     private int nThreads = 24;
 
     @Autowired
     private AsyncHttpClient asyncHttpClient;
     @Autowired
     private KlTsdbs klTsdbs;
-
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -51,25 +51,25 @@ public class AgentScheduler implements InitializingBean, DisposableBean {
                 .setDaemon(true)
                 .build());
         scheduledExecutorService.scheduleAtFixedRate(() -> {
-//            LOGGER.info("AgentScheduler schedule begin");
-//            try {
-//                if (!enableAgent) {
-//                    return;
-//                }
-//                List<String> apps = getApps();
-//                if (CollectionUtils.isEmpty(apps)) {
-//                    return;
-//                }
-//                for (String app : apps) {
-//                    executorService.submit(new AgentTask(app, asyncHttpClient, openTsdbs));
-//                }
-//            } catch (Throwable t) {
-//                LOGGER.error("agent fail ", t);
-//                if (t instanceof Error) {
-//                    disableAgent();
-//                }
-//            }
-//            LOGGER.info("AgentScheduler schedule end");
+            LOGGER.info("AgentScheduler schedule begin");
+            try {
+                if (!enableAgent) {
+                    return;
+                }
+                List<String> apps = getApps();
+                if (CollectionUtils.isEmpty(apps)) {
+                    return;
+                }
+                for (String app : apps) {
+                    executorService.submit(new AgentTask(app, asyncHttpClient, klTsdbs));
+                }
+            } catch (Throwable t) {
+                LOGGER.error("agent fail ", t);
+                if (t instanceof Error) {
+                    disableAgent();
+                }
+            }
+            LOGGER.info("AgentScheduler schedule end");
         }, initialDelay, period, TimeUnit.MILLISECONDS);
         LOGGER.info("AgentScheduler init end");
     }

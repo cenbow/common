@@ -20,6 +20,7 @@ public class Constants {
     public static final Integer API_STATUS_ERROR = 1;
 
     public static final Splitter SPLITTER_OR = Splitter.on("|").trimResults();
+    public static final Splitter SPLITTER_DOT = Splitter.on(",").omitEmptyStrings().trimResults();
     public static final Splitter SPLITTER_EQUAL = Splitter.on("=").omitEmptyStrings().trimResults();
     public static final Joiner JOINER = Joiner.on("|").skipNulls();
 }

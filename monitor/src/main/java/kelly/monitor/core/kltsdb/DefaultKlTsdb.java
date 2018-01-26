@@ -21,7 +21,7 @@ public class DefaultKlTsdb extends AbstractKlTsdb {
         super(client, table, uniqueId);
     }
 
-    protected void validateBeforeAddPoint(String metricName, MetricType type, float[] values, Map<String, String> tags) {
+    protected void validateBeforeAddPoint(String metricName, MetricType type, Float[] values, Map<String, String> tags) {
         super.validateBeforeAddPoint(metricName, type, values, tags);
         int expected = type.sequence().length;
         if (expected != values.length) {
