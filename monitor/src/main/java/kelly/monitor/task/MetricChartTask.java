@@ -4,7 +4,6 @@ package kelly.monitor.task;
 import com.google.common.eventbus.EventBus;
 import kelly.monitor.core.KlTsdbs;
 import kelly.monitor.model.MetricsChart;
-import kelly.monitor.util.Constants;
 import kelly.monitor.web.websocket.MetricsChartWebSocket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,12 +55,13 @@ public class MetricChartTask extends BaseTask {
     public void run() {
         logger.info("MetricChartTask run");
 
-        String[] names = {Constants.TOMCAT_TH, Constants.SESSION_TH, Constants.MYSQL_TH};
+        String[] names = {"Tomcat_MaxThreads","Tomcat_ActiveThreads"};
 
         for (String name : names) {
             MetricsChart metricsChart = null;
             try {
-                metricsChart = klTsdbs.initMetricsChart();
+
+                metricsChart = klTsdbs.initMetricsChart(name);
             } catch (Exception e) {
                 e.printStackTrace();
             }

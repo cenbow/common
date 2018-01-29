@@ -16,8 +16,7 @@ public class NoSuchUniqueName extends NoSuchElementException {
 
     /**
      * Constructor.
-     * 
-     * @param kind The kind of unique ID that triggered the exception.
+     *
      * @param name The name that couldn't be found.
      */
     public NoSuchUniqueName(final String name) {

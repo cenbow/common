@@ -1,9 +1,9 @@
 package kelly.monitor.agent;
 
-import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.ning.http.client.AsyncHttpClient;
 import kelly.monitor.core.KlTsdbs;
+import kelly.monitor.dao.mapper.ApplicationServerMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
@@ -38,6 +38,8 @@ public class AgentScheduler implements InitializingBean, DisposableBean {
     private AsyncHttpClient asyncHttpClient;
     @Autowired
     private KlTsdbs klTsdbs;
+    @Autowired
+    private ApplicationServerMapper applicationServerMapper;
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -61,7 +63,7 @@ public class AgentScheduler implements InitializingBean, DisposableBean {
                     return;
                 }
                 for (String app : apps) {
-                    executorService.submit(new AgentTask(app, asyncHttpClient, klTsdbs));
+                    executorService.submit(new AgentTask(app, asyncHttpClient, klTsdbs, applicationServerMapper));
                 }
             } catch (Throwable t) {
                 LOGGER.error("agent fail ", t);
@@ -75,9 +77,7 @@ public class AgentScheduler implements InitializingBean, DisposableBean {
     }
 
     private List<String> getApps() {
-        List<String> apps = Lists.newArrayList();
-        apps.add("accountplus");
-        return apps;
+        return applicationServerMapper.getAppCodes();
     }
 
     @Override

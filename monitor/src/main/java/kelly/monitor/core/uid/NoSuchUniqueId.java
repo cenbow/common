@@ -17,8 +17,7 @@ public class NoSuchUniqueId extends NoSuchElementException {
 
     /**
      * Constructor.
-     * 
-     * @param kind The kind of unique ID that triggered the exception.
+     *
      * @param id The ID that couldn't be found.
      */
     public NoSuchUniqueId(final byte[] id) {

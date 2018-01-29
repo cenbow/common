@@ -1,6 +1,5 @@
 package kelly.monitor.agent;
 
-import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
@@ -9,6 +8,7 @@ import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Request;
 import kelly.monitor.common.Packet;
 import kelly.monitor.core.KlTsdbs;
+import kelly.monitor.dao.mapper.ApplicationServerMapper;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -23,11 +23,13 @@ public class AgentTask implements Runnable {
     private String appCode;
     private AsyncHttpClient asyncHttpClient;
     private KlTsdbs klTsdbs;
+    private ApplicationServerMapper applicationServerMapper;
 
-    public AgentTask(String appCode, AsyncHttpClient asyncHttpClient, KlTsdbs klTsdbs) {
+    public AgentTask(String appCode, AsyncHttpClient asyncHttpClient, KlTsdbs klTsdbs,ApplicationServerMapper applicationServerMapper) {
         this.appCode = appCode;
         this.asyncHttpClient = asyncHttpClient;
         this.klTsdbs = klTsdbs;
+        this.applicationServerMapper = applicationServerMapper;
     }
 
     @Override
@@ -82,16 +84,8 @@ public class AgentTask implements Runnable {
         return settableFuture;
     }
 
-    private List<ApplicationServer> getApplicationServers(String appName) {
-        List<ApplicationServer> applicationServers = Lists.newArrayList();
-        ApplicationServer applicationServer = new ApplicationServer();
-        applicationServer.setAppCode("monitor");
-        applicationServer.setAppName("监控系统");
-        applicationServer.setHost("localhost");
-        applicationServer.setIp("127.0.0.1");
-        applicationServer.setPort(8080);
-        applicationServers.add(applicationServer);
-        return applicationServers;
+    private List<ApplicationServer> getApplicationServers(String appCode) {
+        return applicationServerMapper.queryByCode(appCode);
     }
 
 

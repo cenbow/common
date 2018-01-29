@@ -61,7 +61,7 @@ public class MetricsChartWebSocket {
         //MetricsChart metricsChart = metricsService.findMetricsRealTimeChat(name);
         MetricsChart metricsChart = null;
         try {
-            metricsChart = klTsdbs.initMetricsChart();
+            metricsChart = klTsdbs.initMetricsChart(name);
         } catch (Exception e) {
             e.printStackTrace();
         }

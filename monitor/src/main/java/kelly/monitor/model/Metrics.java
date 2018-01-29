@@ -7,14 +7,14 @@ public class Metrics {
 
     private Long id;
     private String name;
-    private Integer value;
+    private Float value;
     private String appId;
     private Long createdTime;
 
     public Metrics() {
     }
 
-    public Metrics(String name, Integer value, String appId, Long createdTime) {
+    public Metrics(String name, float value, String appId, Long createdTime) {
         this.name = name;
         this.value = value;
         this.appId = appId;
@@ -37,11 +37,11 @@ public class Metrics {
         this.name = name;
     }
 
-    public Integer getValue() {
+    public Float getValue() {
         return value;
     }
 
-    public void setValue(Integer value) {
+    public void setValue(Float value) {
         this.value = value;
     }
 
