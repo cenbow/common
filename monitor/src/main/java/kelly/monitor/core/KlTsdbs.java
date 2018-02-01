@@ -18,7 +18,6 @@ import kelly.monitor.core.util.MetricSpanUtil;
 import kelly.monitor.model.MetricsChart;
 import kelly.monitor.model.Point;
 import kelly.monitor.opentsdb.query.QueryUtil;
-import kelly.monitor.util.DateTimeGenerater;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.hbase.async.HBaseClient;
@@ -31,7 +30,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
-import static kelly.monitor.util.DateTimeGenerater.HHMMSS;
+import static kelly.monitor.util.DateTimeGenerater.YY_MM_DD_HH_MM_SS;
+import static kelly.monitor.util.DateTimeGenerater.get;
 
 /**
  * Created by kelly-lee on 2018/1/25.
@@ -83,9 +83,7 @@ public class KlTsdbs {
         try {
             List<DataPoints> dataPointsList = klTsdb.run(query);
             List<Map<String, Object>> result = transformToDataSeries(query, dataPointsList);
-
             List<Map<String, Object>> ret = makeAgg(query, result);
-
             boolean first = true;
             for (Map<String, Object> map : ret) {
                 List<Point> list = (List<Point>) map.get("values");
@@ -93,7 +91,7 @@ public class KlTsdbs {
                 List<Float> values = list.stream().map(point -> point.getY()).collect(Collectors.toList());
                 if (first) {
                     for (Point p : list) {
-                        metricsChart.getDate().add(DateTimeGenerater.get(HHMMSS, p.getX()));
+                        metricsChart.getDate().add(get(YY_MM_DD_HH_MM_SS, p.getX()));
                     }
                     first = false;
                 }
@@ -106,12 +104,11 @@ public class KlTsdbs {
     }
 
     public MetricsChart initMetricsChart(String name) throws Exception {
-
         MetricDataQuery query = new MetricDataQuery();
         query.setMetric(name);
         Date now = new Date();
-        query.setStartTime(DateUtils.addDays(now, -1));
-        query.setEndTime(DateUtils.addDays(now, 1));
+        query.setStartTime(DateUtils.addDays(now, -2));
+        query.setEndTime(DateUtils.addDays(now, 2));
         Map<String, String> tags = Maps.newHashMap();
         // tags.put("app_code", "monitor");
         // tags.put("host", "127.0.0.1");
@@ -120,7 +117,6 @@ public class KlTsdbs {
         query.setDownSampler(AggregatorType.AVG);
         query.setSampleInterval(60);
         return initMetricsChart(query);
-
 //        MetricsChart metricsChart = new MetricsChart();
 //        metricsChart.setName(name);
 //        metricsChart.setDate(ImmutableSet.of("2:06", "2:07", "2:08"));
@@ -148,12 +144,10 @@ public class KlTsdbs {
             }
             try {
                 List<List<Map<String, Object>>> dataMapListList = Futures.successfulAsList(futureList).get();
-                System.out.println("******" + dataMapListList.size());
                 for (List<Map<String, Object>> mapList : dataMapListList) {
                     System.out.println();
                     dataSeries.addAll(mapList);
                 }
-                System.out.println("######" + dataSeries.size());
             } catch (Exception e) {
 //                logger.error("concrrent execute error!", e);
             }

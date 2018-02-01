@@ -11,7 +11,9 @@ import java.util.List;
 @Mapper
 public interface MetricsMapper {
 
-    @Select("select name from metrics where app_code = #{app_code}")
+    @Select("select name from kltsdb_metric where app_code = #{app_code}")
     List<String> findNames(String appCode);
+
+
 
 }

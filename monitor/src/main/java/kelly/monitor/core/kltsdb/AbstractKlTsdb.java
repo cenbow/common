@@ -153,11 +153,13 @@ public abstract class AbstractKlTsdb implements Constant, KlTsdb, QueryRunner {
     @Override
     public List<DataPoints> run(Query query) throws Exception {
         String metric = query.getMetric();
+        Date startTime = query.getStartTime();
+        Date endTime = query.getEndTime();
         Map<String, String> tags = query.getTags();
         AggregatorType aggregator = query.getAggregator();
         AggregatorType downsampler = query.getDownSampler();
         int interval = query.getSampleInterval();
-        logger.info("metric={}, tags={}, aggregator={}, downSampler={}, sampleInterval={}", metric, tags,
+        logger.info("startTime={}, endTime={}, metric={}, tags={}, aggregator={}, downSampler={}, sampleInterval={}", startTime, endTime, metric, tags,
                 aggregator, downsampler, interval);
 
 //        final Timer.Context context = Metrics.timer("KlTsdbRunQueryTimer").get().time();

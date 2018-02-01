@@ -3,6 +3,9 @@
       xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
 <head>
     <meta charset="UTF-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <!--初始化移动浏览显示-->
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <title>监控平台</title>
 
     <link href="css/font-awesome.min.css" rel="stylesheet"/>
@@ -13,6 +16,25 @@
     <script src="js/echarts.common.min.js"></script>
     <script src="js/chart.js"></script>
 
+
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"/>
+    <link href="http://cdn.bootcss.com/bootstrap-daterangepicker/2.1.25/daterangepicker.min.css" rel="stylesheet"/>
+    <link href="https://cdn.bootcss.com/dropzone/5.2.0/min/dropzone.min.css" rel="stylesheet"/>
+    <link href="css/local.css" rel="stylesheet"/>
+
+    <!-- 解决ie9以下浏览器对html5新增标签的不识别，并导致CSS不起作用的问题。-->　
+    <script src="http://cdn.bootcss.com/respond.js/1.4.2/respond.js"></script>
+    <!-- 让不支持css3 Media Query的浏览器包括IE6-IE8等其他浏览器支持查询。-->
+    <script src="http://cdn.bootcss.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <!-- 如果要使用Bootstrap的js插件，必须先调入jQuery -->
+    <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+    <!-- 包括所有bootstrap的js插件或者可以根据需要使用的js插件调用　-->
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <script src="http://cdn.bootcss.com/bootstrap-daterangepicker/2.1.25/moment.min.js"></script>
+    <script src="http://cdn.bootcss.com/bootstrap-daterangepicker/2.1.25/daterangepicker.min.js"></script>
+
     <style>
         .chart {
             width: 100%;
@@ -22,7 +44,7 @@
 </head>
 <body>
 
-<nav class="navbar navbar-default" role="navigation">
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
     <div class="container-fluid">
         <div class="navbar-header">
             <a class="navbar-brand" href="#"><i class="fa fa-line-chart fa-1x fa-fw"></i>监控平台</a>
@@ -48,6 +70,7 @@
 </div>
 </body>
 <script type="text/javascript" th:inline="javascript">
+
     var chartMap = new Map();
     $(".panel-body div").each(function(){
         var chart = echarts.init($(this).get(0));
@@ -67,7 +90,33 @@
         $(".panel-body div").each(function(){
             var id = $(this).attr('id');
             if(id != undefined) {
-                websocket.send($(this).attr('id'));
+                var data = {
+                    "metric": id,
+                    "tags": {},
+                    "startTime": moment().subtract(29, 'days'),
+                    "endTime": moment(),
+                    "aggregator": "AVG",
+                    "downSampler": "AVG",
+                    "sampleInterval": 10,
+                    "aggregator2": null,
+                    "downSampler2": null,
+                    "limit": 0,
+                    "orderBy": null,
+                    "limitNTag": null,
+                    "limitType": null,
+                    "metricType": null,
+                    "needArchive": true,
+                    "queryTags": null,
+                    "chartType": null,
+                    "aggTags": null,
+                    "customExpression": null,
+                    "customExpressionTagKey": null,
+                    "concernedValueTypes": null,
+                    "needPreAgg": false,
+                    "appCode": null
+                };
+                console.log(JSON.stringify(data));
+                websocket.send(JSON.stringify(data));
             }
         });
     }

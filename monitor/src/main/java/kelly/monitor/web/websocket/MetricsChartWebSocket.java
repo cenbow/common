@@ -4,6 +4,7 @@ import com.google.common.eventbus.Subscribe;
 import kelly.monitor.config.CustomSpringConfigurator;
 import kelly.monitor.config.JacksonSerializer;
 import kelly.monitor.core.KlTsdbs;
+import kelly.monitor.core.MetricDataQuery;
 import kelly.monitor.model.MetricsChart;
 import kelly.monitor.task.MetricChartTask;
 import org.slf4j.Logger;
@@ -59,9 +60,12 @@ public class MetricsChartWebSocket {
     public void onMessage(String name) {
         logger.info("MetricsChartWebSocket onMessage");
         //MetricsChart metricsChart = metricsService.findMetricsRealTimeChat(name);
+        System.out.println("###############" + name);
+
+        MetricDataQuery metricDataQuery = jacksonSerializer.deSerialize(name, MetricDataQuery.class);
         MetricsChart metricsChart = null;
         try {
-            metricsChart = klTsdbs.initMetricsChart(name);
+            metricsChart = klTsdbs.initMetricsChart(metricDataQuery);
         } catch (Exception e) {
             e.printStackTrace();
         }

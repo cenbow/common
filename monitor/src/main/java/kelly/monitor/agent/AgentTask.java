@@ -43,12 +43,6 @@ public class AgentTask implements Runnable {
 
         List<ListenableFuture<Packet>> futureList = applicationServers.stream()
                 .map(applicationServer -> agentApplicationServer(applicationServer)).collect(Collectors.toList());
-//        List<ListenableFuture<Packet>> futureList = Lists.newArrayListWithCapacity(applicationServers.size());
-//        for (ApplicationServer applicationServer : applicationServers) {
-//            ListenableFuture<Packet> future = agentApplicationServer(applicationServer);
-//            futureList.add(agentApplicationServer(applicationServer));
-//        }
-        //ListenableFuture<List<Packet>> -> List<ListenableFuture<Packet>> futureList
         ListenableFuture<List<Packet>> listListenableFuture = Futures.successfulAsList(futureList);
 
         List<Packet> packets = null;

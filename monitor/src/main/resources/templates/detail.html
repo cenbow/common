@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>监控平台</title>
+    <!--
+        <script src="js/jquery-3.2.1.min.js"></script>
+        <script src="js/bootstrap.min.js"></script>
+        -->
+    <script src="js/echarts.common.min.js"></script>
+    <script src="js/chart.js"></script>
+
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"/>
+    <link href="http://cdn.bootcss.com/bootstrap-daterangepicker/2.1.25/daterangepicker.min.css"
+          rel="stylesheet"/>
+    <link href="https://cdn.bootcss.com/dropzone/5.2.0/min/dropzone.min.css" rel="stylesheet"/>
+
+    <link rel="stylesheet" href="http://davidstutz.de/bootstrap-multiselect/dist/css/bootstrap-multiselect.css"
+          type="text/css"/>
+
+    <!-- 解决ie9以下浏览器对html5新增标签的不识别，并导致CSS不起作用的问题。-->　
+    <script src="http://cdn.bootcss.com/respond.js/1.4.2/respond.js"></script>
+    <!-- 让不支持css3 Media Query的浏览器包括IE6-IE8等其他浏览器支持查询。-->
+    <script src="http://cdn.bootcss.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <!-- 如果要使用Bootstrap的js插件，必须先调入jQuery -->
+    <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+    <!-- 包括所有bootstrap的js插件或者可以根据需要使用的js插件调用　-->
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="http://davidstutz.de/bootstrap-multiselect/dist/js/bootstrap-multiselect.js"></script>
+    <script src="http://cdn.bootcss.com/bootstrap-daterangepicker/2.1.25/moment.min.js"></script>
+    <script src="http://cdn.bootcss.com/bootstrap-daterangepicker/2.1.25/daterangepicker.min.js"></script>
+
+    <script src="js/widgets.js"></script>
+
+
+    <style>
+        .chart {
+            width: 100%;
+            height: 400px;
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-default" role="navigation" style="top:-20px">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="#"><i class="fa fa-line-chart fa-1x fa-fw"></i>监控平台</a>
+        </div>
+    </div>
+</nav>
+
+
+<div class="container">
+    <form class="form-inline" role="form" action="/detail">
+        <div class="input-group">
+            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+            <input class="form-control " id="daterange-text" style="width: 305px"/>
+        </div>
+        <div class="form-group" th:each="tag : ${tags}">
+            <label th:for="${tag.key}" class="label label-default" th:text="${tag.key}"></label>
+            <select style="display: none" th:id="${tag.key}" class="tag">
+                <!--
+                <optgroup label="top">
+                    <option value="#top3">top3</option>
+                    <option value="#top5">top5</option>
+                    <option value="#top10">top10</option>
+                </optgroup>
+                <optgroup label="bottom">
+                    <option value="#bottom3">bottom3</option>
+                    <option value="#bottom5">bottom5</option>
+                    <option value="#bottom10">bottom10</option>
+                </optgroup>
+                <optgroup label="delta">
+                    <option value="#delta3">delta3</option>
+                    <option value="#delta5">delta5</option>
+                    <option value="#delta10">delta10</option>
+                </optgroup>
+                -->
+                <option value="">all</option>
+                <option th:value="${tagvalue}" th:if="${not #lists.isEmpty(tag.value)}"
+                        th:each="tagvalue : ${tag.value}"
+                        th:text="${tagvalue}"></option>
+            </select>
+
+        </div>
+        <input type="hidden" name="startTime" id="startTime"
+               th:value="${query.startTime.time}"/>
+        <input type="hidden" name="endTime" id="endTime"
+               th:value="${query.endTime.time}"/>
+        <input type="hidden" name="metric" id="metric" th:value="${query.metric}"/>
+        <input type="hidden" name="tags" id="tags" value=""/>
+        <button type="submit" class="btn btn-default" id="searchBtn">查询</button>
+    </form>
+</div>
+
+<div class="container" style="margin-top: 20px">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        <i class="fa fa-server fa-fw"></i> <span th:text="${query.metric}"/>
+                    </h3>
+                </div>
+                <div class="panel-body">
+                    <div th:id="${query.metric}" class="chart"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+<script type="text/javascript" th:inline="javascript">
+
+    $(document).ready(function () {
+        init_daterangepicker();
+        $('.tag').multiselect({
+            enableClickableOptGroups: true,
+            enableCollapsibleOptGroups: true,
+            enableFiltering: true,
+            includeSelectAllOption: true
+        });
+        $("#searchBtn").click(function () {
+            parse_tags();
+        });
+
+    });
+
+    function init_tags(){
+        var tags = [[${query.tags}]];
+        $.each(tags, function (key, value) {
+            $("#"+key).val(value);
+            $("#"+key).multiselect("refresh");
+        });
+    }
+
+    function parse_tags(){
+        var tags = new Map();
+        $("select.tag").each(function () {
+            if ($(this).val() != '') {
+                tags[$(this).attr("id")] = $(this).val();
+            }
+        });
+        $("#tags").val(JSON.stringify(tags));
+        return tags;
+    }
+
+    function search() {
+        var data = {
+            "metric": $("#metric").val(),
+            "tags": parse_tags(),
+            "startTime": $("#startTime").val(),
+            "endTime": $("#endTime").val(),
+            "aggregator": "AVG",
+            "downSampler": "AVG",
+            "sampleInterval": 10,
+            "aggregator2": null,
+            "downSampler2": null,
+            "limit": 0,
+            "orderBy": null,
+            "limitNTag": null,
+            "limitType": null,
+            "metricType": null,
+            "needArchive": true,
+            "queryTags": null,
+            "chartType": null,
+            "aggTags": null,
+            "customExpression": null,
+            "customExpressionTagKey": null,
+            "concernedValueTypes": null,
+            "needPreAgg": false,
+            "appCode": null
+        };
+        websocket.send(JSON.stringify(data));
+    }
+
+    function init_daterangepicker() {
+        //日期控件初始化
+        var options = daterangepicker_full_options;
+        options.startDate = moment([[${query.startTime.time}]]);
+        options.endDate = moment([[${query.endTime.time}]]);
+        $('#daterange-text').daterangepicker(options
+                , function (start, end, label) {
+//                  $("#startTime").val(start.format('YYYY-MM-DD HH:mm:ss'));
+//                  $("#endTime").val(end.format('YYYY-MM-DD HH:mm:ss'));
+                    $("#startTime").val(start.format('x'));
+                    $("#endTime").val(end.format('x'));
+                    //console.log(start.get(),start.unix(),start.get(),start.get(),start.get(),start.get(),start.get(),end.toISOString(), label);
+                });
+    }
+
+    var chartMap = new Map();
+    $(".panel-body div").each(function () {
+        var chart = echarts.init($(this).get(0));
+        chartMap.set($(this).attr('id'), chart);
+        chart.setOption(default_option, true);
+        chart.showLoading();
+    });
+
+    if ('WebSocket' in window) {
+        var host = [[${#httpServletRequest.getServerName()+":"+#httpServletRequest.getServerPort()}]];
+        websocket = new WebSocket("ws://" + host + "/chart_ws");
+    } else {
+        alert('Sorry, websocket not supported by your browser.');
+    }
+
+
+    websocket.onopen = function (event) {
+        init_tags();
+        search();
+    }
+
+    websocket.onclose = function (e) {
+        console.log(e);
+    };
+
+    websocket.onmessage = function (event) {
+
+        var data = $.parseJSON(event.data);
+        var name = data.name;
+        var size = Object.keys(data.data).length;
+        var legend = new Array(size);
+        var series = new Array(size);
+
+        $.each(data.data, function (key, value) {
+            legend.push(key);
+            series.push({
+                name: key,
+                type: 'line',
+                showSymbol: false,
+                hoverAnimation: false,
+                areaStyle: {normal: {}},
+                data: value
+            });
+        });
+
+        var option = {
+            legend: {
+                data: legend
+            },
+            xAxis: {
+                data: data.date
+            },
+            series: series
+        };
+        chartMap.get(name).hideLoading();
+        chartMap.get(name).setOption(option);
+        // websocket.close();
+    }
+
+</script>
+
+</html>
