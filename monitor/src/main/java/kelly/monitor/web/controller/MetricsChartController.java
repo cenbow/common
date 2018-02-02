@@ -14,9 +14,9 @@ public class MetricsChartController {
     private Logger logger = LoggerFactory.getLogger(MetricsChartController.class);
 
 
-    @RequestMapping(value = "/", method = RequestMethod.GET)
+    @RequestMapping(value = "/monitor", method = RequestMethod.GET)
     public String index() {
-        return "index";
+        return "monitor";
     }
 
 }

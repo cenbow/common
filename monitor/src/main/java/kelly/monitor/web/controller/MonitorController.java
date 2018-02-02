@@ -8,6 +8,7 @@ import kelly.monitor.core.KlTsdbs;
 import kelly.monitor.core.MetricDataQuery;
 import kelly.monitor.dao.mapper.MetricsMapper;
 import kelly.monitor.model.User;
+import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -34,7 +36,7 @@ public class MonitorController {
     @Autowired
     private KlTsdbs klTsdbs;
 
-    @RequestMapping(value = "/monitor", method = RequestMethod.GET)
+    @RequestMapping(value = "/", method = RequestMethod.GET)
     public String index(Model model) {
         //TODO 应用名先写死
         List<String> metricsNames = metricsMapper.findNames("jvm");
@@ -48,10 +50,17 @@ public class MonitorController {
     public String detail(@ModelAttribute("query") MetricDataQuery query, Model model) {
         try {
             //      System.out.println(query.getTags().get("host").getClass());
-            System.out.println("^^^^^^^^^^^^^^^^^^"+jacksonSerializer.serialize(query));
+            System.out.println("^^^^^^^^^^^^^^^^^^" + jacksonSerializer.serialize(query));
             query.setAggregator(AggregatorType.SUM);
             query.setDownSampler(AggregatorType.AVG);
             query.setSampleInterval(60);
+            Date now = new Date();
+            if (query.getStartTime() == null) {
+                query.setStartTime(DateUtils.addDays(now, -2));
+            }
+            if (query.getEndTime() == null) {
+                query.setEndTime(DateUtils.addDays(now, 2));
+            }
 //            MetricsChart metricsChart = klTsdbs.initMetricsChart(query);
 //            model.addAttribute("chart", metricsChart);
             model.addAttribute("tags", getTags());

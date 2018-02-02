@@ -15,8 +15,8 @@ var daterangepicker_locale = {
 };
 //定义daterangepicker汉化按钮部分
 var daterangepicker_range = {
-    '今日': [moment(), moment()],
-    '昨日': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+    '今日': [moment().subtract(1, 'days'), moment()],
+    '昨日': [moment().subtract(2, 'days'), moment().subtract(1, 'days')],
     '最近7日': [moment().subtract(6, 'days'), moment()],
     '最近30日': [moment().subtract(29, 'days'), moment()],
     '本月': [moment().startOf('month'), moment().endOf('month')],
