@@ -1,6 +1,7 @@
 package kelly.monitor.dao.mapper;
 
-import kelly.monitor.agent.ApplicationServer;
+
+import kelly.monitor.common.ApplicationServer;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 

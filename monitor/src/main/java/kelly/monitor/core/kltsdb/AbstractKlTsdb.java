@@ -5,6 +5,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.stumbleupon.async.Deferred;
+import kelly.monitor.common.AggregatorType;
 import kelly.monitor.common.MetricType;
 import kelly.monitor.core.*;
 import kelly.monitor.core.uid.UniqueId;

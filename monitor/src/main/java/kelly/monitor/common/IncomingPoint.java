@@ -22,6 +22,17 @@ public class IncomingPoint implements Serializable {
 
     private Float[] values;
 
+    public IncomingPoint() {
+    }
+
+    public IncomingPoint(String name, MetricType type, TreeMap<String, String> tags, long timestamp, Float[] values) {
+        this.name = name;
+        this.type = type;
+        this.tags = tags;
+        this.timestamp = timestamp;
+        this.values = values;
+    }
+
     public String getName() {
         return name;
     }

@@ -1,6 +1,8 @@
 package kelly.monitor.common;
 
+import com.google.common.base.Objects;
 import com.google.common.base.Strings;
+
 
 /**
  * Created by kelly-lee on 2018/1/18.
@@ -12,6 +14,21 @@ public class ApplicationServer {
     private String ip;
     private Integer port;
     private String host;
+    private boolean alertEnabled;
+    private boolean monitorEnabled;
+
+    public ApplicationServer() {
+    }
+
+    public ApplicationServer(String appName, String appCode, String ip, Integer port, String host, boolean alertEnabled, boolean monitorEnabled) {
+        this.appName = appName;
+        this.appCode = appCode;
+        this.ip = ip;
+        this.port = port;
+        this.host = host;
+        this.alertEnabled = alertEnabled;
+        this.monitorEnabled = monitorEnabled;
+    }
 
     public String getAppName() {
         return appName;
@@ -53,6 +70,22 @@ public class ApplicationServer {
         this.host = host;
     }
 
+    public boolean isAlertEnabled() {
+        return alertEnabled;
+    }
+
+    public void setAlertEnabled(boolean alertEnabled) {
+        this.alertEnabled = alertEnabled;
+    }
+
+    public boolean isMonitorEnabled() {
+        return monitorEnabled;
+    }
+
+    public void setMonitorEnabled(boolean monitorEnabled) {
+        this.monitorEnabled = monitorEnabled;
+    }
+
     public String getHostOrIp() {
         return !Strings.isNullOrEmpty(host) ? host : ip;
     }
@@ -66,5 +99,20 @@ public class ApplicationServer {
                 ", port=" + port +
                 ", host='" + host + '\'' +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null) return false;
+        if (o == null || getClass() != o.getClass()) return false;
+        ApplicationServer applicationServer = (ApplicationServer) o;
+        return Objects.equal(appCode, applicationServer.getAppCode()) &&
+                Objects.equal(ip, applicationServer.getIp()) &&
+                Objects.equal(host, applicationServer.getHost());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(appCode, ip, host);
     }
 }

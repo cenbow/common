@@ -2,8 +2,12 @@ package kelly.monitor.core.kltsdb;
 
 
 import com.stumbleupon.async.Deferred;
+import kelly.monitor.common.AggregatorType;
 import kelly.monitor.common.MetricType;
-import kelly.monitor.core.*;
+import kelly.monitor.core.MetricDataQuery;
+import kelly.monitor.core.Query;
+import kelly.monitor.core.RowKey;
+import kelly.monitor.core.TagUtil;
 import kelly.monitor.core.uid.UniqueId;
 import kelly.monitor.core.util.MetricSpanUtil;
 import org.hbase.async.Bytes;

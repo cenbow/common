@@ -2,7 +2,7 @@ package kelly.monitor.core;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
-import kelly.monitor.agent.ApplicationServer;
+import kelly.monitor.common.ApplicationServer;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.HashMap;

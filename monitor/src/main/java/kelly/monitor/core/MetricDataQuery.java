@@ -1,6 +1,7 @@
 package kelly.monitor.core;
 
 
+import kelly.monitor.common.AggregatorType;
 import kelly.monitor.common.MetricType;
 import kelly.monitor.common.ValueType;
 

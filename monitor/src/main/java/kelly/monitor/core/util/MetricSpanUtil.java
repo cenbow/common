@@ -1,8 +1,12 @@
 package kelly.monitor.core.util;
 
+import kelly.monitor.common.AggregatorType;
 import kelly.monitor.common.MetricType;
 import kelly.monitor.common.ValueType;
-import kelly.monitor.core.*;
+import kelly.monitor.core.Aggregators;
+import kelly.monitor.core.DataPoints;
+import kelly.monitor.core.MetricDataQuery;
+import kelly.monitor.core.SpanGroup;
 
 
 public class MetricSpanUtil {

@@ -1,4 +1,4 @@
-package kelly.monitor.core;
+package kelly.monitor.common;
 
 /**
  * 预聚合函数类型

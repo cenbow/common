@@ -6,6 +6,7 @@ import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Request;
+import kelly.monitor.common.ApplicationServer;
 import kelly.monitor.common.Packet;
 import kelly.monitor.core.KlTsdbs;
 import kelly.monitor.dao.mapper.ApplicationServerMapper;

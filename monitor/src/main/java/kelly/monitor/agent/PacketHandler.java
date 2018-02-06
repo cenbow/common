@@ -5,6 +5,7 @@ import com.google.common.collect.Maps;
 import com.ning.http.client.AsyncCompletionHandler;
 import com.ning.http.client.HttpResponseStatus;
 import com.ning.http.client.Response;
+import kelly.monitor.common.ApplicationServer;
 import kelly.monitor.common.IncomingPoint;
 import kelly.monitor.common.MetricType;
 import kelly.monitor.common.Packet;

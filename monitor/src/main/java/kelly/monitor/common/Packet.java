@@ -1,17 +1,17 @@
 package kelly.monitor.common;
 
 import com.google.common.collect.Lists;
-import kelly.monitor.agent.ApplicationServer;
 
 import java.util.List;
 
 /**
  * Created by kelly-lee on 2018/1/18.
+ * 一个应用的一台主机在一个时间点所有指标监控数据的集合
  */
 public class Packet {
 
     // 数据来源服务器
-    private kelly.monitor.agent.ApplicationServer applicationServer;
+    private ApplicationServer applicationServer;
     // 抓取结果状态
     private int status;
     // 抓取耗时
@@ -19,11 +19,18 @@ public class Packet {
     // 结果数据
     private List<IncomingPoint> points = Lists.newArrayList();
 
-    public Packet(kelly.monitor.agent.ApplicationServer applicationServer) {
+    public Packet(ApplicationServer applicationServer, int status, long duration, List<IncomingPoint> points) {
+        this.applicationServer = applicationServer;
+        this.status = status;
+        this.duration = duration;
+        this.points = points;
+    }
+
+    public Packet(ApplicationServer applicationServer) {
         this.applicationServer = applicationServer;
     }
 
-    public kelly.monitor.agent.ApplicationServer getApplicationServer() {
+    public ApplicationServer getApplicationServer() {
         return applicationServer;
     }
 

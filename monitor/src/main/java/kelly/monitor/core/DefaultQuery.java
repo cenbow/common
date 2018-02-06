@@ -1,5 +1,7 @@
 package kelly.monitor.core;
 
+import kelly.monitor.common.AggregatorType;
+
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;

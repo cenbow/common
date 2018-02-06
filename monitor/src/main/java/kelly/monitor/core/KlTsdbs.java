@@ -8,6 +8,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.*;
 import com.stumbleupon.async.Deferred;
+import kelly.monitor.common.AggregatorType;
 import kelly.monitor.common.IncomingPoint;
 import kelly.monitor.common.MetricType;
 import kelly.monitor.common.ValueType;

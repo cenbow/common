@@ -2,8 +2,8 @@ package kelly.monitor.web.controller;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
+import kelly.monitor.common.AggregatorType;
 import kelly.monitor.config.JacksonSerializer;
-import kelly.monitor.core.AggregatorType;
 import kelly.monitor.core.KlTsdbs;
 import kelly.monitor.core.MetricDataQuery;
 import kelly.monitor.dao.mapper.MetricsMapper;
