@@ -6,7 +6,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.*;
-import kelly.monitor.agent.ApplicationServer;
+import kelly.monitor.common.AggregatorType;
+import kelly.monitor.common.ApplicationServer;
 import kelly.monitor.common.MetricType;
 import kelly.monitor.common.ValueType;
 import kelly.monitor.core.*;
@@ -104,7 +105,7 @@ public class TestKlOpentsdb {
         query.setStartTime(DateUtils.addHours(now, -2));
         query.setEndTime(DateUtils.addHours(now, 2));
         Map<String, String> tags = Maps.newHashMap();
-        tags.put("app_code", "monitor");
+        //tags.put("app_code", "monitor");
         // tags.put("host", "127.0.0.1");
         query.setTags(tags);
         query.setAggregator(AggregatorType.SUM);

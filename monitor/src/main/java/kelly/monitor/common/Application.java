@@ -8,7 +8,8 @@ import java.util.Set;
 public class Application {
     private String appName;
     private String appCode;
-    private Set<String> owner;
+    private Set<String> owners;
+    private Set<String> emails;
     private Set<ApplicationServer> applicationServers;
 
     public String getAppName() {
@@ -27,12 +28,20 @@ public class Application {
         this.appCode = appCode;
     }
 
-    public Set<String> getOwner() {
-        return owner;
+    public Set<String> getOwners() {
+        return owners;
     }
 
-    public void setOwner(Set<String> owner) {
-        this.owner = owner;
+    public void setOwners(Set<String> owners) {
+        this.owners = owners;
+    }
+
+    public Set<String> getEmails() {
+        return emails;
+    }
+
+    public void setEmails(Set<String> emails) {
+        this.emails = emails;
     }
 
     public Set<ApplicationServer> getApplicationServers() {

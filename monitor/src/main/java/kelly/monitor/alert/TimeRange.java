@@ -33,6 +33,11 @@ public class TimeRange {
         this.slices = parse(range);
     }
 
+    public static void main(String[] args) {
+        TimeRange timeRange = new TimeRange("00:00-12:59,14:00-16:00");
+        System.out.println(timeRange.buildBeautifulString());
+    }
+
     /*  public static boolean checkTimeRange(String range){
           TimeRange timeRange;
           try{

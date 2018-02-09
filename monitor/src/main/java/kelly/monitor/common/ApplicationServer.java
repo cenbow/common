@@ -2,11 +2,17 @@ package kelly.monitor.common;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Strings;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 
 /**
  * Created by kelly-lee on 2018/1/18.
  */
+@Setter
+@Getter
+@ToString
 public class ApplicationServer {
 
     private String appName;
@@ -30,76 +36,15 @@ public class ApplicationServer {
         this.monitorEnabled = monitorEnabled;
     }
 
-    public String getAppName() {
-        return appName;
-    }
-
-    public void setAppName(String appName) {
-        this.appName = appName;
-    }
-
-    public String getAppCode() {
-        return appCode;
-    }
-
-    public void setAppCode(String appCode) {
-        this.appCode = appCode;
-    }
-
-    public String getIp() {
-        return ip;
-    }
-
-    public void setIp(String ip) {
-        this.ip = ip;
-    }
-
-    public Integer getPort() {
-        return port;
-    }
-
-    public void setPort(Integer port) {
-        this.port = port;
-    }
-
-    public String getHost() {
-        return host;
-    }
-
-    public void setHost(String host) {
-        this.host = host;
-    }
-
-    public boolean isAlertEnabled() {
-        return alertEnabled;
-    }
-
-    public void setAlertEnabled(boolean alertEnabled) {
-        this.alertEnabled = alertEnabled;
-    }
-
-    public boolean isMonitorEnabled() {
-        return monitorEnabled;
-    }
-
-    public void setMonitorEnabled(boolean monitorEnabled) {
-        this.monitorEnabled = monitorEnabled;
-    }
-
     public String getHostOrIp() {
         return !Strings.isNullOrEmpty(host) ? host : ip;
     }
 
-    @Override
-    public String toString() {
-        return "ApplicationServer{" +
-                "appName='" + appName + '\'' +
-                ", appCode='" + appCode + '\'' +
-                ", ip='" + ip + '\'' +
-                ", port=" + port +
-                ", host='" + host + '\'' +
-                '}';
+
+    public boolean enableCheckAlert() {
+        return monitorEnabled && alertEnabled;
     }
+
 
     @Override
     public boolean equals(Object o) {

@@ -23,4 +23,6 @@ public class Constants {
     public static final Splitter SPLITTER_DOT = Splitter.on(",").omitEmptyStrings().trimResults();
     public static final Splitter SPLITTER_EQUAL = Splitter.on("=").omitEmptyStrings().trimResults();
     public static final Joiner JOINER = Joiner.on("|").skipNulls();
+
+    public static final String ANY = "*";
 }

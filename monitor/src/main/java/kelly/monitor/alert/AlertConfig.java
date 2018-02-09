@@ -1,13 +1,29 @@
 package kelly.monitor.alert;
 
-import com.google.common.base.Strings;
+import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import kelly.monitor.common.AggregatorType;
+import kelly.monitor.common.IncomingPoint;
+import kelly.monitor.common.MetricType;
+import kelly.monitor.common.Packet;
 import kelly.monitor.config.JacksonSerializer;
-import org.springframework.util.CollectionUtils;
+import kelly.monitor.core.Aggregator;
+import kelly.monitor.core.Aggregators;
+import kelly.monitor.core.IncomingPointIterator;
+import kelly.monitor.core.TagUtil;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
+@Getter
+@Setter
+@ToString
 public class AlertConfig {
 
     private JacksonSerializer jacksonSerializer = new JacksonSerializer();
@@ -24,16 +40,17 @@ public class AlertConfig {
     private String appCode;
     private String metricName;
 
+
     /**
      * 过滤标签
-     * host:*
-     * host:192.168.1.1
-     * host:192.168.1.1|192.168.1.2
-     * host:any
+     * host:*                         include,all
+     * host:192.168.1.1               exclude,all
+     * host:192.168.1.1|192.168.1.2   include,any
      * 这个是指标的各个tag，可以选择不同的值
      * 把符合这些标签的点过滤出来， 有“包含”与“排除”两种过滤方式, 后面的‘默认-ANY’选项，选择ANY的意思是对于已选定tag的任何一个tag value，满足下面的表达式条件就会报警
      */
-    private Map<String, String> tags; // filter
+    private Map<String, AlertTagConfig> alertTagConfigs;
+
     private String tagString;//用于db操作的tag
 
     /**
@@ -60,13 +77,6 @@ public class AlertConfig {
     private int checkCount;
 
     /**
-     * 报警级别
-     * 目前有两种
-     * 用于指定严重程度。暂时没有区别
-     */
-    private AlarmLevel alarmLevel = AlarmLevel.CRITICAL;
-
-    /**
      * 报警方式
      * 默认指定“RTX-邮件-短信”,微信是默认启用。可以选择“发送qmq消息”
      * 指定发送报警的方式
@@ -74,6 +84,14 @@ public class AlertConfig {
     private int alarmMethod = DEFAULT_ALARM_METHOD;//使用位操作, 11111 从右到左表示 MAIL RTX MESSAGE QMQ WECHAT
     //配置需要发报警的次数
     private long alertTimes = -1;
+
+
+    /**
+     * 报警级别
+     * 目前有两种
+     * 用于指定严重程度。暂时没有区别
+     */
+    private AlarmLevel alarmLevel = AlarmLevel.CRITICAL;
 
     /**
      * 通知人员
@@ -104,12 +122,6 @@ public class AlertConfig {
     private Date globalStopTime;//全局停止时间
 
 
-    private Map<String, Integer> tagsAlertLogicMap = Collections.emptyMap();
-    private String tagsAlertLogic = "";//用于db操作的
-    private Map<String, Integer> tagsFilterOptionMap = Collections.emptyMap();
-    private String tagsFilterOption = "";//用于db操作的
-
-
     private Boolean needMessage;//是否需要发送qmq消息
 
     @Deprecated
@@ -122,46 +134,114 @@ public class AlertConfig {
     private int keepAlarmSeconds = 1800;
     private boolean waveKeeping = true;
 
+    private String buildTagsInfo() {
+
+        Map<String,String> queryTags = Maps.newHashMap();
+
+        List<String> result = Lists.newArrayList();
+        for (Map.Entry<String, AlertTagConfig> entry : alertTagConfigs.entrySet()) {
+            String tagKey = entry.getKey();
+            AlertTagConfig alertTagConfig = entry.getValue();
+            if (TagUtil.TAG_NAME_HOST.equals(tagKey)) {
+                // ip地址转成hostname
+                //tagValue = hostTagValueFromIpToHostname(tagValue);
+            }
+
+            if (alertTagConfig.getLogicType() == AlertTagConfig.LogicType.ANY) {
+                result.add(tagKey + "=" + alertTagConfig.getTagValues()); // ANY
+                queryTags.put(tagKey, alertTagConfig.getTagValues().toString());
+            } else {
+                result.add(tagKey + alertTagConfig.getFilterType().name() + alertTagConfig.getTagValues().toString());
+                if (alertTagConfig.getFilterType() == AlertTagConfig.FilterType.EXCLUDE) {
+                    queryTags.put(tagKey, "*");  // 排除
+                } else {
+                    queryTags.put(tagKey,  alertTagConfig.getTagValues().toString());  // 包含
+                }
+            }
+        }
+        return Joiner.on(",").skipNulls().join(result);
+    }
+
+
 
     public static void main(String[] args) {
+        AlertTagConfig host = new AlertTagConfig("host", ImmutableList.of("192.168.1.1", "192.168.1.2", "192.168.1.3"), AlertTagConfig.FilterType.INCLUDE, AlertTagConfig.LogicType.ANY);
+        AlertTagConfig app = new AlertTagConfig("app", ImmutableList.of("*"), AlertTagConfig.FilterType.INCLUDE, AlertTagConfig.LogicType.ANY);
+        AlertTagConfig subject = new AlertTagConfig("subject", ImmutableList.of("mq.test"), AlertTagConfig.FilterType.EXCLUDE, AlertTagConfig.LogicType.ALL);
         AlertConfig alertConfig = new AlertConfig();
         alertConfig.setAppCode("monitor");
         alertConfig.setMetricName("JVM_Thread_Count");
-        alertConfig.setTags(ImmutableMap.of("host","127.0.0.1"));
-//        alertConfig.set
-
+        alertConfig.setAlertTagConfigs(ImmutableMap.of("host", host, "app", app, "subject", subject));
+        IncomingPoint incomingPoint = new IncomingPoint();
+        incomingPoint.setName("JVM_Thread_Count");
+        TreeMap<String, String> treeMap = Maps.newTreeMap();
+//         treeMap.put("app", "monitor");
+//        treeMap.put("host", "192.168.1.3");
+//        treeMap.put("subject", "mq.s1");
+//        treeMap.put("group", "default");
+        incomingPoint.setTags(treeMap);
+        boolean flag = alertConfig.match(incomingPoint);
+        System.out.println(flag);
+        System.out.println(alertConfig.buildTagsInfo());
     }
 
-    public void setWaveKeeping(boolean waveKeeping) {
-        this.waveKeeping = waveKeeping;
+
+    public List<IncomingPoint> hitMetricTags(List<Packet> packets) {
+        return packets.stream().map(packet -> packet.getPoints())
+                .flatMap(incomingPoints -> incomingPoints.stream()).filter(incomingPoint -> match(incomingPoint)).collect(Collectors.toList());
     }
 
-    public long getCheckAccumulateTime() {
-        return checkAccumulateTime;
+    public List<TimeExpression> hitTimeRange() {
+        return getTimeExpressions().stream().filter(timeExpression -> timeExpression.matchTimeRange()).collect(Collectors.toList());
     }
 
-    public void setCheckAccumulateTime(long checkAccumulateTime) {
-        this.checkAccumulateTime = checkAccumulateTime;
+    /**
+     * 如果报警配置有tagk=*，point中是否包含tagk都匹配
+     * 所有报警条件都匹配
+     *
+     * @param incomingPoint
+     * @return
+     */
+    public boolean match(IncomingPoint incomingPoint) {
+//         alertTagConfigs.entrySet().stream()
+//                .filter(entry -> !entry.getValue().matchAll())
+//                 .filter(entry -> entry.getValue().).count();
+//        alertTagConfigs.containsValue(incomingPoint.getTags())
+//        long count = alertTagConfigs.entrySet().stream()
+//                .filter(entry -> entry.getValue().match(incomingPoint.getTags())).count();
+//        System.out.println(alertTagConfigs.entrySet().stream()
+//                .filter(entry -> entry.getValue().match(incomingPoint.getTags())).count());
+
+        return matchMetricName(incomingPoint)
+                && matchAlertTagConfigs(incomingPoint);
     }
 
-    public Map<String, Integer> getTagsFilterOptionMap() {
-        return tagsFilterOptionMap;
+    public Map<String, Float> aggValue(List<IncomingPoint> incomingPoints) {
+        Map<String, Float> valueMap = Maps.newHashMap();
+        MetricType metricType = incomingPoints.get(0).getType();
+        Arrays.stream(metricType.sequence()).forEach(valueType -> {
+            Aggregator aggregator = Aggregators.get(aggregatorType);
+            float value = aggregator.run(new IncomingPointIterator(incomingPoints, valueType));
+            valueMap.put(aggregatorType.name() + "_" + valueType.text(), value);
+        });
+        return valueMap;
     }
 
-    public void setTagsFilterOptionMap(Map<String, Integer> tagsFilterOptionMap) {
-        this.tagsFilterOptionMap = tagsFilterOptionMap;
+    private boolean matchCheckCount(long count) {
+        return count >= checkCount && (alertTimes < 0 || (count - checkCount) < alertTimes);
     }
 
-    public String getTagsFilterOption() {
-        return tagsFilterOption;
+
+
+    private boolean matchMetricName(IncomingPoint incomingPoint) {
+        return metricName.equalsIgnoreCase(incomingPoint.getName());
     }
 
-    public void setTagsFilterOption(String tagsFilterOption) {
-        this.tagsFilterOption = tagsFilterOption;
-        if (!Strings.isNullOrEmpty(tagsFilterOption)) {
-            setTagsFilterOptionMap(jacksonSerializer.deSerialize(tagsFilterOption, Map.class));
-        }
+    private boolean matchAlertTagConfigs(IncomingPoint incomingPoint) {
+        return alertTagConfigs.entrySet().stream()
+                .filter(entry -> entry.getValue().match(incomingPoint.getTags())).count() == alertTagConfigs.size();
     }
+
 
     public boolean isMqMessage() {
         return isMessageType(MQ_MESSAGE_INT);
@@ -200,57 +280,11 @@ public class AlertConfig {
         this.alarmMethod = this.alarmMethod | (messageType ? messageTypeInt : DEFAULT_ALARM_METHOD);
     }
 
-    public int getAlarmMethod() {
-        return alarmMethod;
-    }
-
-    public void setAlarmMethod(int alarmMethod) {
-        this.alarmMethod = alarmMethod;
-    }
 
     private boolean isMessageType(int messageTypeInt) {
         return (alarmMethod & messageTypeInt) > DEFAULT_ALARM_METHOD;
     }
 
-    public AlarmLevel getAlarmLevel() {
-        return alarmLevel;
-    }
-
-    public void setAlarmLevel(AlarmLevel alarmLevel) {
-        this.alarmLevel = alarmLevel;
-    }
-
-    public long getAlertTimes() {
-        return alertTimes;
-    }
-
-    public void setAlertTimes(long alertTimes) {
-        this.alertTimes = alertTimes;
-    }
-
-    public long getPublishStopTimes() {
-        return publishStopTimes;
-    }
-
-    public void setPublishStopTimes(long publishStopTimes) {
-        this.publishStopTimes = publishStopTimes;
-    }
-
-    public Boolean getIsContinueAccumulate() {
-        return isContinueAccumulate;
-    }
-
-    public void setIsContinueAccumulate(Boolean isContinueAccumulate) {
-        this.isContinueAccumulate = isContinueAccumulate;
-    }
-
-    public Boolean getNeedMessage() {
-        return needMessage;
-    }
-
-    public void setNeedMessage(Boolean needMessage) {
-        this.needMessage = needMessage;
-    }
 
     public boolean isStop() {
         long curr = System.currentTimeMillis();
@@ -262,179 +296,8 @@ public class AlertConfig {
         return curr < t;
     }
 
-    public Date getGlobalStopTime() {
-        return globalStopTime;
-    }
-
-    public void setGlobalStopTime(Date globalStopTime) {
-        this.globalStopTime = globalStopTime;
-    }
-
-    public Date getStopTime() {
-        return stopTime;
-    }
-
-    public void setStopTime(Date stopTime) {
-        this.stopTime = stopTime;
-    }
-
-    public String getTagString() {
-        return tagString;
-    }
-
-    public void setTagString(String tagString) {
-        this.tagString = tagString;
-    }
-
-    public Boolean getNotifyAll() {
-        return notifyAll;
-    }
-
-    public void setNotifyAll(Boolean notifyAll) {
-        this.notifyAll = notifyAll;
-    }
-
-    public List<TimeExpression> getTimeExpressions() {
-        return timeExpressions;
-    }
-
-    public void setTimeExpressions(List<TimeExpression> timeExpressions) {
-        this.timeExpressions = timeExpressions;
-    }
-
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getAppCode() {
-        return appCode;
-    }
-
-    public void setAppCode(String appCode) {
-        this.appCode = appCode;
-    }
-
-    public String getMetricName() {
-        return metricName;
-    }
-
-    public void setMetricName(String metricName) {
-        this.metricName = metricName;
-    }
-
-    public Map<String, String> getTags() {
-        return tags;
-    }
-
-    public void setTags(Map<String, String> tags) {
-        this.tags = tags;
-    }
-
-    public AggregatorType getAggregatorType() {
-        return aggregatorType;
-    }
-
-    public void setAggregatorType(AggregatorType aggregatorType) {
-        this.aggregatorType = aggregatorType;
-    }
-
-    public Map<String, Integer> getTagsAlertLogicMap() {
-        return tagsAlertLogicMap;
-    }
-
-    public void setTagsAlertLogicMap(Map<String, Integer> tagsAlertLogicMap) {
-        this.tagsAlertLogicMap = tagsAlertLogicMap;
-        if (!CollectionUtils.isEmpty(tagsAlertLogicMap)) {
-            this.tagsAlertLogic = jacksonSerializer.serialize(tagsAlertLogicMap);
-        }
-    }
-
-    public String getTagsAlertLogic() {
-        return tagsAlertLogic;
-    }
-
-    public void setTagsAlertLogic(String tagsAlertLogic) {
-        this.tagsAlertLogic = tagsAlertLogic;
-        if (!Strings.isNullOrEmpty(tagsAlertLogic)) {
-            this.tagsAlertLogicMap = jacksonSerializer.deSerialize(tagsAlertLogic, Map.class);
-        }
-    }
-
-    public int getCheckCount() {
-        return checkCount;
-    }
-
-    public void setCheckCount(int checkCount) {
-        this.checkCount = checkCount;
-    }
-
-    public String getOwner() {
-        return owner;
-    }
-
-    public void setOwner(String owner) {
-        this.owner = owner;
-    }
-
-    public String getComment() {
-        return comment;
-    }
-
-    public void setComment(String comment) {
-        this.comment = comment;
-    }
-
-    public Status getStatus() {
-        return status;
-    }
-
-    public void setStatus(Status status) {
-        this.status = status;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public String getCreator() {
-        return creator;
-    }
-
-    public void setCreator(String creator) {
-        this.creator = creator;
-    }
-
     public boolean isJustQmqMethod() {
         return this.alarmMethod == 8;
-    }
-
-    public int getKeepAlarmSeconds() {
-        return keepAlarmSeconds;
-    }
-
-    public void setKeepAlarm(boolean keepAlarm) {
-        this.keepAlarm = keepAlarm;
-    }
-
-    public void setKeepAlarmSeconds(int keepAlarmSeconds) {
-        this.keepAlarmSeconds = keepAlarmSeconds;
-    }
-
-    public boolean isKeepAlarm() {
-        return keepAlarm;
-    }
-
-    public boolean isWaveKeeping() {
-        return waveKeeping;
     }
 
     public enum Status {
@@ -442,110 +305,6 @@ public class AlertConfig {
         normal, disable;
     }
 
-    public static class TimeExpression {
-
-        public TimeExpression(TimeRange timeRange, String expression) {
-            this.timeRange = timeRange;
-            this.expression = expression;
-        }
-
-        public TimeExpression(TimeRange timeRange, String expression, int checkType) {
-            this.timeRange = timeRange;
-            this.expression = expression;
-            this.checkType = checkType;
-        }
-
-        public TimeExpression(TimeRange timeRange, String expression, int checkType, int benchmark) {
-            this.timeRange = timeRange;
-            this.expression = expression;
-            this.checkType = checkType;
-            this.benchmark = benchmark;
-        }
-
-        public TimeExpression(TimeRange timeRange, String expression, Map<String, String> aggTypeValueTypeMap, int checkType, int benchmark) {
-            this.timeRange = timeRange;
-            this.expression = expression;
-            this.aggTypeValueTypeMap = aggTypeValueTypeMap;
-            this.checkType = checkType;
-            this.benchmark = benchmark;
-        }
-
-        public TimeExpression() {
-        }
-
-        private TimeRange timeRange;
-
-        private String expression;
-
-        private Map<String, String> aggTypeValueTypeMap;
-
-        /**
-         * 绝对值-波动倍数-波动绝对值
-         * 如何计算当前报警值
-         * 绝对值：就取当前point的值，一般选择这个选项
-         * 波动倍数：和以上一分钟的值比较，看看波动了多少倍，做除法
-         * 波动绝对值：和以上一分钟的值比较，看看波动了多少，做减法，
-         * 取绝对值
-         * 波动报警(波动倍数 波动绝对值) 适合于特别稳定而且敏感的指标，
-         * 用于观察指标的细微变化
-         * 比如某接口的响应时间一直是0.5ms左右，那么设置报警的时候，可以考虑波动报警。
-         * 如果上升到2ms，看起来值很小，其实系统可能产生了一些不稳定的变化。
-         */
-
-        private int checkType;//检查类型 0.正常 1.波动倍数检查 2. 波动绝对值
-
-        private int benchmark;
-
-        public int getCheckType() {
-            return checkType;
-        }
-
-        public void setCheckType(int checkType) {
-            this.checkType = checkType;
-        }
-
-        public int getBenchmark() {
-            return benchmark;
-        }
-
-        public void setBenchmark(int benchmark) {
-            this.benchmark = benchmark;
-        }
-
-        public TimeRange getTimeRange() {
-            return timeRange;
-        }
-
-        public void setTimeRange(TimeRange timeRange) {
-            this.timeRange = timeRange;
-        }
-
-        public String getExpression() {
-            return expression;
-        }
-
-        public void setExpression(String expression) {
-            this.expression = expression;
-        }
-
-        public Map<String, String> getAggTypeValueTypeMap() {
-            return aggTypeValueTypeMap;
-        }
-
-        public void setAggTypeValueTypeMap(Map<String, String> aggTypeValueTypeMap) {
-            this.aggTypeValueTypeMap = aggTypeValueTypeMap;
-        }
-
-        @Override
-        public String toString() {
-            return "TimeExpression{" +
-                    "timeRange=" + timeRange +
-                    ", expression='" + expression + '\'' +
-                    ", checkType=" + checkType +
-                    ", benchmark=" + benchmark +
-                    '}';
-        }
-    }
 
     @Override
     public boolean equals(Object o) {
@@ -587,13 +346,11 @@ public class AlertConfig {
         return
                 "应用名:" + appCode + "\n" +
                         "指标名:" + metricName + "\n" +
-                        "tags:" + tags + "\n" +
+                        "tags:" + alertTagConfigs + "\n" +
                         "时间表达式:" + timeExpressions + "\n" +
                         "聚合类型:" + aggregatorType + "\n" +
                         "描述:" + comment + "\n" +
                         "检查次数:" + checkCount + "\n" +
-                        "需要消息:" + (needMessage ? "是" : "否")
-
-                ;
+                        "需要消息:" + (needMessage ? "是" : "否");
     }
 }

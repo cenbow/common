@@ -1,6 +1,7 @@
 package kelly.monitor;
 
-import kelly.monitor.agent.ApplicationServer;
+
+import kelly.monitor.common.ApplicationServer;
 import kelly.monitor.dao.mapper.ApplicationServerMapper;
 import kelly.monitor.dao.mapper.MetricsMapper;
 import org.junit.Test;
