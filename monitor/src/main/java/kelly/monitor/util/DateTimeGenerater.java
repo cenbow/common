@@ -15,7 +15,8 @@ public class DateTimeGenerater {
     public static final int[] MMDDHHMMSS = {5, 6, 8, 9, 11, 12, 14, 15, 17, 18};
     public static final int[] HHMMSS = {11, 12, 14, 15, 17, 18};
     public static final int[] DD = {8, 9};
-    public static final int[] YY_MM_DD_HH_MM_SS = {2, 3, -1, 5, 6, -1, 8, 9, -3, 11, 12, -2, 14, 15};
+    public static final int[] YY_MM_DD_HH_MM_SS = {2, 3, -1, 5, 6, -1, 8, 9, -3, 11, 12, -2, 14, 15, -2, 17, 18};
+    public static final int[] HH_MM_SS = {11, 12, -2, 14, 15, -2, 17, 18};
     public static final Map<Integer, String> DIC = ImmutableMap.of(-1, "-", -2, ":", -3, " ");
 
     public static String get(int[] pattern, long time) {

@@ -13,8 +13,6 @@ import java.util.stream.Collectors;
 /**
  * Crted by kelly-lee on 2018/2/7.
  */
-
-
 @RequiredArgsConstructor
 @AllArgsConstructor
 @Setter
@@ -23,10 +21,10 @@ import java.util.stream.Collectors;
 public class AlertTagConfig {
 
     @NonNull
-    private String tagKey;
-    private List<String> tagValues = null;
-    private FilterType filterType = FilterType.INCLUDE;
-    private LogicType logicType = LogicType.ALL;
+    String tagKey;
+    List<String> tagValues = null;
+    FilterType filterType = FilterType.INCLUDE;
+    LogicType logicType = LogicType.ALL;
     private static final String VALUE_ALL = "*";
 
     enum LogicType {
@@ -34,9 +32,17 @@ public class AlertTagConfig {
     }
 
     enum FilterType {
-        INCLUDE, EXCLUDE
+        INCLUDE("包含"), EXCLUDE("排除");
+        private String text;
+
+        FilterType(String text) {
+            this.text = text;
+        }
     }
 
+    public String toDescrption() {
+        return tagKey + (logicType == LogicType.ANY ? "=" : filterType.name()) + tagValues;
+    }
 
     public AlertTagConfig(String tagKey, List<String> tagValues) {
         this(tagKey, tagValues, FilterType.INCLUDE);
@@ -46,9 +52,6 @@ public class AlertTagConfig {
         this(tagKey, tagValues, filterType, LogicType.ALL);
     }
 
-
-    //* exclude 是非法的
-    //values include
     public Map<String, String> hit(Map<String, String> tags) {
         if (MapUtils.isEmpty(tags)) return Maps.newTreeMap();
         return tags.entrySet().stream().filter(
@@ -58,7 +61,6 @@ public class AlertTagConfig {
                                 filterType == FilterType.EXCLUDE && !tagValues.contains(entry.getValue())
                         )).collect(Collectors.toMap(entry -> entry.getKey(), entry -> entry.getValue()));
     }
-
 
     public boolean match(Map<String, String> tags) {
         return matchAll() || matchExclude(tags) || matchTags(tags);
@@ -82,8 +84,6 @@ public class AlertTagConfig {
                             );
                         }).findAny().isPresent();
     }
-
-
 
 
 }

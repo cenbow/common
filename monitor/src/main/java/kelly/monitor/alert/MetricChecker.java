@@ -17,14 +17,14 @@ public class MetricChecker {
     public MetricChecker(Application application, AlertConfig alertConfig, List<IncomingPoint> incomingPoints) {
         this.alertConfig = alertConfig;
         this.application = application;
-        incomingPoints = incomingPoints;
+        this.incomingPoints = incomingPoints;
     }
 
     public void check() {
         List<TimeExpression> timeExpressions = alertConfig.hitTimeRange();
         if (CollectionUtils.isEmpty(timeExpressions)) return;
-//        timeExpressions.stream().map()
-
+        timeExpressions.stream().map(timeExpression -> new TimeExpressionChecker(application, alertConfig, timeExpression, incomingPoints))
+                .forEach(timeExpressionChecker -> timeExpressionChecker.check());
     }
 
 }

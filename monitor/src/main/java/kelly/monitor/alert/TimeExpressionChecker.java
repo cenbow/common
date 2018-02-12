@@ -12,14 +12,27 @@ import java.util.Map;
  */
 public class TimeExpressionChecker {
 
+    private Application application;
     private AlertConfig alertConfig;
     private TimeExpression timeExpression;//当前时刻
-    private Application application;
     List<IncomingPoint> incomingPoints;//匹配metric、tag、同一应用、同一时刻、不同机器的点
+
+    public TimeExpressionChecker(Application application, AlertConfig alertConfig, TimeExpression timeExpression, List<IncomingPoint> incomingPoints) {
+        this.application = application;
+        this.alertConfig = alertConfig;
+        this.timeExpression = timeExpression;
+        this.incomingPoints = incomingPoints;
+    }
 
     public void check() {
         Map<String, Float> aggValues = alertConfig.aggValue(incomingPoints);
         boolean flag = timeExpression.matchExpression(aggValues);
+        Expression.Item item = timeExpression.getExpression().hitFirstItem(aggValues);
+
+
+        System.out.println(item);
+        System.out.println(item.resolveLimitNTags(incomingPoints));
+        alertConfig.matchCheckCount(5L);
         //报警
 
     }

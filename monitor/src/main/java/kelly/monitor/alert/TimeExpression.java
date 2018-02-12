@@ -10,25 +10,32 @@ import java.util.Map;
 @AllArgsConstructor
 public class TimeExpression {
 
-    private TimeRange timeRange;
+    AlertConfig alertConfig;
+
+    TimeRange timeRange;
     //expression : #P98>50 OR #MIN_1>1500   #VALUE>0 AND #VALUE<500
     @NonNull
-    private Expression expression;
+    Expression expression;
 
-    private CheckType checkType = CheckType.ABS;
+    CheckType checkType = CheckType.ABS;
 
-    private int benchmark;
-    
-    public TimeExpression(String timeRange, String expression) {
-        this.timeRange = new TimeRange(timeRange);
-        this.expression = new Expression(expression);
+    int benchmark;
+
+    public TimeExpression(TimeRange timeRange, Expression expression) {
+        this.timeRange = timeRange;
+        this.expression = expression;
     }
 
-    public TimeExpression(String timeRange, String expression, CheckType checkType) {
-        this.timeRange = new TimeRange(timeRange);
-        this.expression = new Expression(expression);
-        this.checkType = checkType;
-    }
+//    public TimeExpression(String timeRange, String expression) {
+//        this.timeRange = new TimeRange(timeRange);
+//        this.expression = new Expression(expression);
+//    }
+
+//    public TimeExpression(String timeRange, String expression, CheckType checkType) {
+//        this.timeRange = new TimeRange(timeRange);
+//        this.expression = new Expression(expression);
+//        this.checkType = checkType;
+//    }
 
     public boolean matchTimeRange() {
         return timeRange.hit(System.currentTimeMillis());
