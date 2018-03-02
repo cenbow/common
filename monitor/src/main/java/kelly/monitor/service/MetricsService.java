@@ -1,4 +1,4 @@
-package kelly.monitor.services;
+package kelly.monitor.service;
 
 import kelly.monitor.core.MetricDataQuery;
 import kelly.monitor.model.MetricsChart;

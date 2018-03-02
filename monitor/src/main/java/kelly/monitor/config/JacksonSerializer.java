@@ -1,6 +1,7 @@
 package kelly.monitor.config;
 
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -11,7 +12,7 @@ import java.io.IOException;
 
 public class JacksonSerializer {
     private static final Logger logger = LoggerFactory.getLogger(JacksonSerializer.class);
-    private static final ObjectMapper mapper = new ObjectMapper();
+    public static final ObjectMapper mapper = new ObjectMapper();
 
     static {
 
@@ -66,6 +67,15 @@ public class JacksonSerializer {
             return mapper.readValue(content, clazz);
         } catch (IOException e) {
             logger.error("deserialize error: {} -> {}", content, clazz, e);
+            return null;
+        }
+    }
+
+    public <T> T deSerialize(String content, TypeReference<T> typeReference) {
+        try {
+            return mapper.readValue(content, typeReference);
+        } catch (IOException e) {
+            logger.error("deserialize error: {} -> {}", content, typeReference.getType(), e);
             return null;
         }
     }

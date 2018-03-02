@@ -1,4 +1,4 @@
-package kelly.monitor.alert;
+package kelly.monitor.common;
 
 import lombok.*;
 
@@ -8,12 +8,13 @@ import java.util.Map;
 @Getter
 @ToString
 @AllArgsConstructor
+/**
+ * Created by kelly-lee on 2018/2/11.
+ */
 public class TimeExpression {
 
-    AlertConfig alertConfig;
 
     TimeRange timeRange;
-    //expression : #P98>50 OR #MIN_1>1500   #VALUE>0 AND #VALUE<500
     @NonNull
     Expression expression;
 
@@ -26,16 +27,10 @@ public class TimeExpression {
         this.expression = expression;
     }
 
-//    public TimeExpression(String timeRange, String expression) {
-//        this.timeRange = new TimeRange(timeRange);
-//        this.expression = new Expression(expression);
-//    }
+    public String toDescrption() {
+        return timeRange.toDescription() + " " + expression.toDescription();
+    }
 
-//    public TimeExpression(String timeRange, String expression, CheckType checkType) {
-//        this.timeRange = new TimeRange(timeRange);
-//        this.expression = new Expression(expression);
-//        this.checkType = checkType;
-//    }
 
     public boolean matchTimeRange() {
         return timeRange.hit(System.currentTimeMillis());

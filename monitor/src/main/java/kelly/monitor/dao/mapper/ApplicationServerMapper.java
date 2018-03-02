@@ -2,8 +2,10 @@ package kelly.monitor.dao.mapper;
 
 
 import kelly.monitor.common.ApplicationServer;
+import kelly.monitor.common.query.ApplicationServerQuery;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.SelectProvider;
 
 import java.util.List;
 
@@ -13,8 +15,8 @@ import java.util.List;
 @Mapper
 public interface ApplicationServerMapper {
 
-    @Select("select app_name as appName,app_code as appCode,ip,port,host from application_server where app_code = #{appCode}")
-    List<ApplicationServer> queryByCode(String appCode);
+    @SelectProvider(type = ApplicationServerSqlProvider.class, method = "query")
+    List<ApplicationServer> query(ApplicationServerQuery applicationServerQuery);
 
     @Select("select app_code from application_server")
     List<String> getAppCodes();

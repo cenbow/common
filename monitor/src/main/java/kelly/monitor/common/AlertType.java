@@ -1,14 +1,20 @@
-package kelly.monitor.alert;
+package kelly.monitor.common;
 
+import com.google.common.collect.Lists;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by kelly-lee on 2018/2/12.
  */
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
 public class AlertType {
 
     public static final int NONE = 0;//0000
@@ -22,6 +28,20 @@ public class AlertType {
 
     @NonNull
     private int value;
+
+    public String toDescription() {
+        List<String> alertTypes = Lists.newArrayList();
+        if (isSMS()) {
+            alertTypes.add("短信");
+        }
+        if (isMail()) {
+            alertTypes.add("邮件");
+        }
+        if (isWechat()) {
+            alertTypes.add("微信");
+        }
+        return alertTypes.stream().collect(Collectors.joining("、"));
+    }
 
 
     public boolean isWechat() {
@@ -57,13 +77,8 @@ public class AlertType {
         enableType(MQ);
     }
 
-
     private void enableType(int type) {
         this.value |= type;
-    }
-
-    private void disableType(int type) {
-        this.value |= NONE;
     }
 
     private boolean isType(int type) {

@@ -1,11 +1,9 @@
-package kelly.monitor.alert;
+package kelly.monitor.common;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import kelly.monitor.common.AggregatorType;
-import kelly.monitor.common.IncomingPoint;
-import kelly.monitor.common.MetricType;
-import kelly.monitor.common.Packet;
 import kelly.monitor.config.JacksonSerializer;
 import kelly.monitor.core.Aggregator;
 import kelly.monitor.core.Aggregators;
@@ -13,6 +11,8 @@ import kelly.monitor.core.IncomingPointIterator;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.MapUtils;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -24,27 +24,22 @@ import java.util.stream.Collectors;
 @Getter
 @Setter
 @ToString
+/**
+ * Created by kelly-lee on 2018/1/17.
+ */
 public class AlertConfig {
 
-    private JacksonSerializer jacksonSerializer = new JacksonSerializer();
-
-    private int id;
+    private Long id;
     private String appCode;
     private String metricName;
     private Map<String, AlertTagConfig> alertTagConfigs = Maps.newHashMap();
-
-    private String tagString;//用于db操作的tag
     private AggregatorType aggregatorType;
     private List<TimeExpression> timeExpressions = Lists.newArrayList();
     private int checkCount;
-
     private AlertType alertType = AlertType.DEFAULT;
     private AlertLevel alertLevel = AlertLevel.CRITICAL;
     //配置需要发报警的次数
-    private long alertTimes = -1;
-
-
-
+    private int alertTimes = -1;
     private String owner;
     private Boolean notifyAll;
 
@@ -57,9 +52,10 @@ public class AlertConfig {
 
 
     // 配置状态
-    private Status status;
+    private Status status = Status.ENABLE;
 
     private Date createTime;
+    private Date updateTime;
     private String creator;
 
 
@@ -68,15 +64,49 @@ public class AlertConfig {
     private Date globalStopTime;//全局停止时间
 
 
-    @Deprecated
-    private Boolean isContinueAccumulate = true;
-    @Deprecated
-    private long publishStopTimes; /*发布后是否关闭报警*/
-    @Deprecated
-    private long checkAccumulateTime;//累计时间---秒
-    private boolean keepAlarm;//在没有手工确认处理报警之前，持续报警
-    private int keepAlarmSeconds = 1800;
-    private boolean waveKeeping = true;
+//    @Deprecated
+//    private Boolean isContinueAccumulate = true;
+//    @Deprecated
+//    private long publishStopTimes; /*发布后是否关闭报警*/
+//    @Deprecated
+//    private long checkAccumulateTime;//累计时间---秒
+//    private boolean keepAlarm;//在没有手工确认处理报警之前，持续报警
+//    private int keepAlarmSeconds = 1800;
+//    private boolean waveKeeping = true;
+
+    private String alertTagConfigsJson;
+    private String timeExpressionsJson;
+    private int alertTypeValue = -1;
+
+    public void persist(JacksonSerializer serializer) {
+        if (alertTypeValue >= 0) {
+            alertType = new AlertType(alertTypeValue);
+        }
+        if (MapUtils.isNotEmpty(alertTagConfigs)) {
+            alertTagConfigsJson = serializer.serialize(alertTagConfigs);
+        }
+        if (CollectionUtils.isNotEmpty(timeExpressions)) {
+            timeExpressionsJson = serializer.serialize(timeExpressions);
+        }
+        createTime = new Date();
+        updateTime = new Date();
+        //TODO 未能接入登录
+        creator = "admin";
+    }
+
+    public void load(JacksonSerializer serializer) {
+        if (alertTypeValue >= 0) {
+            alertType = new AlertType(alertTypeValue);
+        }
+        if (!Strings.isNullOrEmpty(alertTagConfigsJson)) {
+            alertTagConfigs = serializer.deSerialize(alertTagConfigsJson, new TypeReference<Map<String, AlertTagConfig>>() {
+            });
+        }
+        if (!Strings.isNullOrEmpty(timeExpressionsJson)) {
+            timeExpressions = serializer.deSerialize(timeExpressionsJson, new TypeReference<List<TimeExpression>>() {
+            });
+        }
+    }
 
 
     public List<TimeExpression> hitTimeRange() {
@@ -101,6 +131,7 @@ public class AlertConfig {
         return valueMap;
     }
 
+
     public boolean matchCheckCount(long count) {
         return count >= checkCount && (alertTimes < 0 || (count - checkCount) < alertTimes);
     }
@@ -115,10 +146,21 @@ public class AlertConfig {
                 .filter(entry -> entry.getValue().match(incomingPoint.getTags())).count() == alertTagConfigs.size();
     }
 
-    public String buildTagsInfo() {
+    public String getTagsDescription() {
         return alertTagConfigs.values().stream()
                 .map(alertTagConfig -> alertTagConfig.toDescrption())
                 .collect(Collectors.joining(" AND "));
+    }
+
+    public String getTimeExpressionsDescription() {
+        return timeExpressions.stream()
+                .map(timeExpression -> timeExpression.toDescrption())
+                .collect(Collectors.joining(" AND "));
+    }
+
+    public String getAlertDescription() {
+        return "超过阈值" + checkCount + "次报警以" + alertType.toDescription() + "方式发给" + owner;
+
     }
 
     public List<IncomingPoint> hitMetricTags(List<Packet> packets) {
@@ -140,7 +182,7 @@ public class AlertConfig {
 
     public enum Status {
         //勿切换顺序
-        normal, disable;
+        ENABLE, DISABLE;
     }
 
     public enum AlertLevel {
@@ -184,15 +226,4 @@ public class AlertConfig {
         return result;
     }
 
-    @Override
-    public String toString() {
-        return
-                "应用名:" + appCode + "\n" +
-                        "指标名:" + metricName + "\n" +
-                        "tags:" + alertTagConfigs + "\n" +
-                        "时间表达式:" + timeExpressions + "\n" +
-                        "聚合类型:" + aggregatorType + "\n" +
-                        "描述:" + comment + "\n" +
-                        "检查次数:" + checkCount + "\n" ;
-    }
 }

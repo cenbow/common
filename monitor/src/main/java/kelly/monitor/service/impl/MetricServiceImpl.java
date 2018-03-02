@@ -1,8 +1,8 @@
-package kelly.monitor.services.impl;
+package kelly.monitor.service.impl;
 
 import kelly.monitor.core.MetricDataQuery;
 import kelly.monitor.model.MetricsChart;
-import kelly.monitor.services.MetricsService;
+import kelly.monitor.service.MetricsService;
 
 /**
  * Created by kelly-lee on 2018/1/29.

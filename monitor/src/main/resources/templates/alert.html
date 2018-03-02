@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>监控平台-报警管理</title>
+    <!--
+        <script src="js/jquery-3.2.1.min.js"></script>
+        <script src="js/bootstrap.min.js"></script>
+        -->
+    <script src="js/echarts.common.min.js"></script>
+    <script src="js/chart.js"></script>
+
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"/>
+    <link href="http://cdn.bootcss.com/bootstrap-daterangepicker/2.1.25/daterangepicker.min.css"
+          rel="stylesheet"/>
+    <link href="https://cdn.bootcss.com/dropzone/5.2.0/min/dropzone.min.css" rel="stylesheet"/>
+
+    <link rel="stylesheet" href="http://davidstutz.de/bootstrap-multiselect/dist/css/bootstrap-multiselect.css"
+          type="text/css"/>
+
+    <!-- 解决ie9以下浏览器对html5新增标签的不识别，并导致CSS不起作用的问题。-->　
+    <script src="http://cdn.bootcss.com/respond.js/1.4.2/respond.js"></script>
+    <!-- 让不支持css3 Media Query的浏览器包括IE6-IE8等其他浏览器支持查询。-->
+    <script src="http://cdn.bootcss.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <!-- 如果要使用Bootstrap的js插件，必须先调入jQuery -->
+    <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+    <!-- 包括所有bootstrap的js插件或者可以根据需要使用的js插件调用　-->
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="http://davidstutz.de/bootstrap-multiselect/dist/js/bootstrap-multiselect.js"></script>
+    <script src="http://cdn.bootcss.com/bootstrap-daterangepicker/2.1.25/moment.min.js"></script>
+    <script src="http://cdn.bootcss.com/bootstrap-daterangepicker/2.1.25/daterangepicker.min.js"></script>
+
+    <script src="js/widgets.js"></script>
+
+
+    <style>
+        .chart {
+            width: 100%;
+            height: 400px;
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-default" role="navigation" style="top:-20px">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="#"><i class="fa fa-line-chart fa-1x fa-fw"></i>监控平台</a>
+        </div>
+    </div>
+</nav>
+
+
+
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title" id="myModalLabel">报警配置</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" role="form" action="/alert/save" id="alertConfigForm1" method="get">
+                    <div class="form-group alertTagConfigs">
+                        <label class="col-sm-2 control-label">标签描述：</label>
+                        <div class="col-sm-8">
+                            <div class="btn-group  switchBtn">
+                                <button type="button" class="btn btn-default filterType" value="INCLUDE">包含</button>
+                                <button type="button" class="btn btn-primary filterType" value="EXCLUDE">排除</button>
+                            </div>
+                            <label class="label label-default tagKey">app</label>
+                            <select class="form-control tag tagValues" multiple="true">
+                                <option value="#top3">top3</option>
+                                <option value="#top5">top5</option>
+                                <option value="#top10">top10</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group alertTagConfigs">
+                        <label class="col-sm-2 control-label"></label>
+                        <div class="col-sm-8">
+                            <div class="btn-group switchBtn">
+                                <button type="button" class="btn btn-primary filterType" value="INCLUDE">包含</button>
+                                <button type="button" class="btn btn-default filterType" value="EXCLUDE">排除</button>
+                            </div>
+                            <label class="label label-default tagKey">host</label>
+                            <select class="form-control tag tagValues" multiple="true">
+                                <option value="#top3">top3</option>
+                                <option value="#top5">top5</option>
+                                <option value="#top10">top10</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">规则描述：</label>
+                        <div class="col-sm-6">
+                            <select class="form-control checkCount" id="timeRangeBegin">
+                                <option th:value="${hour+':00'}"
+                                        th:each="hour : ${#numbers.sequence(0,23)}"
+                                        th:text="${hour+':00'}"></option>
+                            </select>
+                            至
+                            <select class="form-control checkCount" id="timeRangeEnd">
+                                <option th:value="${hour+':59'}"
+                                        th:each="hour : ${#numbers.sequence(0,23)}"
+                                        th:text="${hour+':59'}"></option>
+                            </select>
+
+                            <select class="form-control valueType" id="valueType">
+                                <option value="VALUE">数值</option>
+                                <option value="MEAN_RATE">TPS</option>
+                                <option value="MIN_1">1分钟TPS</option>
+                                <option value="MIN_5">5分钟TPS</option>
+                                <option value="MIN_15">15分钟TPS</option>
+                                <option value="MEAN">平均值</option>
+                                <option value="STD">方差</option>
+                                <option value="P75">75%请求的时间</option>
+                                <option value="P98">98%请求的时间</option>
+                            </select>
+
+                            <select class="form-control aggregatorType" id="aggregatorType" name="aggregatorType">
+                                <option value="SUM">总和</option>
+                                <option value="MIN">最小值</option>
+                                <option value="MAX">最大值</option>
+                                <option value="AVG">平均值</option>
+                                <option value="STDDEV">标准差</option>
+                            </select>
+
+                            <select class="form-control logicType" id="logicType">
+                                <option>&gt;=</option>
+                                <option>&gt;</option>
+                                <option>&lt;=</option>
+                                <option>&gt;</option>
+                                <option>=</option>
+                                <option>!=</option>
+                            </select>
+                            <div class="btn-group-vertical">
+                                <input type="text" class="form-control" style="width: 60px" id="value"
+                                       placeholder="阀值"/>
+                            </div>
+                        </div>
+
+
+                    </div>
+                    <div class="form-group">
+                        <label for="lastname" class="col-sm-2 control-label">报警描述：</label>
+                        <div class="col-sm-8">
+                            超过阈值
+                            <select class="form-control checkCount" id="checkCount" name="checkCount">
+                                <option value="1">1</option>
+                                <option value="3">3</option>
+                                <option value="5">5</option>
+                                <option value="10">10</option>
+                                <option value="15">15</option>
+                                <option value="30">30</option>
+                            </select>
+                            次
+                            以
+                            <select class="form-control alertType" id="alertType" multiple="true">
+                                <option value="0">报警方式</option>
+                                <option value="1">短信</option>
+                                <option value="2">邮件</option>
+                                <option value="4">微信</option>
+                                <option value="8">消息</option>
+                            </select>
+                            形式发给
+                            <select class="form-control owner" id="owner" name="owner" multiple="true">
+                                <option value="jingli185">李静</option>
+                                <option value="luosisi">罗思思</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-10">
+                            <input type="hidden" id="alertTagConfigsJson" name="alertTagConfigsJson"/>
+                            <input type="hidden" id="timeExpressionsJson" name="timeExpressionsJson"/>
+                            <input type="hidden" id="alertTypeValue" name="alertTypeValue"/>
+                            <input type="hidden" id="metricName" name="metricName" value="packet_collect_time"/>
+                            <input type="hidden" id="appCode" name="appCode" value="monitor"/>
+                            <button type="button" class="btn btn-default" id="alertConfigBtn">配置报警</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default"
+                        data-dismiss="modal">关闭
+                </button>
+                <button type="button" class="btn btn-primary">
+                    提交更改
+                </button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<div class="container" style="margin-top: 20px">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        <i class="fa fa-edit fa-fw"></i>报警配置 <span/>
+                    </h3>
+                </div>
+                <div class="panel-body">
+                    <form class="form-horizontal" role="form" action="/alert/save" id="alertConfigForm" method="get">
+                        <div class="form-group alertTagConfigs">
+                            <label class="col-sm-2 control-label">标签描述：</label>
+                            <div class="col-sm-8">
+                                <div class="btn-group  switchBtn">
+                                    <button type="button" class="btn btn-default filterType" value="INCLUDE">包含</button>
+                                    <button type="button" class="btn btn-primary filterType" value="EXCLUDE">排除</button>
+                                </div>
+                                <label class="label label-default tagKey">app</label>
+                                <select class="form-control tag tagValues" multiple="true">
+                                    <option value="#top3">top3</option>
+                                    <option value="#top5">top5</option>
+                                    <option value="#top10">top10</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group alertTagConfigs">
+                            <label class="col-sm-2 control-label"></label>
+                            <div class="col-sm-8">
+                                <div class="btn-group switchBtn">
+                                    <button type="button" class="btn btn-primary filterType" value="INCLUDE">包含</button>
+                                    <button type="button" class="btn btn-default filterType" value="EXCLUDE">排除</button>
+                                </div>
+                                <label class="label label-default tagKey">host</label>
+                                <select class="form-control tag tagValues" multiple="true">
+                                    <option value="#top3">top3</option>
+                                    <option value="#top5">top5</option>
+                                    <option value="#top10">top10</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">规则描述：</label>
+                            <div class="col-sm-6">
+                                <select class="form-control checkCount" id="timeRangeBegin">
+                                    <option th:value="${hour+':00'}"
+                                            th:each="hour : ${#numbers.sequence(0,23)}"
+                                            th:text="${hour+':00'}"></option>
+                                </select>
+                                至
+                                <select class="form-control checkCount" id="timeRangeEnd">
+                                    <option th:value="${hour+':59'}"
+                                            th:each="hour : ${#numbers.sequence(0,23)}"
+                                            th:text="${hour+':59'}"></option>
+                                </select>
+
+                                <select class="form-control valueType" id="valueType">
+                                    <option value="VALUE">数值</option>
+                                    <option value="MEAN_RATE">TPS</option>
+                                    <option value="MIN_1">1分钟TPS</option>
+                                    <option value="MIN_5">5分钟TPS</option>
+                                    <option value="MIN_15">15分钟TPS</option>
+                                    <option value="MEAN">平均值</option>
+                                    <option value="STD">方差</option>
+                                    <option value="P75">75%请求的时间</option>
+                                    <option value="P98">98%请求的时间</option>
+                                </select>
+
+                                <select class="form-control aggregatorType" id="aggregatorType" name="aggregatorType">
+                                    <option value="SUM">总和</option>
+                                    <option value="MIN">最小值</option>
+                                    <option value="MAX">最大值</option>
+                                    <option value="AVG">平均值</option>
+                                    <option value="STDDEV">标准差</option>
+                                </select>
+
+                                <select class="form-control logicType" id="logicType">
+                                    <option>&gt;=</option>
+                                    <option>&gt;</option>
+                                    <option>&lt;=</option>
+                                    <option>&gt;</option>
+                                    <option>=</option>
+                                    <option>!=</option>
+                                </select>
+                                <div class="btn-group-vertical">
+                                    <input type="text" class="form-control" style="width: 60px" id="value"
+                                           placeholder="阀值"/>
+                                </div>
+                            </div>
+
+
+                        </div>
+                        <div class="form-group">
+                            <label for="lastname" class="col-sm-2 control-label">报警描述：</label>
+                            <div class="col-sm-8">
+                                超过阈值
+                                <select class="form-control checkCount" id="checkCount" name="checkCount">
+                                    <option value="1">1</option>
+                                    <option value="3">3</option>
+                                    <option value="5">5</option>
+                                    <option value="10">10</option>
+                                    <option value="15">15</option>
+                                    <option value="30">30</option>
+                                </select>
+                                次
+                                以
+                                <select class="form-control alertType" id="alertType" multiple="true">
+                                    <option value="0">报警方式</option>
+                                    <option value="1">短信</option>
+                                    <option value="2">邮件</option>
+                                    <option value="4">微信</option>
+                                    <option value="8">消息</option>
+                                </select>
+                                形式发给
+                                <select class="form-control owner" id="owner" name="owner" multiple="true">
+                                    <option value="jingli185">李静</option>
+                                    <option value="luosisi">罗思思</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-sm-offset-2 col-sm-10">
+                                <input type="hidden" id="alertTagConfigsJson" name="alertTagConfigsJson"/>
+                                <input type="hidden" id="timeExpressionsJson" name="timeExpressionsJson"/>
+                                <input type="hidden" id="alertTypeValue" name="alertTypeValue"/>
+                                <input type="hidden" id="metricName" name="metricName" value="packet_collect_time"/>
+                                <input type="hidden" id="appCode" name="appCode" value="monitor"/>
+                                <button type="button" class="btn btn-default" id="alertConfigBtn">配置报警</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+   <div class="container" style="margin: 20px 0">
+    <!-- 按钮触发模态框 -->
+    <button class="btn btn-primary" data-toggle="modal" data-target="#myModal">
+        <i class="fa fa-edit fa-fw"></i>报警配置 <span/>
+    </button>
+   </div>
+    <!--  查询列表 开始-->
+    <div class="table-responsive">
+        <table class="table  table-bordered table-hover ">
+            <!--
+            <caption>查询列表</caption>
+            -->
+            <thead>
+            <tr>
+                <th class="text-center text-middle"><input type="checkbox"/></th>
+                <th class="text-middle">标签描述
+                    <a href="#" class="pull-right"><i class="fa fa-sort-asc fa-fw "></i></a>
+                </th>
+                <th class="text-middle">规则描述
+                    <a href="#" class="pull-right"><i class="fa fa-sort fa-fw "></i></a>
+                </th>
+                <th class="text-middle">报警描述
+                    <a href="#" class="pull-right"><i class="fa fa-sort fa-fw "></i></a>
+                </th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr class="active" th:if="${not #lists.isEmpty(alertConfigs)}" th:each="alertConfig : ${alertConfigs}">
+                <td class="text-center text-middle">
+                    <input type="checkbox" id="ck_1" name="ck" value="1"/>
+                </td>
+                <td class="text-middle" th:text="${alertConfig.tagsDescription}"></td>
+                <td class="text-middle" th:text="${alertConfig.timeExpressionsDescription}"></td>
+                <td class="text-center text-middle" th:text="${alertConfig.alertDescription}"></td>
+                <td width="25%">
+
+                    <a class="btn btn-default btn-sm" href="#"><i class="fa fa-cog"></i> 修改</a>
+
+                    <div class="btn-group btn-group-sm switchBtn">
+                        <button type="button" class="btn btn-default filterType" value="START">开启</button>
+                        <button type="button" class="btn btn-primary filterType" value="STOP">停止</button>
+                    </div>
+
+                    <div class="btn-group btn-group-sm  statusBtn">
+                        <button type="button" class="btn btn-default status" value="ENABLE">启用</button>
+                        <button type="button" class="btn btn-primary status" value="DISABLE">禁止</button>
+                    </div>
+
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <!--  查询列表 结束-->
+
+    <!-- 分页 开始 -->
+    <div class="row-table" style="margin-top: -15px">
+
+        <div class="pull-middle">当前 1/100页</div>
+
+        <ul class="pagination pull-right pull-middle">
+            <li class="disabled"><a href="#"><i class="fa fa-chevron-left"></i>上一页</a></li>
+            <li class="active"><a href="#">1</a></li>
+            <li><a href="#">2</a></li>
+            <li><a href="#">3</a></li>
+            <li><a href="#">4</a></li>
+            <li><a href="#">5</a></li>
+            <li><a href="#"><i class="fa fa-ellipsis-h"></i></a></li>
+            <li><a href="#">下一页<i class="fa fa-chevron-right"></i></a></li>
+        </ul>
+        <div class="pull-middle">
+            <a class="btn btn-default">确定</a>
+        </div>
+    </div>
+    <!-- 分页 结束 -->
+</div>
+
+</body>
+<script type="text/javascript" th:inline="javascript">
+
+    //    $(function () {
+    //        $('#myModal').modal({
+    //        keyboard: true
+    //    })});
+
+    $('.tag').multiselect({
+        enableClickableOptGroups: true,
+        enableCollapsibleOptGroups: true,
+        enableFiltering: true,
+        includeSelectAllOption: true
+    });
+    $('.valueType,.logicType,.aggregatorType,.checkCount,.alertType,.owner').multiselect({});
+
+
+    $(".switchBtn button").click(function () {
+        var flag = $(this).hasClass("btn-default");
+        if (flag) {
+            $(this).parent().find(".btn-primary").removeClass("btn-primary").addClass("btn-default");
+            $(this).removeClass("btn-default").addClass("btn-primary");
+        } else {
+            $(this).parent().find(".btn-default").removeClass("btn-default").addClass("btn-primary");
+            $(this).removeClass("btn-primary").addClass("btn-default");
+        }
+    });
+
+    $("#alertConfigBtn").click(function () {
+        //获得alertTagConfigs
+        var alertTagConfigs = new Map();
+        $(".alertTagConfigs").each(function () {
+            var tagValues = $(this).find(".tagValues").val();
+            if (tagValues.length > 0) {
+                var tagKey = $(this).find(".tagKey").html();
+                var filterType = $(this).find(".btn-primary").attr("value");
+                var alertTagConfig = {
+                    "filterType": filterType,
+                    "tagValues": tagValues,
+                    "tagKey": tagKey,
+                    "logicType": "ANY"
+                };
+                alertTagConfigs[tagKey] = alertTagConfig;
+            }
+        });
+        $("#alertTagConfigsJson").val(JSON.stringify(alertTagConfigs));
+
+
+        var range = $("#timeRangeBegin").val() + "-" + $("#timeRangeEnd").val();
+        var expression = {
+            "aggregatorType": $("#aggregatorType").val(),
+            "valueType": $("#valueType").val(),
+            "logicType": $("#logicType").val(),
+            "value": $("#value").val(),
+            "filterType": "OR"
+        };
+        var timeExpression = {
+            "timeRange": {"values": [range]},
+            "expression": {"items": [expression]}
+        }
+        $("#timeExpressionsJson").val(JSON.stringify(timeExpression));
+
+
+        //获得alertType
+        var alertType = 0;
+        $.each($("#alertType").val(), function (index, value) {
+            alertType += eval(value);
+        });
+        $("#alertTypeValue").val(alertType);
+
+
+        $("#alertConfigForm").submit();
+//        $.ajax({
+//            type: "POST",   //提交的方法
+//            url:"/alert/save", //提交的地址
+//            data:$('#alertConfigForm').serialize(),// 序列化表单值
+//            async: false,
+//            error: function(request) {  //失败的话
+//                alert("Connection error");
+//            },
+//            success: function(data) {  //成功
+//                alert(data);  //就将返回的数据显示出来
+//                $('#identifier').modal('hide');
+//            }
+//        });
+
+
+    });
+
+
+</script>
+
+</html>

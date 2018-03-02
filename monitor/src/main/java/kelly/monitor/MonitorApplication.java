@@ -12,16 +12,16 @@ import org.springframework.boot.web.support.SpringBootServletInitializer;
 
 @SpringBootApplication
 //@EnableCaching
-public class Application
+public class MonitorApplication
         extends SpringBootServletInitializer {
 
     @Override
     protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-        return application.sources(Application.class);
+        return application.sources(MonitorApplication.class);
     }
 
     public static void main(String[] args) {
-        SpringApplication springApplication = new SpringApplication(Application.class);
+        SpringApplication springApplication = new SpringApplication(MonitorApplication.class);
         springApplication.setBannerMode(Banner.Mode.OFF);
         springApplication.run(args);
         //  SpringApplication.run(Application.class, args);

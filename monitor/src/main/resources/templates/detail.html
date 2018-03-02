@@ -128,15 +128,15 @@
 
     });
 
-    function init_tags(){
+    function init_tags() {
         var tags = [[${query.tags}]];
         $.each(tags, function (key, value) {
-            $("#"+key).val(value);
-            $("#"+key).multiselect("refresh");
+            $("#" + key).val(value);
+            $("#" + key).multiselect("refresh");
         });
     }
 
-    function parse_tags(){
+    function parse_tags() {
         var tags = new Map();
         $("select.tag").each(function () {
             if ($(this).val() != '') {

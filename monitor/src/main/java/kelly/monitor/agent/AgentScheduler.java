@@ -4,8 +4,7 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.ning.http.client.AsyncHttpClient;
 import kelly.monitor.core.KlTsdbs;
 import kelly.monitor.dao.mapper.ApplicationServerMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,12 +19,12 @@ import java.util.concurrent.*;
  * 抓取任务调度
  */
 @Component
+@Slf4j
 public class AgentScheduler implements InitializingBean, DisposableBean {
 
     //定义一个任务调度器，获得需要抓去监控数据的应用，然后把应用传给agentTask抓取该应用的数据
     //提供一个启动停止抓取任务的开关
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AgentScheduler.class);
     private ScheduledExecutorService scheduledExecutorService;
     private ExecutorService executorService;
     private boolean enableAgent = true;
@@ -43,7 +42,7 @@ public class AgentScheduler implements InitializingBean, DisposableBean {
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        LOGGER.info("AgentScheduler init begin");
+        log.info("AgentScheduler init begin");
         executorService = Executors.newFixedThreadPool(nThreads, new ThreadFactoryBuilder()
                 .setNameFormat("AgentWork-%d")
                 .setDaemon(true)
@@ -53,7 +52,7 @@ public class AgentScheduler implements InitializingBean, DisposableBean {
                 .setDaemon(true)
                 .build());
         scheduledExecutorService.scheduleAtFixedRate(() -> {
-            LOGGER.info("AgentScheduler schedule begin");
+            log.info("AgentScheduler schedule begin");
             try {
                 if (!enableAgent) {
                     return;
@@ -66,16 +65,17 @@ public class AgentScheduler implements InitializingBean, DisposableBean {
                     executorService.submit(new AgentTask(app, asyncHttpClient, klTsdbs, applicationServerMapper));
                 }
             } catch (Throwable t) {
-                LOGGER.error("agent fail ", t);
+                log.error("agent fail ", t);
                 if (t instanceof Error) {
                     disableAgent();
                 }
             }
-            LOGGER.info("AgentScheduler schedule end");
-        }, initialDelay, period, TimeUnit.MILLISECONDS);
-        LOGGER.info("AgentScheduler init end");
+            log.info("AgentScheduler schedule end");
+        }, initialDelay, period, TimeUnit.HOURS);
+        log.info("AgentScheduler init end");
     }
 
+    //TODO 是否加载可用的应用名
     private List<String> getApps() {
         return applicationServerMapper.getAppCodes();
     }
@@ -93,7 +93,7 @@ public class AgentScheduler implements InitializingBean, DisposableBean {
 
     public void offLineAgentIfNeeded(Throwable t) {
         if (t instanceof java.io.IOException && t.getMessage().contains("Too many")) {
-            LOGGER.error("offline the agent, cause: ", t);
+            log.error("offline the agent, cause: ", t);
             disableAgent();
         }
     }

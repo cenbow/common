@@ -1,5 +1,6 @@
 package kelly.monitor.alert;
 
+import kelly.monitor.common.AlertType;
 import org.junit.Assert;
 import org.junit.Test;
 

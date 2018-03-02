@@ -8,9 +8,12 @@ import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Request;
 import kelly.monitor.common.ApplicationServer;
 import kelly.monitor.common.Packet;
+import kelly.monitor.common.msg.PacketMsg;
+import kelly.monitor.common.query.ApplicationServerQuery;
 import kelly.monitor.core.KlTsdbs;
 import kelly.monitor.dao.mapper.ApplicationServerMapper;
 
+import java.net.MalformedURLException;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
@@ -26,7 +29,7 @@ public class AgentTask implements Runnable {
     private KlTsdbs klTsdbs;
     private ApplicationServerMapper applicationServerMapper;
 
-    public AgentTask(String appCode, AsyncHttpClient asyncHttpClient, KlTsdbs klTsdbs,ApplicationServerMapper applicationServerMapper) {
+    public AgentTask(String appCode, AsyncHttpClient asyncHttpClient, KlTsdbs klTsdbs, ApplicationServerMapper applicationServerMapper) {
         this.appCode = appCode;
         this.asyncHttpClient = asyncHttpClient;
         this.klTsdbs = klTsdbs;
@@ -48,9 +51,15 @@ public class AgentTask implements Runnable {
 
         List<Packet> packets = null;
         try {
+            packets = listListenableFuture.get();
             //调用Collector收集Packet
             PacketCollector packetCollector = PacketCollector.getOrCreate(appCode, klTsdbs);
-            packetCollector.addPoints(listListenableFuture.get());
+            packetCollector.addPoints(packets);
+
+            //发给alert报警
+            PacketMsg packetMsg = new PacketMsg(appCode, packets);
+            PacketEvent.post(packetMsg);
+
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
@@ -80,11 +89,18 @@ public class AgentTask implements Runnable {
     }
 
     private List<ApplicationServer> getApplicationServers(String appCode) {
-        return applicationServerMapper.queryByCode(appCode);
+        ApplicationServerQuery query = ApplicationServerQuery.builder().appCode(appCode).build();
+        return applicationServerMapper.query(query);
     }
 
 
     private String parseAgentUrls(ApplicationServer applicationServer) {
-        return "http://localhost:8080/_/metrics";
+
+        try {
+            return applicationServer.url("/_/metrics");
+        } catch (MalformedURLException e) {
+            return null;
+        }
     }
+
 }

@@ -48,9 +48,6 @@ public class PacketCollector {
         }
         //过滤 状态非ok的，没有点的
         //指标名转换
-
-        //https://www.cnblogs.com/java-zhao/p/5929723.html
-      //  System.out.println("-----------------------" + packets.get(0).getPoints().size());
         for (Packet packet : packets) {
             if (packet.getStatus() == 404) {
                 continue;

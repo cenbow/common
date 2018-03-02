@@ -8,13 +8,9 @@ package kelly.monitor.common;
 public enum AggregatorType {
 
     SUM("总和"),
-    //
     MIN("最小值"),
-    //
     MAX("最大值"),
-    //
     AVG("平均值"),
-    //
     STDDEV("标准差");
 
     private String text;

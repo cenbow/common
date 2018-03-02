@@ -1,9 +1,6 @@
-package kelly.monitor.alert;
+package kelly.monitor.common;
 
 import com.google.common.collect.Lists;
-import kelly.monitor.common.AggregatorType;
-import kelly.monitor.common.IncomingPoint;
-import kelly.monitor.common.ValueType;
 import lombok.*;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.ExpressionParser;
@@ -26,6 +23,10 @@ public class Expression {
     @NonNull
     List<Item> items;
 
+    public String toDescription() {
+        return items.stream().map(item -> item.toDescription()).collect(Collectors.joining(" "));
+    }
+
     public String expression() {
         return IntStream.range(0, items.size()).mapToObj(index -> items.get(index).expression(index == items.size() - 1)).collect(Collectors.joining());
     }
@@ -41,7 +42,6 @@ public class Expression {
         EvaluationContext context = new StandardEvaluationContext();
         values.entrySet().stream().forEach(entry -> context.setVariable(entry.getKey(), entry.getValue()));
         try {
-            System.out.println(expression());
             return SPEL_EXPRESSION_PARSER.parseExpression(expression()).getValue(context, Boolean.class);
         } catch (Exception e) {
             return false;
@@ -52,7 +52,7 @@ public class Expression {
     @Getter
     @AllArgsConstructor
     @ToString
-    static class Item {
+    public static class Item {
         private AggregatorType aggregatorType;
         private ValueType valueType;
         private LogicType logicType;
@@ -62,8 +62,12 @@ public class Expression {
         static int LIMIT_N = 5;
 
 
+        public String toDescription() {
+            return valueType.text() + aggregatorType.text() + logicType.text() + value;
+        }
+
         public String expression(boolean isLast) {
-            return "#" + aggregatorType.name() + "_" + valueType.name() + logicType.value + value + (isLast ? ("") : (" " + filterType.value + " "));
+            return "#" + aggregatorType.name() + "_" + valueType.name() + logicType.text + value + (isLast ? ("") : (" " + filterType.value + " "));
         }
 
         public boolean matchExpression(Map<String, Float> values) {
@@ -88,7 +92,7 @@ public class Expression {
             PriorityQueue priorityQueue = new PriorityQueue(comparator);
             matchedPointList.stream().forEach(point -> priorityQueue.add(point));
             List<Map<String, String>> result = Lists.newArrayList();
-            IntStream.range(0, LIMIT_N).forEach(index -> {
+            IntStream.range(0, Math.min(LIMIT_N, priorityQueue.size())).forEach(index -> {
                 IncomingPoint incomingPoint = (IncomingPoint) priorityQueue.poll();
                 result.add(incomingPoint.getTags());
             });
@@ -97,7 +101,7 @@ public class Expression {
         }
     }
 
-    enum LogicType {
+    public enum LogicType {
         GT(">"),
         GTE(">="),
         LT("<"),
@@ -105,14 +109,20 @@ public class Expression {
         DET("=="),
         NET("!=");
 
-        private String value;
+        private String text;
 
-        LogicType(String value) {
-            this.value = value;
+        LogicType(String text) {
+            this.text = text;
         }
+
+        public String text() {
+            return text;
+        }
+
+
     }
 
-    enum FilterType {
+    public enum FilterType {
         AND("AND"),
         OR("OR");
 

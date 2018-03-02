@@ -3,10 +3,7 @@ package kelly.monitor.alert;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
-import kelly.monitor.common.AggregatorType;
-import kelly.monitor.common.IncomingPoint;
-import kelly.monitor.common.MetricType;
-import kelly.monitor.common.ValueType;
+import kelly.monitor.common.*;
 import kelly.monitor.core.Aggregator;
 import kelly.monitor.core.Aggregators;
 import kelly.monitor.core.IncomingPointIterator;
@@ -16,7 +13,8 @@ import org.junit.Test;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
+
+import static kelly.monitor.alert.BuildData.buildTreeMap;
 
 /**
  * Created by kelly-lee on 2018/2/11.
@@ -34,18 +32,18 @@ public class TestExpression {
     }
 
     private Expression buildExpression() {
-        Expression.Item item1 = new Expression.Item(AggregatorType.SUM, ValueType.MEAN_RATE, Expression.LogicType.GT, 100000, Expression.FilterType.OR);
-        Expression.Item item2 = new Expression.Item(AggregatorType.SUM, ValueType.MIN_1, Expression.LogicType.GT, 10000, Expression.FilterType.OR);
-        Expression.Item item3 = new Expression.Item(AggregatorType.SUM, ValueType.MIN_5, Expression.LogicType.GT, 1000, Expression.FilterType.OR);
-        Expression.Item item4 = new Expression.Item(AggregatorType.SUM, ValueType.MIN_15, Expression.LogicType.GT, 100, Expression.FilterType.OR);
+        Expression.Item item1 = new Expression.Item(AggregatorType.SUM, ValueType.MEAN_RATE, Expression.LogicType.GT, 10000, Expression.FilterType.OR);
+        Expression.Item item2 = new Expression.Item(AggregatorType.SUM, ValueType.MIN_1, Expression.LogicType.GT, 1000, Expression.FilterType.OR);
+        Expression.Item item3 = new Expression.Item(AggregatorType.SUM, ValueType.MIN_5, Expression.LogicType.GT, 100, Expression.FilterType.OR);
+        Expression.Item item4 = new Expression.Item(AggregatorType.SUM, ValueType.MIN_15, Expression.LogicType.GT, 10, Expression.FilterType.OR);
         return new Expression(ImmutableList.of(item1, item2, item3, item4));
     }
-
-    private TreeMap<String, String> buildTreeMap(Map<String, String> map) {
-        TreeMap<String, String> treeMap = Maps.newTreeMap();
-        map.entrySet().stream().forEach(entry -> treeMap.put(entry.getKey(), entry.getValue()));
-        return treeMap;
-    }
+//
+//    private TreeMap<String, String> buildTreeMap(Map<String, String> map) {
+//        TreeMap<String, String> treeMap = Maps.newTreeMap();
+//        map.entrySet().stream().forEach(entry -> treeMap.put(entry.getKey(), entry.getValue()));
+//        return treeMap;
+//    }
 
     private Map<String, Float> aggValue(AggregatorType aggregatorType, List<IncomingPoint> incomingPoints) {
         Map<String, Float> valueMap = Maps.newHashMap();
@@ -62,14 +60,15 @@ public class TestExpression {
     public void test1() {
         List<IncomingPoint> incomingPoints = buildPoints();
         Expression expression = buildExpression();
-        Map<String, Float> values = aggValue(AggregatorType.SUM, buildPoints());
+        Map<String, Float> values = aggValue(AggregatorType.SUM, incomingPoints);
         boolean flag = expression.matchExpression(values);
         Assert.assertTrue(flag);
 //        Assert.assertEquals(expression.expression(),
 //                "#SUM_MEAN_RATE>1000 OR #SUM_MIN_1>1000 OR #SUM_MIN_5>100 OR #SUM_MIN_15>10 ");
         System.out.println(values);
         Expression.Item item = expression.hitFirstItem(values);
-        System.out.println(item);
+        System.out.println(item.expression(true));
+        System.out.println(item.toDescription());
         System.out.println(item.resolveLimitNTags(incomingPoints));
 
     }

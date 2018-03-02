@@ -6,6 +6,9 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+
 
 /**
  * Created by kelly-lee on 2018/1/18.
@@ -20,20 +23,25 @@ public class ApplicationServer {
     private String ip;
     private Integer port;
     private String host;
-    private boolean alertEnabled;
-    private boolean monitorEnabled;
+    private boolean alertEnable;
+    private boolean monitorEnable;
 
     public ApplicationServer() {
     }
 
-    public ApplicationServer(String appName, String appCode, String ip, Integer port, String host, boolean alertEnabled, boolean monitorEnabled) {
+    public ApplicationServer(String appName, String appCode, String ip, Integer port, String host, boolean alertEnable, boolean monitorEnable) {
         this.appName = appName;
         this.appCode = appCode;
         this.ip = ip;
         this.port = port;
         this.host = host;
-        this.alertEnabled = alertEnabled;
-        this.monitorEnabled = monitorEnabled;
+        this.alertEnable = alertEnable;
+        this.monitorEnable = monitorEnable;
+    }
+
+    public String url(String file) throws MalformedURLException {
+        URL url = new URL("http", getHostOrIp(), port, file);
+        return url.toString();
     }
 
     public String getHostOrIp() {
@@ -42,7 +50,7 @@ public class ApplicationServer {
 
 
     public boolean enableCheckAlert() {
-        return monitorEnabled && alertEnabled;
+        return monitorEnable && alertEnable;
     }
 
 

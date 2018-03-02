@@ -112,3 +112,6 @@ var dropzone_full_options = {
 //  init：一个函数，在 Dropzone 初始化的时候调用，可以用来添加自己的事件监听器。
 //  forceFallback：Fallback 是一种机制，当浏览器不支持此插件时，提供一个备选方案。默认为false。如果设为true，则强制 fallback。
 //  fallback：一个函数，如果浏览器不支持此插件则调用。
+
+
+

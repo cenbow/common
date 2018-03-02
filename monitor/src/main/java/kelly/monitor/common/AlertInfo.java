@@ -1,7 +1,5 @@
-package kelly.monitor.alert;
+package kelly.monitor.common;
 
-import kelly.monitor.common.Application;
-import kelly.monitor.common.IncomingPoint;
 import kelly.monitor.util.DateTimeGenerater;
 
 import java.util.List;
@@ -26,25 +24,13 @@ public class AlertInfo {
     private Set<String> emails;
     private long time;
 
+    private AlertInfo() {
+    }
+
 
     public String toSms() {
         return "[" + status + "][" + appCode + "]" + metricName + "[" + expression + "|" + count + "]" + DateTimeGenerater.get(DateTimeGenerater.HH_MM_SS, time);
     }
-
-    //    public HtmlTableBuilder getAlarmDetailHtml() {
-//        return HtmlTableBuilder.create()
-//                .row("发生时间", dateTimeFormatter.print(timestamp))
-//                .row("状态", status)
-//                .row("应用", alertConfig.getAppCode())
-//                .row("指标", alertConfig.getMetricName())
-//                .row("Tags", buildTagsInfo())
-//                .row("TOP-5 Tags", HTML_LINE_SEPARATOR_JOINER.join(getLimitNTagStrings()))
-//                .row("报警表达式", timeExpression.getExpression())
-//                .row("数值", getMetricAllValueTypeData())
-//                .row("累积次数", count)
-//                .row("联系人", COMMA_JOINER.join(getContact()))
-//                .row("Comment", getComment());
-//    }
 
     public String toEmail() {
         return "发生时间:" + DateTimeGenerater.get(DateTimeGenerater.YY_MM_DD_HH_MM_SS, time) + "\n" +
@@ -64,7 +50,7 @@ public class AlertInfo {
         return new Builder();
     }
 
-    static class Builder {
+    public static class Builder {
         Application application;
         AlertConfig alertConfig;
         TimeExpression timeExpression;
@@ -110,7 +96,7 @@ public class AlertInfo {
             alertInfo.metricName = alertConfig.getMetricName();
             alertInfo.appCode = application.getAppCode();
             alertInfo.status = status;
-            alertInfo.tags = alertConfig.buildTagsInfo();
+            alertInfo.tags = alertConfig.getTagsDescription();
             Map<String, Float> aggValues = alertConfig.aggValue(incomingPoints);
             Expression.Item item = timeExpression.getExpression().hitFirstItem(aggValues);
             List<Map<String, String>> limitNTags = item.resolveLimitNTags(incomingPoints);
@@ -119,8 +105,6 @@ public class AlertInfo {
 
             return alertInfo;
         }
-
-
     }
 
 

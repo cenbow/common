@@ -1,8 +1,13 @@
-package kelly.monitor.alert;
+package kelly.monitor.common;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.Maps;
 import kelly.monitor.util.Constants;
-import lombok.*;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Setter;
+import lombok.ToString;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 
@@ -13,12 +18,12 @@ import java.util.stream.Collectors;
 /**
  * Crted by kelly-lee on 2018/2/7.
  */
-@RequiredArgsConstructor
-@AllArgsConstructor
+
 @Setter
 @Getter
 @ToString
 public class AlertTagConfig {
+
 
     @NonNull
     String tagKey;
@@ -27,11 +32,26 @@ public class AlertTagConfig {
     LogicType logicType = LogicType.ALL;
     private static final String VALUE_ALL = "*";
 
-    enum LogicType {
+
+    @JsonCreator
+    public AlertTagConfig(@JsonProperty("filterType") FilterType filterType, @JsonProperty("tagValues") List<String> tagValues, @JsonProperty("tagKey") String tagKey) {
+        this(LogicType.ALL, filterType, tagValues, tagKey);
+    }
+
+    @JsonCreator
+    public AlertTagConfig(@JsonProperty("logicType") LogicType logicType, @JsonProperty("filterType") FilterType filterType, @JsonProperty("tagValues") List<String> tagValues, @JsonProperty("tagKey") String tagKey) {
+        this.logicType = logicType;
+        this.filterType = filterType;
+        this.tagValues = tagValues;
+        this.tagKey = tagKey;
+    }
+
+
+    public enum LogicType {
         ALL, ANY
     }
 
-    enum FilterType {
+    public enum FilterType {
         INCLUDE("包含"), EXCLUDE("排除");
         private String text;
 
@@ -41,16 +61,9 @@ public class AlertTagConfig {
     }
 
     public String toDescrption() {
-        return tagKey + (logicType == LogicType.ANY ? "=" : filterType.name()) + tagValues;
+        return tagKey + (logicType == LogicType.ANY ? "=" : filterType.text) + tagValues;
     }
 
-    public AlertTagConfig(String tagKey, List<String> tagValues) {
-        this(tagKey, tagValues, FilterType.INCLUDE);
-    }
-
-    public AlertTagConfig(String tagKey, List<String> tagValues, FilterType filterType) {
-        this(tagKey, tagValues, filterType, LogicType.ALL);
-    }
 
     public Map<String, String> hit(Map<String, String> tags) {
         if (MapUtils.isEmpty(tags)) return Maps.newTreeMap();

@@ -1,5 +1,6 @@
 package kelly.monitor.common;
 
+import com.google.common.collect.Sets;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -13,9 +14,16 @@ import java.util.Set;
 @Getter
 @ToString
 public class Application {
+    private Integer id;
     private String appName;
     private String appCode;
-    private Set<String> owners;
-    private Set<String> emails;
+    private String description;
+    private Status status;
+    private Set<String> owners = Sets.newHashSet("kelly.li");
+    private Set<String> emails = Sets.newHashSet("kelly.li@gmail.com");
     private Set<ApplicationServer> applicationServers;
+
+    public enum Status {
+        ENABLE, DISABLE;
+    }
 }
