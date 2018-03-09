@@ -15,6 +15,7 @@ import lombok.ToString;
 @Builder
 public class AlertConfigQuery {
 
+    private Long id;
     private String appCode;
     private String metricName;
     private AlertConfig.Status status;

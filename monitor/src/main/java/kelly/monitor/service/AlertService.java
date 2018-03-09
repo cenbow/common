@@ -1,6 +1,7 @@
 package kelly.monitor.service;
 
 import kelly.monitor.common.AlertConfig;
+import kelly.monitor.util.Paginator;
 
 import java.util.List;
 
@@ -9,7 +10,9 @@ import java.util.List;
  */
 public interface AlertService {
 
-    public void save(AlertConfig alertConfig);
+    public void saveOrUpdate(AlertConfig alertConfig);
 
-    public List<AlertConfig> findAlertConfigs(String appCode, String metricName);
+    public AlertConfig findById(Long id);
+
+    public List<AlertConfig> findAlertConfigs(String appCode, String metricName, Paginator paginator);
 }

@@ -8,6 +8,7 @@ import kelly.monitor.config.JacksonSerializer;
 import kelly.monitor.core.Aggregator;
 import kelly.monitor.core.Aggregators;
 import kelly.monitor.core.IncomingPointIterator;
+import kelly.monitor.util.Constants;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -33,14 +34,14 @@ public class AlertConfig {
     private String appCode;
     private String metricName;
     private Map<String, AlertTagConfig> alertTagConfigs = Maps.newHashMap();
-    private AggregatorType aggregatorType;
+    private AggregatorType aggregatorType = AggregatorType.SUM;
     private List<TimeExpression> timeExpressions = Lists.newArrayList();
     private int checkCount;
     private AlertType alertType = AlertType.DEFAULT;
     private AlertLevel alertLevel = AlertLevel.CRITICAL;
     //配置需要发报警的次数
     private int alertTimes = -1;
-    private String owner;
+    private String owners;
     private Boolean notifyAll;
 
     /**
@@ -52,13 +53,14 @@ public class AlertConfig {
 
 
     // 配置状态
-    private Status status = Status.ENABLE;
+    private Status status;
 
     private Date createTime;
     private Date updateTime;
     private String creator;
 
 
+    private StopStatus stopStatus;
     private Date stopTime;//本报警的停止时间
     //停止报警 当同时关闭报警的 所有的报警设置的一个值(这个跟下面stopTime一样了)
     private Date globalStopTime;//全局停止时间
@@ -94,6 +96,13 @@ public class AlertConfig {
         creator = "admin";
     }
 
+    public List<String> getOwnerList() {
+        if (!Strings.isNullOrEmpty(owners)) {
+            return Constants.SPLITTER_DOT.splitToList(owners);
+        }
+        return Lists.newArrayList();
+    }
+
     public void load(JacksonSerializer serializer) {
         if (alertTypeValue >= 0) {
             alertType = new AlertType(alertTypeValue);
@@ -106,6 +115,7 @@ public class AlertConfig {
             timeExpressions = serializer.deSerialize(timeExpressionsJson, new TypeReference<List<TimeExpression>>() {
             });
         }
+        stopStatus = stopTime == null ? StopStatus.START : StopStatus.STOP;
     }
 
 
@@ -159,7 +169,7 @@ public class AlertConfig {
     }
 
     public String getAlertDescription() {
-        return "超过阈值" + checkCount + "次报警以" + alertType.toDescription() + "方式发给" + owner;
+        return "超过阈值" + checkCount + "次报警以" + alertType.toDescription() + "方式发给" + owners;
 
     }
 
@@ -184,6 +194,12 @@ public class AlertConfig {
         //勿切换顺序
         ENABLE, DISABLE;
     }
+
+    public enum StopStatus {
+        //勿切换顺序
+        START, STOP;
+    }
+
 
     public enum AlertLevel {
         //勿切换顺序

@@ -35,9 +35,33 @@
 
 
     <style>
-        .chart {
-            width: 100%;
-            height: 400px;
+        .modal-dialog {
+            width: 900px;
+        }
+
+        #alertTagConfigsTemp, #timeExpressionDefault, .timeRangeDefault, .expressionDefault {
+            display: none;
+        }
+
+        .value {
+            width: 80px;
+        }
+
+        .timeExpression {
+            border: 1px dotted #e3e3e3;
+            padding-top: 15px;
+            margin-bottom: 15px;
+        }
+
+        .delTimeExpressionBtn {
+            right: 5px;
+            top: 0px;
+            position: absolute;
+        }
+
+        #addTimeExpressionBtn {
+            width: 80px;
+            margin-top: 10px;
         }
     </style>
 </head>
@@ -51,103 +75,107 @@
 </nav>
 
 
-
 <!-- 模态框（Modal） -->
-<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<div class="modal fade" id="alertConfigModal" tabindex="-1" role="dialog" aria-labelledby="alertConfigModalLabel"
+     aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                <h4 class="modal-title" id="myModalLabel">报警配置</h4>
+                <h4 class="modal-title" id="alertConfigModalLabel">报警配置</h4>
             </div>
             <div class="modal-body">
-                <form class="form-horizontal" role="form" action="/alert/save" id="alertConfigForm1" method="get">
-                    <div class="form-group alertTagConfigs">
-                        <label class="col-sm-2 control-label">标签描述：</label>
-                        <div class="col-sm-8">
+                <form class="form-horizontal" role="form" action="/alert/save" id="alertConfigForm" method="get">
+
+                    <div class="form-group" id="alertTagConfigsTemp">
+                        <label class="col-md-2 control-label">标签描述：</label>
+                        <div class="col-md-9">
                             <div class="btn-group  switchBtn">
                                 <button type="button" class="btn btn-default filterType" value="INCLUDE">包含</button>
                                 <button type="button" class="btn btn-primary filterType" value="EXCLUDE">排除</button>
                             </div>
-                            <label class="label label-default tagKey">app</label>
-                            <select class="form-control tag tagValues" multiple="true">
-                                <option value="#top3">top3</option>
-                                <option value="#top5">top5</option>
-                                <option value="#top10">top10</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="form-group alertTagConfigs">
-                        <label class="col-sm-2 control-label"></label>
-                        <div class="col-sm-8">
-                            <div class="btn-group switchBtn">
-                                <button type="button" class="btn btn-primary filterType" value="INCLUDE">包含</button>
-                                <button type="button" class="btn btn-default filterType" value="EXCLUDE">排除</button>
-                            </div>
-                            <label class="label label-default tagKey">host</label>
-                            <select class="form-control tag tagValues" multiple="true">
-                                <option value="#top3">top3</option>
-                                <option value="#top5">top5</option>
-                                <option value="#top10">top10</option>
-                            </select>
+                            <label class="label label-default tagKey"></label>
+                            <select class="form-control tagValues" multiple="true"></select>
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label class="col-sm-2 control-label">规则描述：</label>
-                        <div class="col-sm-6">
-                            <select class="form-control checkCount" id="timeRangeBegin">
-                                <option th:value="${hour+':00'}"
-                                        th:each="hour : ${#numbers.sequence(0,23)}"
-                                        th:text="${hour+':00'}"></option>
-                            </select>
-                            至
-                            <select class="form-control checkCount" id="timeRangeEnd">
-                                <option th:value="${hour+':59'}"
-                                        th:each="hour : ${#numbers.sequence(0,23)}"
-                                        th:text="${hour+':59'}"></option>
-                            </select>
 
-                            <select class="form-control valueType" id="valueType">
-                                <option value="VALUE">数值</option>
-                                <option value="MEAN_RATE">TPS</option>
-                                <option value="MIN_1">1分钟TPS</option>
-                                <option value="MIN_5">5分钟TPS</option>
-                                <option value="MIN_15">15分钟TPS</option>
-                                <option value="MEAN">平均值</option>
-                                <option value="STD">方差</option>
-                                <option value="P75">75%请求的时间</option>
-                                <option value="P98">98%请求的时间</option>
-                            </select>
+                        <label class="col-md-2 control-label">规则描述：
+                            <a class="btn btn-default btn-xs"
+                               id="addTimeExpressionBtn">
+                                <i class="fa fa-plus"></i>&nbsp;规则
+                            </a>
+                        </label>
 
-                            <select class="form-control aggregatorType" id="aggregatorType" name="aggregatorType">
-                                <option value="SUM">总和</option>
-                                <option value="MIN">最小值</option>
-                                <option value="MAX">最大值</option>
-                                <option value="AVG">平均值</option>
-                                <option value="STDDEV">标准差</option>
-                            </select>
+                        <div class="col-md-9" id="timeExpressionDefault">
+                            <button type="button" class="close delTimeExpressionBtn">×</button>
+                            <div class="col-md-4">
+                                <!-- 时间段模版 开始-->
+                                <div class="form-group timeRangeDefault">
+                                    <select class="form-control timeRangeBegin">
+                                        <option th:each="hour : ${#numbers.sequence(0,23)}"
+                                                th:value="${hour+':00'}"
+                                                th:text="${hour+':00'}"></option>
+                                    </select>
+                                    至
+                                    <select class="form-control timeRangeEnd">
+                                        <option th:each="hour : ${#numbers.sequence(0,23)}"
+                                                th:value="${hour+':59'}"
+                                                th:text="${hour+':59'}"></option>
+                                    </select>
+                                    <a class="btn btn-danger btn-xs delTimeRangeBtn">
+                                        <i class="fa fa-trash-o"></i>
+                                    </a>
+                                </div>
+                                <!-- 时间段模版 结束-->
+                                <div class="form-group">
+                                    <button type="button" class="btn btn-default btn-sm addTimeRangeBtn"
+                                            style="width:163px;">
+                                        <i class="fa fa-plus"/>&nbsp;时间段
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <!-- 条件表达式模版 开始-->
+                                <div class="form-group expressionDefault">
+                                    <select class="form-control valueType">
+                                        <option value="VALUE" th:each="valueType:${metricValueTypes}"
+                                                th:text="${valueType.text()}" th:value="${valueType.name()}"></option>
+                                    </select>
 
-                            <select class="form-control logicType" id="logicType">
-                                <option>&gt;=</option>
-                                <option>&gt;</option>
-                                <option>&lt;=</option>
-                                <option>&gt;</option>
-                                <option>=</option>
-                                <option>!=</option>
-                            </select>
-                            <div class="btn-group-vertical">
-                                <input type="text" class="form-control" style="width: 60px" id="value"
-                                       placeholder="阀值"/>
+                                    <select class="form-control aggregatorType">
+                                        <option value="VALUE" th:each="aggregatorType:${aggregatorTypes}"
+                                                th:text="${aggregatorType.text()}"
+                                                th:value="${aggregatorType.name()}"></option>
+                                    </select>
+
+                                    <select class="form-control logicType">
+                                        <option value="VALUE" th:each="expressionLogicType:${expressionLogicTypes}"
+                                                th:text="${expressionLogicType.text()}"
+                                                th:value="${expressionLogicType.name()}"></option>
+                                    </select>
+                                    <div class="btn-group-vertical">
+                                        <input type="text" class="form-control value" placeholder="阀值"/>
+                                    </div>
+                                    <a class="btn btn-danger btn-xs delTimeRangeBtn">
+                                        <i class="fa fa-trash-o"></i>
+                                    </a>
+                                </div>
+                                <!-- 条件表达式模版 结束-->
+                                <div class="form-group">
+                                    <button type="button" class="btn btn-default btn-sm addExpressionBtn"
+                                            style="width:360px;"><i class="fa fa-plus"/>&nbsp;条件表达式
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
-
                     </div>
+
                     <div class="form-group">
-                        <label for="lastname" class="col-sm-2 control-label">报警描述：</label>
-                        <div class="col-sm-8">
+                        <label class="col-md-2 control-label">报警描述：</label>
+                        <div class="col-md-10">
                             超过阈值
                             <select class="form-control checkCount" id="checkCount" name="checkCount">
                                 <option value="1">1</option>
@@ -157,41 +185,40 @@
                                 <option value="15">15</option>
                                 <option value="30">30</option>
                             </select>
-                            次
-                            以
+                            次以
                             <select class="form-control alertType" id="alertType" multiple="true">
-                                <option value="0">报警方式</option>
                                 <option value="1">短信</option>
                                 <option value="2">邮件</option>
                                 <option value="4">微信</option>
                                 <option value="8">消息</option>
                             </select>
                             形式发给
-                            <select class="form-control owner" id="owner" name="owner" multiple="true">
-                                <option value="jingli185">李静</option>
-                                <option value="luosisi">罗思思</option>
+                            <select class="form-control owners" id="owners" multiple="true">
+                                <option th:each="owner : ${owners}" th:value="${owner.code}"
+                                        th:text="${owner.name}"></option>
                             </select>
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <div class="col-sm-offset-2 col-sm-10">
+                        <div class="col-md-offset-3 col-md-9">
+                            <input type="hidden" id="id" name="id"/>
                             <input type="hidden" id="alertTagConfigsJson" name="alertTagConfigsJson"/>
                             <input type="hidden" id="timeExpressionsJson" name="timeExpressionsJson"/>
                             <input type="hidden" id="alertTypeValue" name="alertTypeValue"/>
-                            <input type="hidden" id="metricName" name="metricName" value="packet_collect_time"/>
-                            <input type="hidden" id="appCode" name="appCode" value="monitor"/>
-                            <button type="button" class="btn btn-default" id="alertConfigBtn">配置报警</button>
+                            <input type="hidden" id="ownersValue" name="owners"/>
+                            <input type="hidden" id="metricName" name="metricName" th:value="${metricName}"/>
+                            <input type="hidden" id="appCode" name="appCode" th:value="${appCode}"/>
+
+
                         </div>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="alertConfigBtn">配置报警</button>
                 <button type="button" class="btn btn-default"
-                        data-dismiss="modal">关闭
-                </button>
-                <button type="button" class="btn btn-primary">
-                    提交更改
+                        data-dismiss="modal">取消
                 </button>
             </div>
         </div><!-- /.modal-content -->
@@ -199,150 +226,12 @@
 </div><!-- /.modal -->
 
 <div class="container" style="margin-top: 20px">
-    <div class="row">
-        <div class="col-md-12">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">
-                        <i class="fa fa-edit fa-fw"></i>报警配置 <span/>
-                    </h3>
-                </div>
-                <div class="panel-body">
-                    <form class="form-horizontal" role="form" action="/alert/save" id="alertConfigForm" method="get">
-                        <div class="form-group alertTagConfigs">
-                            <label class="col-sm-2 control-label">标签描述：</label>
-                            <div class="col-sm-8">
-                                <div class="btn-group  switchBtn">
-                                    <button type="button" class="btn btn-default filterType" value="INCLUDE">包含</button>
-                                    <button type="button" class="btn btn-primary filterType" value="EXCLUDE">排除</button>
-                                </div>
-                                <label class="label label-default tagKey">app</label>
-                                <select class="form-control tag tagValues" multiple="true">
-                                    <option value="#top3">top3</option>
-                                    <option value="#top5">top5</option>
-                                    <option value="#top10">top10</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="form-group alertTagConfigs">
-                            <label class="col-sm-2 control-label"></label>
-                            <div class="col-sm-8">
-                                <div class="btn-group switchBtn">
-                                    <button type="button" class="btn btn-primary filterType" value="INCLUDE">包含</button>
-                                    <button type="button" class="btn btn-default filterType" value="EXCLUDE">排除</button>
-                                </div>
-                                <label class="label label-default tagKey">host</label>
-                                <select class="form-control tag tagValues" multiple="true">
-                                    <option value="#top3">top3</option>
-                                    <option value="#top5">top5</option>
-                                    <option value="#top10">top10</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="col-sm-2 control-label">规则描述：</label>
-                            <div class="col-sm-6">
-                                <select class="form-control checkCount" id="timeRangeBegin">
-                                    <option th:value="${hour+':00'}"
-                                            th:each="hour : ${#numbers.sequence(0,23)}"
-                                            th:text="${hour+':00'}"></option>
-                                </select>
-                                至
-                                <select class="form-control checkCount" id="timeRangeEnd">
-                                    <option th:value="${hour+':59'}"
-                                            th:each="hour : ${#numbers.sequence(0,23)}"
-                                            th:text="${hour+':59'}"></option>
-                                </select>
-
-                                <select class="form-control valueType" id="valueType">
-                                    <option value="VALUE">数值</option>
-                                    <option value="MEAN_RATE">TPS</option>
-                                    <option value="MIN_1">1分钟TPS</option>
-                                    <option value="MIN_5">5分钟TPS</option>
-                                    <option value="MIN_15">15分钟TPS</option>
-                                    <option value="MEAN">平均值</option>
-                                    <option value="STD">方差</option>
-                                    <option value="P75">75%请求的时间</option>
-                                    <option value="P98">98%请求的时间</option>
-                                </select>
-
-                                <select class="form-control aggregatorType" id="aggregatorType" name="aggregatorType">
-                                    <option value="SUM">总和</option>
-                                    <option value="MIN">最小值</option>
-                                    <option value="MAX">最大值</option>
-                                    <option value="AVG">平均值</option>
-                                    <option value="STDDEV">标准差</option>
-                                </select>
-
-                                <select class="form-control logicType" id="logicType">
-                                    <option>&gt;=</option>
-                                    <option>&gt;</option>
-                                    <option>&lt;=</option>
-                                    <option>&gt;</option>
-                                    <option>=</option>
-                                    <option>!=</option>
-                                </select>
-                                <div class="btn-group-vertical">
-                                    <input type="text" class="form-control" style="width: 60px" id="value"
-                                           placeholder="阀值"/>
-                                </div>
-                            </div>
-
-
-                        </div>
-                        <div class="form-group">
-                            <label for="lastname" class="col-sm-2 control-label">报警描述：</label>
-                            <div class="col-sm-8">
-                                超过阈值
-                                <select class="form-control checkCount" id="checkCount" name="checkCount">
-                                    <option value="1">1</option>
-                                    <option value="3">3</option>
-                                    <option value="5">5</option>
-                                    <option value="10">10</option>
-                                    <option value="15">15</option>
-                                    <option value="30">30</option>
-                                </select>
-                                次
-                                以
-                                <select class="form-control alertType" id="alertType" multiple="true">
-                                    <option value="0">报警方式</option>
-                                    <option value="1">短信</option>
-                                    <option value="2">邮件</option>
-                                    <option value="4">微信</option>
-                                    <option value="8">消息</option>
-                                </select>
-                                形式发给
-                                <select class="form-control owner" id="owner" name="owner" multiple="true">
-                                    <option value="jingli185">李静</option>
-                                    <option value="luosisi">罗思思</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <div class="col-sm-offset-2 col-sm-10">
-                                <input type="hidden" id="alertTagConfigsJson" name="alertTagConfigsJson"/>
-                                <input type="hidden" id="timeExpressionsJson" name="timeExpressionsJson"/>
-                                <input type="hidden" id="alertTypeValue" name="alertTypeValue"/>
-                                <input type="hidden" id="metricName" name="metricName" value="packet_collect_time"/>
-                                <input type="hidden" id="appCode" name="appCode" value="monitor"/>
-                                <button type="button" class="btn btn-default" id="alertConfigBtn">配置报警</button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
+    <div class="container" style="margin: 20px 0">
+        <!-- 按钮触发模态框 -->
+        <button class="btn btn-primary" data-toggle="modal" data-target="#alertConfigModal">
+            <i class="fa fa-edit fa-fw"></i>报警配置 <span/>
+        </button>
     </div>
-
-   <div class="container" style="margin: 20px 0">
-    <!-- 按钮触发模态框 -->
-    <button class="btn btn-primary" data-toggle="modal" data-target="#myModal">
-        <i class="fa fa-edit fa-fw"></i>报警配置 <span/>
-    </button>
-   </div>
     <!--  查询列表 开始-->
     <div class="table-responsive">
         <table class="table  table-bordered table-hover ">
@@ -351,39 +240,46 @@
             -->
             <thead>
             <tr>
-                <th class="text-center text-middle"><input type="checkbox"/></th>
-                <th class="text-middle">标签描述
-                    <a href="#" class="pull-right"><i class="fa fa-sort-asc fa-fw "></i></a>
-                </th>
-                <th class="text-middle">规则描述
-                    <a href="#" class="pull-right"><i class="fa fa-sort fa-fw "></i></a>
-                </th>
-                <th class="text-middle">报警描述
-                    <a href="#" class="pull-right"><i class="fa fa-sort fa-fw "></i></a>
-                </th>
+                <th class="text-middle">标签描述</th>
+                <th class="text-middle">规则描述</th>
+                <th class="text-middle">报警描述</th>
                 <th>操作</th>
             </tr>
             </thead>
             <tbody>
-            <tr class="active" th:if="${not #lists.isEmpty(alertConfigs)}" th:each="alertConfig : ${alertConfigs}">
-                <td class="text-center text-middle">
-                    <input type="checkbox" id="ck_1" name="ck" value="1"/>
-                </td>
+            <tr th:if="${not #lists.isEmpty(alertConfigs)}" th:each="alertConfig : ${alertConfigs}">
+
                 <td class="text-middle" th:text="${alertConfig.tagsDescription}"></td>
                 <td class="text-middle" th:text="${alertConfig.timeExpressionsDescription}"></td>
-                <td class="text-center text-middle" th:text="${alertConfig.alertDescription}"></td>
+                <td class="text-middle" th:text="${alertConfig.alertDescription}"></td>
                 <td width="25%">
 
-                    <a class="btn btn-default btn-sm" href="#"><i class="fa fa-cog"></i> 修改</a>
+                    <a class="btn btn-default btn-sm" th:href="'javascript:edit('+${alertConfig.id}+')'">
+                        <i class="fa fa-cog"></i> 修改
+                    </a>
 
                     <div class="btn-group btn-group-sm switchBtn">
-                        <button type="button" class="btn btn-default filterType" value="START">开启</button>
-                        <button type="button" class="btn btn-primary filterType" value="STOP">停止</button>
+                        <button type="button"
+                                th:class="'btn stopStatus '+(${#strings.equals(alertConfig.stopStatus,'START')}?'btn-primary':'btn-default')"
+                                value="START"
+                                th:onclick="'javascript:start('+${alertConfig.id}+',\'START\')'">开启
+                        </button>
+                        <button type="button"
+                                th:class="'btn stopStatus '+(${#strings.equals(alertConfig.stopStatus,'STOP')}?'btn-primary':'btn-default')"
+                                value="STOP"
+                                th:onclick="'javascript:start('+${alertConfig.id}+',\'STOP\')'">停止
+                        </button>
                     </div>
 
-                    <div class="btn-group btn-group-sm  statusBtn">
-                        <button type="button" class="btn btn-default status" value="ENABLE">启用</button>
-                        <button type="button" class="btn btn-primary status" value="DISABLE">禁止</button>
+                    <div class="btn-group btn-group-sm switchBtn">
+                        <button type="button"
+                                th:class="'btn status '+(${#strings.equals(alertConfig.status,'ENABLE')}?'btn-primary':'btn-default')"
+                                value="ENABLE" th:onclick="'javascript:enable('+${alertConfig.id}+',\'ENABLE\')'">启用
+                        </button>
+                        <button type="button"
+                                th:class="'btn status '+(${#strings.equals(alertConfig.status,'DISABLE')}?'btn-primary':'btn-default')"
+                                value="DISABLE" th:onclick="'javascript:enable('+${alertConfig.id}+',\'DISABLE\')'">禁止
+                        </button>
                     </div>
 
                 </td>
@@ -396,55 +292,425 @@
     <!-- 分页 开始 -->
     <div class="row-table" style="margin-top: -15px">
 
-        <div class="pull-middle">当前 1/100页</div>
-
-        <ul class="pagination pull-right pull-middle">
-            <li class="disabled"><a href="#"><i class="fa fa-chevron-left"></i>上一页</a></li>
-            <li class="active"><a href="#">1</a></li>
-            <li><a href="#">2</a></li>
-            <li><a href="#">3</a></li>
-            <li><a href="#">4</a></li>
-            <li><a href="#">5</a></li>
-            <li><a href="#"><i class="fa fa-ellipsis-h"></i></a></li>
-            <li><a href="#">下一页<i class="fa fa-chevron-right"></i></a></li>
-        </ul>
-        <div class="pull-middle">
-            <a class="btn btn-default">确定</a>
+        <div class="pull-middle col-md-4" style="height: 74px;line-height: 74px;">当前 <span
+                th:text="${paginator.pageIndex}"/>/<span th:text="${paginator.pageNum}"/>页
         </div>
+        <div class="col-md-8">
+            <ul class="pagination pull-right">
+                <li th:class="${paginator.hasFirst()?'':'disabled'}"><a
+                        th:href="'javascript:pagination('+${paginator.pageIndex-1}+')'"><i
+                        class="fa fa-chevron-left"></i>上一页</a></li>
+                <li th:class="${paginator.pageIndex==index?'active':''}"
+                    th:each="index : ${#numbers.sequence(paginator.start,paginator.end)}">
+                    <a th:href="'javascript:pagination('+${index}+')'" th:text="${index}"></a>
+                </li>
+                <!--
+                <li><a href="#"><i class="fa fa-ellipsis-h"></i></a></li>
+                -->
+                <li th:class="${paginator.hasLast()?'':'disabled'}"><a
+                        th:href="'javascript:pagination('+${paginator.pageIndex+1}+')'">下一页<i
+                        class="fa fa-chevron-right"></i></a></li>
+            </ul>
+        </div>
+
     </div>
+
     <!-- 分页 结束 -->
 </div>
 
 </body>
 <script type="text/javascript" th:inline="javascript">
+    // <![CDATA[
+    var edit_id = 0;
 
-    //    $(function () {
-    //        $('#myModal').modal({
-    //        keyboard: true
-    //    })});
+    function pagination(pageIndex) {
+        window.location.href = "/alert/" + $("#appCode").val() + "/" + $("#metricName").val() + "/" + pageIndex;
+    }
 
-    $('.tag').multiselect({
-        enableClickableOptGroups: true,
-        enableCollapsibleOptGroups: true,
-        enableFiltering: true,
-        includeSelectAllOption: true
+    $(function () {
+        initMetricTags();
+        initAlertConfigModal();
+        initAlertConfigBtn();
+        addTimeExpression();
+
+        //添加时间段按钮
+        $("#addTimeExpressionBtn").click(function () {
+            addTimeExpression();
+        });
+
+        //下拉菜单
+        $('.checkCount,.alertType').multiselect({
+            nonSelectedText: "请选择"
+        });
+
+        $(".owners").multiselect({
+            buttonWidth: '200px',
+            enableFiltering: true,
+            nonSelectedText: "请选择"
+        });
+
+        //开关按钮
+        $(".switchBtn button").click(function () {
+            clickSwitchBtn($(this));
+        });
     });
-    $('.valueType,.logicType,.aggregatorType,.checkCount,.alertType,.owner').multiselect({});
 
 
-    $(".switchBtn button").click(function () {
-        var flag = $(this).hasClass("btn-default");
-        if (flag) {
-            $(this).parent().find(".btn-primary").removeClass("btn-primary").addClass("btn-default");
-            $(this).removeClass("btn-default").addClass("btn-primary");
-        } else {
-            $(this).parent().find(".btn-default").removeClass("btn-default").addClass("btn-primary");
-            $(this).removeClass("btn-primary").addClass("btn-default");
+    function initMetricTags() {
+        var metricTags = [[${metricTags}]];
+        var first = true;
+        $.each(metricTags, function (tagName, tagValues) {
+            var alertTagConfig = $("#alertTagConfigsTemp").clone();
+            if (!first) {
+                alertTagConfig.find('.control-label').html('');
+            } else {
+                first = false;
+            }
+            alertTagConfig.find(".tagKey").html(tagName);
+            var options = new Array();
+            $.each(tagValues, function (index, tagValue) {
+                options[index] = {label: tagValue, title: tagValue, value: tagValue};
+            });
+            alertTagConfig.find(".tagValues").multiselect({
+                buttonWidth: '400px',
+                maxHeight: 200,
+                enableFiltering: true,
+                buttonText: function (options, select) {
+                    if (options.length === 0) {
+                        return '请选择';
+                    }
+                    else {
+                        var labels = [];
+                        options.each(function () {
+                            if ($(this).attr('label') !== undefined) {
+                                labels.push($(this).attr('label'));
+                            }
+                            else {
+                                labels.push($(this).html());
+                            }
+                        });
+                        return labels.join(', ') + '';
+                    }
+                }
+            });
+            alertTagConfig.find(".tagValues").multiselect('dataprovider', options);
+            alertTagConfig.attr("id", "").addClass("alertTagConfigs").insertBefore("#alertTagConfigsTemp");
+        });
+    }
+
+    function addTimeExpression() {
+        var timeExpression = $("#timeExpressionDefault").clone().attr("id", "").addClass("timeExpression");
+        if ($(".timeExpression").length > 0) {
+            timeExpression.addClass("col-md-offset-2");
         }
-    });
+        var addTimeRangeBtn = timeExpression.find(".addTimeRangeBtn");
+        var addExpressionBtn = timeExpression.find(".addExpressionBtn");
+        addTimeRange(addTimeRangeBtn);
+        bindTimeRange(addTimeRangeBtn);
+        addExpression(addExpressionBtn);
+        bindExpression(addExpressionBtn);
 
-    $("#alertConfigBtn").click(function () {
-        //获得alertTagConfigs
+        timeExpression.insertBefore("#timeExpressionDefault");
+        timeExpression.find(".delTimeExpressionBtn").click(function () {
+            if ($(".timeExpression").length == 1) {
+                alert("无法删除，必须保留一个规则");
+                return;
+            }
+            $(this).parent().remove();
+            $(".timeExpression:first").removeClass("col-md-offset-2");
+        });
+        return timeExpression;
+    }
+
+    function addTimeRange(btn) {
+        var timeRangeDefault = btn.parent().prev(".timeRangeDefault");
+        var timeRange = timeRangeDefault.clone().attr("id", "").removeClass("timeRangeDefault").addClass("timeRange");
+        timeRange.insertBefore(timeRangeDefault);
+        timeRange.find('.timeRangeBegin,.timeRangeEnd').multiselect({buttonWidth: '70px'});
+        initSelect(timeRange.find(".timeRangeEnd"), "23:59");
+        timeRange.find(".delTimeRangeBtn").click(function () {
+            if ($(this).parent().parent().find(".timeRange").length == 1) {
+                alert("无法删除，必须保留一个时间段");
+                return;
+            }
+            $(this).parent().remove();
+        });
+    }
+
+    function addExpression(btn) {
+        var expressionDefault = btn.parent().prev(".expressionDefault");
+        var expression = expressionDefault.clone().attr("id", "").removeClass("expressionDefault").addClass("expression");
+        expression.insertBefore(expressionDefault);
+        expression.find('.valueType').multiselect({
+            buttonWidth: '135px'
+        });
+        expression.find('.aggregatorType').multiselect({
+            buttonWidth: '78px'
+        });
+        expression.find('.logicType').multiselect({
+            buttonWidth: '55px'
+        });
+        expression.find(".delTimeRangeBtn").click(function () {
+            if ($(this).parent().parent().find(".expression").length == 1) {
+                alert("无法删除，必须保留一个表达式");
+                return;
+            }
+            $(this).parent().remove();
+        });
+    }
+
+    function bindExpression(btn) {
+        btn.bind("click", function () {
+            addExpression($(this));
+        });
+    }
+
+    function bindTimeRange(btn) {
+        btn.bind("click", function () {
+            addTimeRange($(this));
+        });
+    }
+
+    function edit(id) {
+        edit_id = id;
+        $('#alertConfigModal').modal('show');
+    }
+
+    function initAlertConfigModal() {
+        $('#alertConfigModal').on('shown.bs.modal', function () {
+            cleanAlertConfigModal();
+            if (edit_id == 0) {
+                addTimeExpression();
+                return;
+            }
+            $.ajax({
+                type: "GET",
+                url: "/alert/edit/" + edit_id,
+                async: false,
+                error: function (request) {
+                    alert("连接错误");
+                    edit_id = 0;
+                },
+                success: function (data) {
+                    $("#id").val(data.id);
+                    $("#appCode").val(data.appCode);
+                    $("#metricName").val(data.metricName);
+                    $.each(data.alertTagConfigs, function (key, alertTagConfig) {
+                        var parent = $(".tagKey:contains(" + key + ")").parent().parent();
+                        initMultiSelect(parent.find(".tagValues"), alertTagConfig.tagValues);
+                        clickSwitchBtn(parent.find(".filterType[value=" + alertTagConfig.filterType + "]"));
+                    });
+                    $.each(data.timeExpressions, function (index, timeExpression) {
+                        var timeExpressionDiv = addTimeExpression();
+                        var rangs = timeExpression.timeRange.ranges;
+                        var expressions = timeExpression.expression.items;
+                        $.each(rangs, function (index, range) {
+                            if (index > 0) {
+                                addTimeRange(timeExpressionDiv.find(".addTimeRangeBtn"));
+                            }
+                            initSelect(timeExpressionDiv.find(".timeRangeBegin:eq(" + index + ")"), range.fromText);
+                            initSelect(timeExpressionDiv.find(".timeRangeEnd:eq(" + index + ")"), range.toText);
+                        });
+                        $.each(expressions, function (index, expression) {
+                            if (index > 0) {
+                                addExpression(timeExpressionDiv.find(".addExpressionBtn"));
+                            }
+                            initSelect(timeExpressionDiv.find(".aggregatorType:eq(" + index + ")"), expression.aggregatorType);
+                            initSelect(timeExpressionDiv.find(".valueType:eq(" + index + ")"), expression.valueType);
+                            initSelect(timeExpressionDiv.find(".logicType:eq(" + index + ")"), expression.logicType);
+                            timeExpressionDiv.find(".value:eq(" + index + ")").val(expression.value);
+                        });
+                    });
+                    initSelect($("#checkCount"), data.checkCount);
+                    initMultiSelect($("#alertType"), data.alertType.valueList);
+                    initMultiSelect($("#owners"), data.ownerList);
+                    edit_id = 0;
+                }
+            });
+        });
+    }
+
+    function cleanAlertConfigModal() {
+        initMultiSelect($(".tagValues"), null);
+        clickSwitchBtn($(".filterType[value=INCLUDE]"));
+        $(".timeExpression").remove();
+        initSelect($("#checkCount"), null);
+        initMultiSelect($("#alertType"), null);
+        initMultiSelect($("#owners"), null);
+        $(".value").val("");
+        $("#id").val(0);
+    }
+
+    function initAlertConfigBtn() {
+        $("#alertConfigBtn").click(function () {
+
+            parseAlertTagConfigs();
+            var flag1 = parseTimeExpressions();
+            if (!flag1) {
+                return;
+            }
+            var flag2 = parseAlertType();
+            if (!flag2) {
+                return;
+            }
+            var flag3 = parseOwners();
+            if (!flag3) {
+                return;
+            }
+
+            $.ajax({
+                type: "POST",
+                url: "/alert/update",
+                data: $('#alertConfigForm').serialize(),
+                async: false,
+                error: function (request) {
+                    alert("连接错误");
+                },
+                success: function (data) {
+                    $('#alertConfigModal').modal('hide');
+                    window.location.href = "/alert/" + $("#appCode").val() + "/" + $("#metricName").val();
+                }
+            });
+        });
+    }
+
+    function enable(id, status) {
+        $.ajax({
+            type: "POST",
+            url: "/alert/update",
+            data: {"id": id, status: status},
+            async: false,
+            error: function (request) {
+                alert("连接错误");
+            },
+            success: function (data) {
+                //window.location.href = "/alert/" + $("#appCode").val() + "/" + $("#metricName").val();
+            }
+        });
+    }
+
+    function start(id, stopStatus) {
+        $.ajax({
+            type: "POST",
+            url: "/alert/update",
+            data: {"id": id, stopStatus: stopStatus},
+            async: false,
+            error: function (request) {
+                alert("连接错误");
+            },
+            success: function (data) {
+                //window.location.href = "/alert/" + $("#appCode").val() + "/" + $("#metricName").val();
+            }
+        });
+    }
+
+    function initSelect(select, value) {
+        if (value == null) {
+            select.val(select.find("option:eq(0)").val());
+        } else {
+            select.val(value);
+        }
+        select.multiselect("refresh");
+    }
+
+    function initMultiSelect(select, values) {
+        select.multiselect('deselectAll', false);
+        if (values != null) {
+            select.multiselect('select', values, true);
+        }
+        select.multiselect("refresh");
+    }
+
+    function clickSwitchBtn(btn) {
+        btn.parent().find("button").removeClass("btn-primary").addClass("btn-default");
+        btn.removeClass("btn-default").addClass("btn-primary");
+    }
+
+    function parseTimeExpressions() {
+        var flag = true;
+        //TODO 表单还可以进一步验证
+        $(".expression .value").each(function () {
+            if ($.trim($(this).val()).length == 0) {
+                if (flag) {
+                    alert("阀值必填");
+                    flag = false;
+                    return;
+                }
+                return;
+            }
+        });
+        if (!flag) {
+            return flag;
+        }
+
+        var timeExpressions = new Array();
+        $(".timeExpression").each(function (index) {
+
+            var timeRanges = new Array();
+            $(this).find(".timeRange").each(function (index) {
+                var fromText = $(this).find(".timeRangeBegin").val();
+                var toText = $(this).find(".timeRangeEnd").val();
+                var from = moment(fromText, "hh:mm").hours() * 60 * 60 + moment(fromText, "hh:mm").minutes() * 60;
+                var to = moment(toText, "hh:mm").hours() * 60 * 60 + moment(toText, "hh:mm").minutes() * 60 + 59;
+                var timeRange = {
+                    "fromText": fromText,
+                    "toText": toText,
+                    "from": from,
+                    "to": to
+                };
+                timeRanges[index] = timeRange;
+            });
+
+            var expressions = new Array();
+            $(this).find(".expression").each(function (index) {
+                var expression = {
+                    "aggregatorType": $(this).find(".aggregatorType").val(),
+                    "valueType": $(this).find(".valueType").val(),
+                    "logicType": $(this).find(".logicType").val(),
+                    "value": eval($(this).find(".value").val()),
+                    "filterType": "OR"
+                };
+                expressions[index] = expression;
+            });
+
+            var timeExpression = {
+                "timeRange": {"ranges": timeRanges},
+                "expression": {"items": expressions}
+            };
+            timeExpressions[index] = timeExpression;
+        });
+        $("#timeExpressionsJson").val(JSON.stringify(timeExpressions));
+        return flag;
+    }
+
+    function parseAlertType() {
+        var alertType = 0;
+        $.each($("#alertType").val(), function (index, value) {
+            alertType += eval(value);
+        });
+        if (alertType == 0) {
+            alert("请选择报警方式");
+            return false;
+        }
+        $("#alertTypeValue").val(alertType);
+        return true;
+    }
+
+    function parseOwners() {
+        var owners = $("#owners").val();
+        if (owners.length == 0) {
+            alert("报警联系人必填");
+            return false;
+        }
+        var ownersValue = "";
+        $.each(owners, function (index, value) {
+            ownersValue += (value + ",");
+        });
+        $("#ownersValue").val(ownersValue);
+        return true;
+    }
+
+    function parseAlertTagConfigs() {
         var alertTagConfigs = new Map();
         $(".alertTagConfigs").each(function () {
             var tagValues = $(this).find(".tagValues").val();
@@ -455,56 +721,16 @@
                     "filterType": filterType,
                     "tagValues": tagValues,
                     "tagKey": tagKey,
-                    "logicType": "ANY"
+                    "logicType": "ALL"
                 };
                 alertTagConfigs[tagKey] = alertTagConfig;
             }
         });
-        $("#alertTagConfigsJson").val(JSON.stringify(alertTagConfigs));
-
-
-        var range = $("#timeRangeBegin").val() + "-" + $("#timeRangeEnd").val();
-        var expression = {
-            "aggregatorType": $("#aggregatorType").val(),
-            "valueType": $("#valueType").val(),
-            "logicType": $("#logicType").val(),
-            "value": $("#value").val(),
-            "filterType": "OR"
-        };
-        var timeExpression = {
-            "timeRange": {"values": [range]},
-            "expression": {"items": [expression]}
+        if (Object.keys(alertTagConfigs).length != 0) {
+            $("#alertTagConfigsJson").val(JSON.stringify(alertTagConfigs));
         }
-        $("#timeExpressionsJson").val(JSON.stringify(timeExpression));
-
-
-        //获得alertType
-        var alertType = 0;
-        $.each($("#alertType").val(), function (index, value) {
-            alertType += eval(value);
-        });
-        $("#alertTypeValue").val(alertType);
-
-
-        $("#alertConfigForm").submit();
-//        $.ajax({
-//            type: "POST",   //提交的方法
-//            url:"/alert/save", //提交的地址
-//            data:$('#alertConfigForm').serialize(),// 序列化表单值
-//            async: false,
-//            error: function(request) {  //失败的话
-//                alert("Connection error");
-//            },
-//            success: function(data) {  //成功
-//                alert(data);  //就将返回的数据显示出来
-//                $('#identifier').modal('hide');
-//            }
-//        });
-
-
-    });
-
-
+    }
+    // ]]>
 </script>
 
 </html>

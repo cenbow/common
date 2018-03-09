@@ -40,7 +40,27 @@ public class AlertType {
         if (isWechat()) {
             alertTypes.add("微信");
         }
+        if (isMq()) {
+            alertTypes.add("消息");
+        }
         return alertTypes.stream().collect(Collectors.joining("、"));
+    }
+
+    public List<Integer> getValueList() {
+        List<Integer> valueList = Lists.newArrayList();
+        if (isSMS()) {
+            valueList.add(SMS);
+        }
+        if (isMail()) {
+            valueList.add(MAIL);
+        }
+        if (isWechat()) {
+            valueList.add(WECHAT);
+        }
+        if (isMq()) {
+            valueList.add(MQ);
+        }
+        return valueList;
     }
 
 
@@ -49,7 +69,6 @@ public class AlertType {
     }
 
     public boolean isSMS() {
-        System.out.println(value);
         return isType(SMS);
     }
 

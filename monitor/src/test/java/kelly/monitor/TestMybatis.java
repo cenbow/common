@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import static kelly.monitor.alert.BuildData.alertConfig;
 
@@ -43,6 +44,12 @@ public class TestMybatis {
     private AlertConfigMapper alertConfigMapper;
     @Autowired
     private JacksonSerializer jacksonSerializer;
+
+    @Test
+    public void test0() {
+        System.out.println(TimeUnit.DAYS.toSeconds(1) - 1);
+
+    }
 
     @Test
     public void test1() {
@@ -85,6 +92,13 @@ public class TestMybatis {
     public void test41() {
         alertConfig.persist(jacksonSerializer);
         alertConfigMapper.save(alertConfig);
+    }
+
+    @Test
+    public void test42() {
+        alertConfig.persist(jacksonSerializer);
+        alertConfig.setId(60L);
+        alertConfigMapper.update(alertConfig);
     }
 
     @Test

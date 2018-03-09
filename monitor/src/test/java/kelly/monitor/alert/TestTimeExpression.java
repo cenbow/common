@@ -13,7 +13,6 @@ public class TestTimeExpression {
     @Test
     public void test1() {
         System.out.println(buildTimeExpression().toDescrption());
-
     }
 
 
