@@ -2,6 +2,9 @@ package kelly.springboot.weixin;
 
 import com.google.common.collect.ImmutableMap;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -18,7 +21,7 @@ public class WeixinApiService {
     @Autowired
     private RestTemplate restTemplate;
 
-    private String accessToken = "wYaEkk50nAPXgeiF1SJkmaMoBNNT7LIAca3_iZ5SgodOctDUOREOeJdXtUZPJA9AQdVvn33NjwIrgbfql2rNsVWhQBViYi69_7YJ77DWkJAQ-WC9ENWaeiRsPITEs55pSIYeADADTJ";
+    private String accessToken = "7_Et_lzcEofUyenqYRRbqWaOl-LHr-EJGHCK4C1kHvKX-Mkon9___ncKyNdLiwvbE5EyEx2AD0ldjYlHZKBfsaN9ngPpIIBeEUu0f3ZTqP9DIDVVuOoloBr9p06YUVWEjABAGHP";
 
 
     private String tokenUrl = "https://api.weixin.qq.com/cgi-bin/token?grant_type={grantType}&appid={appid}&secret={secret}";
@@ -56,14 +59,41 @@ public class WeixinApiService {
 
     public String userInfoBatchget() {
         Map<String, String> param = ImmutableMap.of("accessToken", accessToken);
-        return restTemplate.getForObject(userInfoBatchgetUrl, String.class, param);
+        return restTemplate.postForObject(userInfoBatchgetUrl, null, String.class, accessToken);
     }
 
-    private String menuGetUrl="https://api.weixin.qq.com/cgi-bin/menu/get?access_token={accessToken}";
+    private String menuGetUrl = "https://api.weixin.qq.com/cgi-bin/menu/get?access_token={accessToken}";
 //{"menu":{"button":[{"name":"服务列表","sub_button":[{"type":"view","name":"绑卡","url":"http:\/\/www.soso.com\/","sub_button":[]},{"type":"view","name":"查看信息","url":"http:\/\/v.qq.com\/","sub_button":[]},{"type":"click","name":"赞一下我们","key":"V1001_GOOD","sub_button":[]}]},{"type":"click","name":"活动","key":"V1001_TODAY_MUSIC","sub_button":[]}]}}
 
     public String menuGet() {
         Map<String, String> param = ImmutableMap.of("accessToken", accessToken);
         return restTemplate.getForObject(menuGetUrl, String.class, param);
     }
+
+    //https://api.weixin.qq.com/cgi-bin/message/custom/send?access_token=ACCESS_TOKEN
+//    private String
+    private String messageCustomSendUrl = "https://api.weixin.qq.com/cgi-bin/message/custom/send?access_token={accessToken}";
+
+    //    {
+//        "touser":"OPENID",
+//            "msgtype":"text",
+//            "text":
+//        {
+//            "content":"Hello World"
+//        }
+//    }
+    public String messageCustomSend() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<Map<String, Object>> entity = new HttpEntity<Map<String, Object>>(ImmutableMap.of("touser", Constants.OPENID, "msgtype", "text", "text", ImmutableMap.of("content", "Hello")), headers);
+        return restTemplate.postForEntity(messageCustomSendUrl, entity, String.class, accessToken).getBody();
+    }
+
+
+    private String url = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token={accessToken}";
+
+    public String messageTemplateSend() {
+        return null;
+    }
+
 }

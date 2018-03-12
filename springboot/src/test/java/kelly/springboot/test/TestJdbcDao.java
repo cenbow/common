@@ -7,7 +7,7 @@ import kelly.springboot.model.User;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
@@ -21,7 +21,7 @@ import java.util.List;
 //需要增加@WebAppConfiguration,否则接入swagger会报Error creating bean with name 'documentationPluginsBootstrapper'
 @WebAppConfiguration
 //注意写的是Application类，不是TestConfig类
-@SpringApplicationConfiguration(Application.class)
+@SpringBootTest(classes = Application.class)
 public class TestJdbcDao {
 
 

@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.support.SpringBootServletInitializer;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.cloud.netflix.feign.EnableFeignClients;
 
 /**
  * Created by kelly.li on 17/9/16.
@@ -13,6 +14,7 @@ import org.springframework.cache.annotation.EnableCaching;
 
 @SpringBootApplication
 @EnableCaching
+@EnableFeignClients
 public class Application extends SpringBootServletInitializer {
 
     @Override

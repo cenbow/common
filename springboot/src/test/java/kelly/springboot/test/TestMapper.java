@@ -3,11 +3,10 @@ package kelly.springboot.test;
 import kelly.springboot.Application;
 import kelly.springboot.dao.mapper.UserMapper;
 import kelly.springboot.model.User;
-import org.apache.ibatis.jdbc.SQL;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
@@ -20,7 +19,7 @@ import java.util.List;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
-@SpringApplicationConfiguration(Application.class)
+@SpringBootTest(classes = Application.class)
 public class TestMapper {
 
     @Autowired
