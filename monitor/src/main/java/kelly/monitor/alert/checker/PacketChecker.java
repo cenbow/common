@@ -6,6 +6,7 @@ import kelly.monitor.common.Packet;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,18 +18,22 @@ import java.util.stream.Collectors;
 @Slf4j
 public class PacketChecker {
 
-    private Application application;
-    private List<AlertConfig> alertConfigs;//该应用的配置，包含默认报警配置
-    private List<Packet> packets;//该应用的所有抓包
+    @Autowired
+    private MetricChecker metricChecker;
 
-    public void check() {
-        log.info("[PacketChecker] check begin");
+    /**
+     * @param application
+     * @param alertConfigs 该应用的配置，包含默认报警配置
+     * @param packets      该应用的所有抓包
+     */
+    public void check(Application application, List<AlertConfig> alertConfigs, List<Packet> packets) {
+        // log.info("[PacketChecker] check begin");
         //配置中时间是否停止,检查次数是否为正书
         List<AlertConfig> enableAlertConfigs = alertConfigs.stream().filter(alertConfig ->
                 !alertConfig.isStop()
         ).collect(Collectors.toList());
         if (CollectionUtils.isEmpty(enableAlertConfigs)) {
-            log.info("[PacketChecker] no alert config matched : {}", alertConfigs);
+            // log.info("[PacketChecker] no alert config matched : {}", alertConfigs);
             return;
         }
 
@@ -39,11 +44,11 @@ public class PacketChecker {
         //D.抓包是否正常
         List<Packet> enableAlertPackects = packets.stream().filter((packet) -> packet.enableCheckAlert()).collect(Collectors.toList());
         if (CollectionUtils.isEmpty(enableAlertPackects)) {
-            log.info("[PacketChecker] no enable alert packects matched : {}", packets);
+            // log.info("[PacketChecker] no enable alert packects matched : {}", packets);
             return;
         }
-        enableAlertConfigs.stream().map(alertConfig -> new MetricChecker(application, alertConfig, enableAlertPackects))
-                .forEach(metricChecker -> metricChecker.check());
+        enableAlertConfigs.stream()
+                .forEach(enableAlertConfig -> metricChecker.check(application, enableAlertConfig, enableAlertPackects));
 
     }
 }

@@ -3,7 +3,6 @@ package kelly.monitor.alert.checker;
 import kelly.monitor.alert.notify.EmailAlertNotify;
 import kelly.monitor.alert.notify.SmsAlertNotify;
 import kelly.monitor.common.*;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -18,19 +17,18 @@ import java.util.Map;
 @Slf4j
 public class TimeExpressionChecker {
 
-    @NonNull
-    private Application application;
-    @NonNull
-    private AlertConfig alertConfig;
-    @NonNull
-    private TimeExpression timeExpression;//当前时刻
-    @NonNull
-    List<IncomingPoint> incomingPoints;//匹配metric、tag、同一应用、同一时刻、不同机器的点
     EmailAlertNotify emailAlertNotify = new EmailAlertNotify();
     SmsAlertNotify smsAlertNotify = new SmsAlertNotify();
 
 
-    public void check() {
+    /**
+     *
+     * @param application
+     * @param alertConfig
+     * @param timeExpression 当前时刻
+     * @param incomingPoints 匹配metric、tag、同一应用、同一时刻、不同机器的点
+     */
+    public void check(Application application, AlertConfig alertConfig, TimeExpression timeExpression, List<IncomingPoint> incomingPoints) {
         log.info("[TimeExpressionChecker] check begin");
         Map<String, Float> aggValues = alertConfig.aggValue(incomingPoints);
         boolean matchTimeExpression = timeExpression.matchExpression(aggValues);

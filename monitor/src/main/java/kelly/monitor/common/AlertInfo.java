@@ -1,6 +1,7 @@
 package kelly.monitor.common;
 
 import kelly.monitor.util.DateTimeGenerater;
+import lombok.Getter;
 
 import java.util.List;
 import java.util.Map;
@@ -9,9 +10,10 @@ import java.util.Set;
 /**
  * Created by kelly-lee on 2018/2/11.
  */
-
+@Getter
 public class AlertInfo {
 
+    private AlertType alertType;
     private Status status;
     private String appCode;
     private String metricName;
@@ -51,12 +53,18 @@ public class AlertInfo {
     }
 
     public static class Builder {
+        AlertType alertType;
         Application application;
         AlertConfig alertConfig;
         TimeExpression timeExpression;
         List<IncomingPoint> incomingPoints;
         Status status;
         long count;
+
+        public Builder alertType(AlertType alertType) {
+            this.alertType = alertType;
+            return this;
+        }
 
         public Builder application(Application application) {
             this.application = application;
@@ -102,7 +110,7 @@ public class AlertInfo {
             List<Map<String, String>> limitNTags = item.resolveLimitNTags(incomingPoints);
             alertInfo.limitNTags = limitNTags.toString();
             alertInfo.owners = application.getOwners();
-
+            alertInfo.alertType = alertType;
             return alertInfo;
         }
     }

@@ -1,37 +1,38 @@
-package kelly.monitor.alert.notify;
+package kelly.monitor.alert;
 
-import kelly.monitor.common.AlertInfo;
-import lombok.extern.slf4j.Slf4j;
+import kelly.monitor.MonitorApplication;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.stereotype.Component;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.mail.internet.MimeMessage;
 
 /**
- * Created by kelly-lee on 2018/2/13.
+ * Created by kelly.li on 18/3/10.
  */
-@Slf4j
-@Component
-public class EmailAlertNotify implements AlertNotify {
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = MonitorApplication.class)
+public class TestEmail {
 
     @Autowired
     JavaMailSender mailSender;
 
-    @Override
-    public void notify(AlertInfo alertInfo) {
+    @Test
+    public void testSendEmail() {
         try {
             final MimeMessage mimeMessage = this.mailSender.createMimeMessage();
             final MimeMessageHelper message = new MimeMessageHelper(mimeMessage);
             message.setFrom("admin@monitor.klplay.cn");
             message.setTo("kellyleemz285@163.com");
-            message.setSubject(alertInfo.toSms());
-            message.setText(alertInfo.toEmail());
+            message.setSubject("测试邮件主题");
+            message.setText("测试邮件内容");
             this.mailSender.send(mimeMessage);
-            log.info("send email : {}", alertInfo.toEmail());
         } catch (Exception ex) {
-            log.error("send email fail : {}", ex.getMessage());
+            ex.printStackTrace();
         }
     }
 }

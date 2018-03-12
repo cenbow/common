@@ -36,6 +36,9 @@ public class AlertChecker {
     @Autowired
     private JacksonSerializer jacksonSerializer;
 
+    @Autowired
+    private PacketChecker packetChecker;
+
     @PostConstruct
     public void init() {
         PacketEvent.register(this);
@@ -55,8 +58,7 @@ public class AlertChecker {
         if (CollectionUtils.isEmpty(alertConfigs)) {
             return;
         }
-        PacketChecker packetChecker = new PacketChecker(application, alertConfigs, packets);
-        packetChecker.check();
+        packetChecker.check(application, alertConfigs, packets);
     }
 
     private Application getApplicaton(String appCode) {
