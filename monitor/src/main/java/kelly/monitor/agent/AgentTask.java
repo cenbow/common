@@ -9,38 +9,39 @@ import com.ning.http.client.Request;
 import kelly.monitor.common.ApplicationServer;
 import kelly.monitor.common.Packet;
 import kelly.monitor.common.msg.PacketMsg;
-import kelly.monitor.common.query.ApplicationServerQuery;
+import kelly.monitor.config.SpringUtil;
 import kelly.monitor.core.KlTsdbs;
-import kelly.monitor.dao.mapper.ApplicationServerMapper;
+import kelly.monitor.service.ApplicationService;
+import lombok.extern.slf4j.Slf4j;
 
 import java.net.MalformedURLException;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 /**
  * Created by kelly-lee on 2018/1/18.
  * 抓取一台机器的数据
  */
+@Slf4j
 public class AgentTask implements Runnable {
 
     private String appCode;
     private AsyncHttpClient asyncHttpClient;
     private KlTsdbs klTsdbs;
-    private ApplicationServerMapper applicationServerMapper;
+    private ApplicationService applicationService;
 
-    public AgentTask(String appCode, AsyncHttpClient asyncHttpClient, KlTsdbs klTsdbs, ApplicationServerMapper applicationServerMapper) {
+    public AgentTask(String appCode) {
         this.appCode = appCode;
-        this.asyncHttpClient = asyncHttpClient;
-        this.klTsdbs = klTsdbs;
-        this.applicationServerMapper = applicationServerMapper;
+        this.asyncHttpClient = SpringUtil.getBean("asyncHttpClient", AsyncHttpClient.class);
+        this.klTsdbs = SpringUtil.getBean("klTsdbs", KlTsdbs.class);
+        this.applicationService = SpringUtil.getBean("applicationService", ApplicationService.class);
     }
 
     @Override
     public void run() {
         //根据appName拿到对应的machineList,为空返回(从redis中 根据  hgetAll(r_app_svr_$appName))
         //filter抓取开关打开的machineList，为空返回
-        List<ApplicationServer> applicationServers = getApplicationServers(appCode);
+        List<ApplicationServer> applicationServers = applicationService.getApplicationServers(appCode);
 
         //使用AsyncHttpClient并发请求agen_url,返回ListenableFuture
         //ListenableFuture -> SettableFuture
@@ -53,17 +54,15 @@ public class AgentTask implements Runnable {
         try {
             packets = listListenableFuture.get();
             //调用Collector收集Packet
-            PacketCollector packetCollector = PacketCollector.getOrCreate(appCode, klTsdbs);
+            PacketCollector packetCollector = PacketCollector.getOrCreate(appCode);
             packetCollector.addPoints(packets);
 
             //发给alert报警
             PacketMsg packetMsg = new PacketMsg(appCode, packets);
             PacketEvent.post(packetMsg);
 
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            log.error("agent application server {}", e.getMessage());
         }
     }
 
@@ -82,20 +81,14 @@ public class AgentTask implements Runnable {
                 }
             }, MoreExecutors.sameThreadExecutor());
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("agent application server {}", e.getMessage());
             settableFuture.set(packetHandler.getPacket());
         }
         return settableFuture;
     }
 
-    private List<ApplicationServer> getApplicationServers(String appCode) {
-        ApplicationServerQuery query = ApplicationServerQuery.builder().appCode(appCode).build();
-        return applicationServerMapper.query(query);
-    }
-
 
     private String parseAgentUrls(ApplicationServer applicationServer) {
-
         try {
             return applicationServer.url("/_/metrics");
         } catch (MalformedURLException e) {

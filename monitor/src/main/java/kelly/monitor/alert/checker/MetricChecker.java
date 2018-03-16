@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
@@ -13,6 +14,7 @@ import java.util.List;
  */
 @AllArgsConstructor
 @Slf4j
+@Component
 public class MetricChecker {
 
     @Autowired
@@ -23,14 +25,14 @@ public class MetricChecker {
         log.info("[MetricChecker] check begin");
         List<IncomingPoint> incomingPoints = alertConfig.hitMetricTags(packets);
         if (CollectionUtils.isEmpty(incomingPoints)) {
-            log.info("[MetricChecker] no point matched : {} --> {} --> {}", application.getAppCode(), alertConfig.getAlertTagConfigs(), packets);
             return;
         }
+        log.info("[MetricChecker] point matched : {} --> {} --> {}", application.getAppCode(), alertConfig.getAlertTagConfigs(), packets);
         List<TimeExpression> timeExpressions = alertConfig.hitTimeRange();
         if (CollectionUtils.isEmpty(timeExpressions)) {
-            log.info("[MetricChecker] no time range matched : {} --> {} ", application.getAppCode(), alertConfig.getTimeExpressions());
             return;
         }
+        log.info("[MetricChecker] time range matched : {} --> {} ", application.getAppCode(), alertConfig.getTimeExpressions());
         timeExpressions.stream()
                 .forEach(timeExpression -> timeExpressionChecker.check(application, alertConfig, timeExpression, incomingPoints));
     }

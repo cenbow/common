@@ -22,8 +22,7 @@ public class AlertInfo {
     private String expression;
     private long count;
     private String comment;
-    private Set<String> owners;
-    private Set<String> emails;
+    private Set<Owner> owners;
     private long time;
 
     private AlertInfo() {
@@ -60,11 +59,6 @@ public class AlertInfo {
         List<IncomingPoint> incomingPoints;
         Status status;
         long count;
-
-        public Builder alertType(AlertType alertType) {
-            this.alertType = alertType;
-            return this;
-        }
 
         public Builder application(Application application) {
             this.application = application;
@@ -110,7 +104,7 @@ public class AlertInfo {
             List<Map<String, String>> limitNTags = item.resolveLimitNTags(incomingPoints);
             alertInfo.limitNTags = limitNTags.toString();
             alertInfo.owners = application.getOwners();
-            alertInfo.alertType = alertType;
+            alertInfo.alertType = alertConfig.getAlertType();
             return alertInfo;
         }
     }

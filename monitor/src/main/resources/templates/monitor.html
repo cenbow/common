@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+>
 <head>
     <meta charset="UTF-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
@@ -21,6 +21,7 @@
     <link href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"/>
     <link href="http://cdn.bootcss.com/bootstrap-daterangepicker/2.1.25/daterangepicker.min.css" rel="stylesheet"/>
     <link href="https://cdn.bootcss.com/dropzone/5.2.0/min/dropzone.min.css" rel="stylesheet"/>
+    <link href="https://cdn.bootcss.com/bootstrap-treeview/1.2.0/bootstrap-treeview.min.css" rel="stylesheet"/>
     <link href="css/local.css" rel="stylesheet"/>
 
     <!-- 解决ie9以下浏览器对html5新增标签的不识别，并导致CSS不起作用的问题。-->　
@@ -34,12 +35,14 @@
 
     <script src="http://cdn.bootcss.com/bootstrap-daterangepicker/2.1.25/moment.min.js"></script>
     <script src="http://cdn.bootcss.com/bootstrap-daterangepicker/2.1.25/daterangepicker.min.js"></script>
+    <script src="https://cdn.bootcss.com/bootstrap-treeview/1.2.0/bootstrap-treeview.min.js"></script>
 
     <style>
         .chart {
             width: 100%;
             height: 400px;
         }
+
     </style>
 </head>
 <body>
@@ -54,15 +57,23 @@
 
 <div class="container" style="margin-top:100px;">
     <div class="row">
-        <div class="col-md-6" th:each="chart : ${charts}">
-            <div class="panel panel-default" >
-                <div class="panel-heading">
-                    <h3 class="panel-title">
-                        <a  th:href="@{'/detail?metric='+${chart}}"> <i class="fa fa-server fa-fw"></i></a> <span th:text="${chart}"/>
-                    </h3>
-                </div>
-                <div class="panel-body">
-                    <div th:id="${chart}" class="chart"></div>
+
+        <div class="col-md-2">
+            <div id="tree"></div>
+        </div>
+
+        <div class="col-md-10" >
+            <div class="col-md-6" th:each="chart : ${charts}">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">
+                            <a th:href="@{'/detail?metric='+${chart}}"> <i class="fa fa-server fa-fw"></i></a>
+                            <span th:text="${chart}"/>
+                        </h3>
+                    </div>
+                    <div class="panel-body">
+                        <div th:id="${chart}" class="chart"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -71,25 +82,81 @@
 </body>
 <script type="text/javascript" th:inline="javascript">
 
+    var data = [
+        {
+            text: "Node 1",
+            collapseIcon: "fa fa-fw minus-circle",
+            expandIcon: "fa fa-fw plus-circle",
+            icon: "fa fa-server fa-fw",
+            selectedIcon: "fa fa-server fa-fw",
+            color: "#000000",
+            backColor: "#FFFFFF",
+            href: "#node-1",
+            selectable: true,
+            state: {
+                checked: true,
+                disabled: false,
+                expanded: true,
+                selected: true
+            },
+            tags: ['available'],
+            nodes: [
+                {
+                    text: "Child 1",
+                    collapseIcon: "fa fa-fw minus-circle",
+                    expandIcon: "fa fa-fw plus-circle",
+                    nodes: [
+                        {
+                            text: "Grandchild 1"
+                        },
+                        {
+                            text: "Grandchild 2"
+                        }
+                    ]
+                },
+                {
+                    text: "Child 2"
+                }
+            ]
+        },
+        {
+            text: "Parent 2"
+        },
+        {
+            text: "Parent 3"
+        },
+        {
+            text: "Parent 4"
+        },
+        {
+            text: "Parent 5"
+        }
+    ];
+
+    function getTree() {
+        return data;
+    }
+    $('#tree').treeview({data: getTree()});
+
     var chartMap = new Map();
-    $(".panel-body div").each(function(){
+    $(".panel-body div").each(function () {
         var chart = echarts.init($(this).get(0));
-        chartMap.set($(this).attr('id'),chart);
+        chartMap.set($(this).attr('id'), chart);
         chart.setOption(default_option, true);
         chart.showLoading();
     });
 
     if ('WebSocket' in window) {
         var host = [[${#httpServletRequest.getServerName()+":"+#httpServletRequest.getServerPort()}]];
-        websocket = new WebSocket("ws://"+host+"/chart_ws");
+        websocket = new WebSocket("ws://" + host + "/chart_ws");
     } else {
         alert('Sorry, websocket not supported by your browser.');
     }
 
     websocket.onopen = function (event) {
-        $(".panel-body div").each(function(){
+        $(".panel-body div").each(function () {
             var id = $(this).attr('id');
-            if(id != undefined) {
+            if (id != undefined) {
                 var data = {
                     "metric": id,
                     "tags": {},

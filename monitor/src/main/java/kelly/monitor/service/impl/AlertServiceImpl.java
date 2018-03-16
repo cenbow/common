@@ -10,6 +10,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -47,11 +48,24 @@ public class AlertServiceImpl implements AlertService {
         return alertConfig;
     }
 
+    public List<AlertConfig> findAlertConfigs(String appCode) {
+        AlertConfigQuery query = AlertConfigQuery.builder().appCode(appCode).build();
+        List<AlertConfig> alertConfigs = alertConfigMapper.query(query);
+        if (CollectionUtils.isEmpty(alertConfigs)) {
+            return Collections.emptyList();
+        }
+        alertConfigs.stream().forEach(alertConfig -> {
+            alertConfig.load(jacksonSerializer);
+        });
+        return alertConfigs;
+    }
+
+
     @Override
     public List<AlertConfig> findAlertConfigs(String appCode, String metricName, Paginator paginator) {
         AlertConfigQuery.AlertConfigQueryBuilder alertConfigQueryBuilder = AlertConfigQuery.builder().appCode(appCode).metricName(metricName);
         long count = alertConfigMapper.count(alertConfigQueryBuilder.build());
-        paginator.init(count, 2);
+        paginator.init(count, 5);
         AlertConfigQuery alertConfigQuery = alertConfigQueryBuilder.firstResult(paginator.getFirstResult()).pageSize(paginator.getPageSize()).build();
         List<AlertConfig> alertConfigs = alertConfigMapper.query(alertConfigQuery);
         if (!CollectionUtils.isEmpty(alertConfigs)) {

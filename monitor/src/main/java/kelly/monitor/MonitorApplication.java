@@ -12,6 +12,7 @@ import org.springframework.boot.web.support.SpringBootServletInitializer;
 
 @SpringBootApplication
 //@EnableCaching
+//@ComponentScan(basePackages={"kelly.monitor.*","kelly.weixin.*"})
 public class MonitorApplication
         extends SpringBootServletInitializer {
 
@@ -24,6 +25,6 @@ public class MonitorApplication
         SpringApplication springApplication = new SpringApplication(MonitorApplication.class);
         springApplication.setBannerMode(Banner.Mode.OFF);
         springApplication.run(args);
-        //  SpringApplication.run(Application.class, args);
+       // SpringApplication.run(Application.class, args);
     }
 }

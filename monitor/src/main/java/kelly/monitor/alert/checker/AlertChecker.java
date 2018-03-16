@@ -6,17 +6,16 @@ import kelly.monitor.common.AlertConfig;
 import kelly.monitor.common.Application;
 import kelly.monitor.common.Packet;
 import kelly.monitor.common.msg.PacketMsg;
-import kelly.monitor.common.query.AlertConfigQuery;
-import kelly.monitor.common.query.ApplicationQuery;
 import kelly.monitor.config.JacksonSerializer;
-import kelly.monitor.dao.mapper.AlertConfigMapper;
-import kelly.monitor.dao.mapper.ApplicationMapper;
+import kelly.monitor.service.AlertService;
+import kelly.monitor.service.ApplicationService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import java.util.List;
 
 /**
@@ -28,10 +27,10 @@ import java.util.List;
 public class AlertChecker {
 
     @Autowired
-    private ApplicationMapper applicationMapper;
+    private ApplicationService applicationService;
 
     @Autowired
-    private AlertConfigMapper alertConfigMapper;
+    private AlertService alertService;
 
     @Autowired
     private JacksonSerializer jacksonSerializer;
@@ -50,32 +49,21 @@ public class AlertChecker {
         String appCode = packetMsg.getAppCode();
         List<Packet> packets = packetMsg.getPackets();
 
-        Application application = getApplicaton(appCode);
+        Application application = applicationService.getApplicaton(appCode);
         if (application == null) {
             return;
         }
-        List<AlertConfig> alertConfigs = findAlertConfigs(appCode);
+        List<AlertConfig> alertConfigs = alertService.findAlertConfigs(appCode);
         if (CollectionUtils.isEmpty(alertConfigs)) {
             return;
         }
         packetChecker.check(application, alertConfigs, packets);
     }
 
-    private Application getApplicaton(String appCode) {
-        ApplicationQuery applicationQuery = ApplicationQuery.builder().appCode(appCode).status(Application.Status.ENABLE).build();
-        return applicationMapper.query(applicationQuery);
+    @PreDestroy
+    public void destroy() {
+        PacketEvent.unregister(this);
     }
 
-    private List<AlertConfig> findAlertConfigs(String appCode) {
-        AlertConfigQuery query = AlertConfigQuery.builder().appCode(appCode).build();
-        List<AlertConfig> alertConfigs = alertConfigMapper.query(query);
-        if (CollectionUtils.isEmpty(alertConfigs)) {
-            return null;
-        }
-        alertConfigs.stream().forEach(alertConfig -> {
-            alertConfig.load(jacksonSerializer);
-        });
-        return alertConfigs;
-    }
 
 }

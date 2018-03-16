@@ -1,9 +1,18 @@
 package kelly.monitor.model;
 
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
 /**
  * Created by kelly-lee on 2017/10/12.
  */
-public class MetricsQuery {
+@Setter
+@Getter
+@ToString
+@Builder
+public class MetricQuery {
 
     private String name;
     private String appId;

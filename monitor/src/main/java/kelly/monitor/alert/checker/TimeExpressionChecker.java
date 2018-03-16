@@ -1,10 +1,11 @@
 package kelly.monitor.alert.checker;
 
-import kelly.monitor.alert.notify.EmailAlertNotify;
-import kelly.monitor.alert.notify.SmsAlertNotify;
+import kelly.monitor.alert.notify.AlertNotifyFactory;
 import kelly.monitor.common.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
@@ -15,14 +16,14 @@ import java.util.Map;
  */
 @RequiredArgsConstructor
 @Slf4j
+@Component
 public class TimeExpressionChecker {
 
-    EmailAlertNotify emailAlertNotify = new EmailAlertNotify();
-    SmsAlertNotify smsAlertNotify = new SmsAlertNotify();
+    @Autowired
+    AlertNotifyFactory alertNotifyFactory;
 
 
     /**
-     *
      * @param application
      * @param alertConfig
      * @param timeExpression 当前时刻
@@ -33,7 +34,7 @@ public class TimeExpressionChecker {
         Map<String, Float> aggValues = alertConfig.aggValue(incomingPoints);
         boolean matchTimeExpression = timeExpression.matchExpression(aggValues);
 
-        CountChecker.Result result = CountChecker.check("testKey", matchTimeExpression, alertConfig.getCheckCount());
+        CountChecker.Result result = CountChecker.check(alertConfig.getId() + "|" + timeExpression.getExpression().expression(), matchTimeExpression, alertConfig.getCheckCount());
         result = CountChecker.Result.ALERT;
         if (result == CountChecker.Result.NONE) return;
 
@@ -41,21 +42,15 @@ public class TimeExpressionChecker {
                 .alertConfig(alertConfig)
                 .expression(timeExpression)
                 .incomingPoints(incomingPoints)
-                .count(CountChecker.getCount("testKey"))
+                .count(CountChecker.getCount(alertConfig.getId() + "|" + timeExpression.getExpression().expression()))
                 .status(result == CountChecker.Result.ALERT ? AlertInfo.Status.ALERT : AlertInfo.Status.RECOVER);
+
         Expression.Item item = timeExpression.getExpression().hitFirstItem(aggValues);
         List<Map<String, String>> limitNTags = item.resolveLimitNTags(incomingPoints);
 
         AlertInfo alertInfo = builder.build();
         //报警
-        AlertType alertType = alertConfig.getAlertType();
-        if (alertType.isMail()) {
-            emailAlertNotify.notify(alertInfo);
-        }
-        if (alertType.isSMS()) {
-            smsAlertNotify.notify(alertInfo);
-        }
-
+        alertNotifyFactory.notify(alertInfo);
 
     }
 

@@ -6,7 +6,7 @@ import kelly.monitor.common.AggregatorType;
 import kelly.monitor.config.JacksonSerializer;
 import kelly.monitor.core.KlTsdbs;
 import kelly.monitor.core.MetricDataQuery;
-import kelly.monitor.dao.mapper.MetricsMapper;
+import kelly.monitor.dao.mapper.MetricMapper;
 import kelly.monitor.model.User;
 import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
@@ -28,7 +28,7 @@ public class MonitorController {
 
     private Logger logger = LoggerFactory.getLogger(MetricsChartController.class);
     @Autowired
-    private MetricsMapper metricsMapper;
+    private MetricMapper metricsMapper;
 
     @Autowired
     private JacksonSerializer jacksonSerializer;
@@ -39,7 +39,7 @@ public class MonitorController {
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public String index(Model model) {
         //TODO 应用名先写死
-        List<String> metricsNames = metricsMapper.findNames("jvm");
+        List<String> metricsNames = metricsMapper.findNames("monitor");
         System.out.println("-----------------------" + metricsNames.size());
         model.addAttribute("charts", metricsNames);
         return "monitor";

@@ -41,7 +41,7 @@ public class PacketHandler extends AsyncCompletionHandler<Packet> {
             this.context = Metrics.timer("packet_collect_time", "app_code", packet.getApplicationServer().getAppCode(),
                     "server_host", applicationServer.getHostOrIp()).time();
         } else {
-            context = null;
+            this.context = null;
         }
     }
 

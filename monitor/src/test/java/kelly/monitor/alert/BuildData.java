@@ -27,8 +27,8 @@ public class BuildData {
         Application application = new Application();
         application.setAppCode("monitor");
         application.setAppName("监控系统");
-        application.setOwners(ImmutableSet.of("kelly"));
-        application.setEmails(ImmutableSet.of("kelly@163.com"));
+        Owner owner = new Owner(1L, "kelly", "kelly", "13688888888", "onNrXwsGRNbUrBxqRLiXwUEbeMcg", "kellyleemz285@163.com", new Date(), new Date());
+        application.setOwners(ImmutableSet.of(owner));
         return application;
     }
 

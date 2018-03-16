@@ -11,7 +11,7 @@ public class ApplicationSqlProvider {
 
     public String query(ApplicationQuery query) {
         return new SQL() {{
-            SELECT("id,app_code as appCode,app_name as appName,description,status");
+            SELECT("id,app_code as appCode,app_name as appName,description,status,owners as ownerJson");
             FROM("application");
             WHERE("1=1");
             if (query != null) {

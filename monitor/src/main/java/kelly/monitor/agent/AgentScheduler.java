@@ -1,9 +1,7 @@
 package kelly.monitor.agent;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import com.ning.http.client.AsyncHttpClient;
-import kelly.monitor.core.KlTsdbs;
-import kelly.monitor.dao.mapper.ApplicationServerMapper;
+import kelly.monitor.service.ApplicationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -34,11 +32,7 @@ public class AgentScheduler implements InitializingBean, DisposableBean {
     private int nThreads = 24;
 
     @Autowired
-    private AsyncHttpClient asyncHttpClient;
-    @Autowired
-    private KlTsdbs klTsdbs;
-    @Autowired
-    private ApplicationServerMapper applicationServerMapper;
+    private ApplicationService applicationService;
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -62,7 +56,7 @@ public class AgentScheduler implements InitializingBean, DisposableBean {
                     return;
                 }
                 for (String app : apps) {
-                    executorService.submit(new AgentTask(app, asyncHttpClient, klTsdbs, applicationServerMapper));
+                    executorService.submit(new AgentTask(app));
                 }
             } catch (Throwable t) {
                 log.error("agent fail ", t);
@@ -75,9 +69,8 @@ public class AgentScheduler implements InitializingBean, DisposableBean {
         log.info("AgentScheduler init end");
     }
 
-    //TODO 是否加载可用的应用名
     private List<String> getApps() {
-        return applicationServerMapper.getAppCodes();
+        return applicationService.getAppCodes();
     }
 
     @Override

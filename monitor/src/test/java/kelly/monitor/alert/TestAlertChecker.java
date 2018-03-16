@@ -22,12 +22,13 @@ public class TestAlertChecker {
 
     @Autowired
     AlertChecker alertChecker;
+    @Autowired
+    PacketChecker packetChecker;
 
 
     @Test
     public void test1() {
-        PacketChecker packetChecker = new PacketChecker(application, Lists.newArrayList(alertConfig), packets);
-        packetChecker.check();
+        packetChecker.check(application, Lists.newArrayList(alertConfig), packets);
     }
 
     @Test

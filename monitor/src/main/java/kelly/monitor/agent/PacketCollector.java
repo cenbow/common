@@ -4,8 +4,9 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import kelly.monitor.common.IncomingPoint;
 import kelly.monitor.common.Packet;
+import kelly.monitor.config.SpringUtil;
 import kelly.monitor.core.KlTsdbs;
-import org.springframework.util.CollectionUtils;
+import org.apache.commons.collections.CollectionUtils;
 
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -21,23 +22,26 @@ public class PacketCollector {
 
     private String appCode;
 
-    private PacketCollector(String appCode, KlTsdbs klTsdbs) {
+    private MetricTagCache metricTagCache;
+
+    private PacketCollector(String appCode) {
         this.appCode = appCode;
-        this.klTsdbs = klTsdbs;
+        this.klTsdbs = SpringUtil.getBean("klTsdbs", KlTsdbs.class);
+        this.metricTagCache = SpringUtil.getBean("metricTagCache", MetricTagCache.class);
     }
 
     private static Cache<String, PacketCollector> collectors = CacheBuilder.newBuilder().build();
 
-    public static PacketCollector getOrCreate(String appCode, KlTsdbs klTsdbs) {
+    public static PacketCollector getOrCreate(String appCode) {
         try {
             return collectors.get(appCode, new Callable<PacketCollector>() {
                 @Override
                 public PacketCollector call() throws Exception {
-                    return new PacketCollector(appCode, klTsdbs);
+                    return new PacketCollector(appCode);
                 }
             });
         } catch (ExecutionException e) {
-            return new PacketCollector(appCode, klTsdbs);
+            return new PacketCollector(appCode);
         }
     }
 
@@ -55,6 +59,10 @@ public class PacketCollector {
             for (IncomingPoint point : packet.getPoints()) {
                 try {
                     klTsdbs.addPointAsync(point);
+                    metricTagCache.addMetric(appCode, point.getName(), point.getType());
+                    point.getTags().entrySet().stream().forEach(entry -> {
+                        metricTagCache.addMetricTag(appCode, point.getName(), entry.getKey(), entry.getValue());
+                    });
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

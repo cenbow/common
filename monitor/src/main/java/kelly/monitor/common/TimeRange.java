@@ -106,8 +106,6 @@ public class TimeRange {
         // second of day
         int time = secondOfDay(timestamp);
         for (Range range : ranges) {
-//            if(range.from ==0 ){
-//            }
             if (range.from <= time && time <= range.to) {
                 return true;
             }

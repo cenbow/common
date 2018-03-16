@@ -14,5 +14,7 @@ public interface AlertService {
 
     public AlertConfig findById(Long id);
 
+    public List<AlertConfig> findAlertConfigs(String appCode);
+
     public List<AlertConfig> findAlertConfigs(String appCode, String metricName, Paginator paginator);
 }

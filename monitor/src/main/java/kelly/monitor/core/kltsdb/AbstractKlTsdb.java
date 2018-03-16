@@ -82,7 +82,7 @@ public abstract class AbstractKlTsdb implements Constant, KlTsdb, QueryRunner {
         this.client.setFlushInterval((short) 3000);
         this.client.setIncrementBufferSize(0x20000);
     }
-
+//appcode_metric tagNames tagValues
     @Override
     public Deferred<Object> addPoints(final String metricName, final MetricType type, final long timestamp, final Float[] values, final Map<String, String> tags) {
         if (logger.isDebugEnabled()) {

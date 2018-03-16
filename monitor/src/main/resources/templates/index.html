@@ -25,14 +25,71 @@
 <nav class="navbar navbar-default" role="navigation">
     <div class="container-fluid">
         <div class="navbar-header">
-            <a class="navbar-brand" href="#"><i class="fa fa-line-chart fa-1x fa-fw"></i>监控平台</a>
+            <a class="navbar-brand" href="#"><i class="fa fa-line-chart fa-1x fa-fw"></i>监控平台1111</a>
         </div>
     </div>
 </nav>
 
 <div class="container">
     <div class="row">
-        <div class="col-md-6">
+
+        <div class="col-md-4">
+
+        <div class="dropdown">
+            <a id="dLabel" data-target="#" href="http://example.com" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <span class="glyphicon glyphicon-align-justify"></span>
+            </a>
+            <ul class="dropdown-menu " role="menu" aria-labelledby="dLabel">
+                <li class="dropdown">
+                    <a id="dLabel1" data-target="#" href="http://example.com" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Action
+                    </a>
+                    <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel1">
+                        <li><a href="#">Action</a></li>
+                        <li><a href="#">Another action</a></li>
+                        <li><a href="#">Something else here</a></li>
+                        <li class="divider"></li>
+                        <li><a href="#">Separated link</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a id="dLabel2" data-target="#" href="http://example.com" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Another action
+                    </a>
+                    <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel2">
+                        <li><a href="#">Action</a></li>
+                        <li><a href="#">Another action</a></li>
+                        <li><a href="#">Something else here</a></li>
+                        <li class="divider"></li>
+                        <li><a href="#">Separated link</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a id="dLabel3" data-target="#" href="http://example.com" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Something else
+                    </a>
+                    <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel3">
+                        <li><a href="#">Action</a></li>
+                        <li><a href="#">Another action</a></li>
+                        <li><a href="#">Something else here</a></li>
+                        <li class="divider"></li>
+                        <li><a href="#">Separated link</a></li>
+                    </ul>
+                </li>
+                <li class="divider"></li>
+                <li><a href="#">Separated link</a></li>
+            </ul>
+        </div>
+
+
+        </div>
+
+
+
+
+
+
+        <div class="col-md-4">
 
             <div class="panel panel-default">
                 <div class="panel-heading">
@@ -45,7 +102,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-4">
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <h3 class="panel-title">
@@ -78,74 +135,7 @@
 </div>
 <script type="text/javascript" th:inline="javascript">
 
-    var tomcatChart = echarts.init(document.getElementById("tomcat_chart"));
-    var sessionChart = echarts.init(document.getElementById("session_chart"));
-    var mysqlChart = echarts.init(document.getElementById("mysql_chart"));
-    tomcatChart.setOption(default_option, true);
-    sessionChart.setOption(default_option, true);
-    mysqlChart.setOption(default_option, true);
-    tomcatChart.showLoading();
-    sessionChart.showLoading();
-    mysqlChart.showLoading();
 
-    if ('WebSocket' in window) {
-        var host = [[${#httpServletRequest.getServerName()+":"+#httpServletRequest.getServerPort()}]]
-        websocket = new WebSocket("ws://"+host+"/chart_ws");
-    } else {
-        alert('Sorry, websocket not supported by your browser.')
-    }
-
-    websocket.onopen = function (event) {
-//        websocket.send("tomcat_th");
-//        websocket.send("session_th");
-//        websocket.send("mysql_th");
-    }
-
-    websocket.onmessage = function (event) {
-
-        var data = $.parseJSON(event.data);
-        var name = data.name;
-        var size = Object.keys(data.data).length;
-        var legend = new Array(size);
-        var series = new Array(size);
-
-        $.each(data.data, function (key, value) {
-            legend.push(key);
-            series.push({
-                name: key,
-                type: 'line',
-                showSymbol: false,
-                hoverAnimation: false,
-                areaStyle: {normal: {}},
-                data: value
-            });
-        });
-
-        var option = {
-            legend: {
-                data: legend
-            },
-            xAxis: {
-                data: data.date
-            },
-            series: series
-        };
-
-//        if (name == 'TOMCAT_ACTIVE_THREADS') {
-            tomcatChart.hideLoading();
-            tomcatChart.setOption(option);
-//        }
-
-        if (name == 'TOMCAT_CURRENT_THREADS') {
-            sessionChart.hideLoading();
-            sessionChart.setOption(option);
-        }
-
-        if (name == 'TOMCAT_MAX_THREADS') {
-            mysqlChart.hideLoading();
-            mysqlChart.setOption(option);
-        }
-    }
 
 </script>
 </body>

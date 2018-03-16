@@ -2,22 +2,20 @@ package kelly.monitor;
 
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import kelly.monitor.alert.BuildData;
 import kelly.monitor.common.*;
-import kelly.monitor.common.query.AlertConfigQuery;
-import kelly.monitor.common.query.ApplicationQuery;
-import kelly.monitor.common.query.ApplicationServerQuery;
+import kelly.monitor.common.query.*;
 import kelly.monitor.config.JacksonSerializer;
-import kelly.monitor.dao.mapper.AlertConfigMapper;
-import kelly.monitor.dao.mapper.ApplicationMapper;
-import kelly.monitor.dao.mapper.ApplicationServerMapper;
-import kelly.monitor.dao.mapper.MetricsMapper;
+import kelly.monitor.dao.mapper.*;
 import org.assertj.core.util.Strings;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.util.CollectionUtils;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -39,11 +37,15 @@ public class TestMybatis {
     @Autowired
     private ApplicationMapper applicationMapper;
     @Autowired
-    private MetricsMapper metricsMapper;
+    private MetricMapper metricsMapper;
     @Autowired
     private AlertConfigMapper alertConfigMapper;
     @Autowired
+    private OwnerMapper ownerMapper;
+    @Autowired
     private JacksonSerializer jacksonSerializer;
+    @Autowired
+    private MetricTagMapper metricTagMapper;
 
     @Test
     public void test0() {
@@ -131,5 +133,41 @@ public class TestMybatis {
         System.out.println(application);
     }
 
+    @Test
+    public void test7() {
+//        Date now = new Date();
+//        Owner owner = new Owner(0L, "kelly", "kelly", "13683252445", "onNrXwsGRNbUrBxqRLiXwUEbeMcg", "kellyleemz285@163.com", now, now);
+//        int row = ownerMapper.save(owner);
+//        System.out.println(row);
+//        Owner owner = ownerMapper.findById(1L);
+//        owner.setName("李静");
+//        ownerMapper.update(owner);
+
+        OwnerQuery ownerQuery = OwnerQuery.builder().code("kelly").build();
+        List<Owner> owners = ownerMapper.query(ownerQuery);
+        System.out.println(owners);
+
+    }
+
+
+    @Test
+    public void test8() {
+        Map<String, List<String>> result = findMetricTags("appCode2", "metricName2");
+        System.out.println(result);
+    }
+
+
+    public Map<String, List<String>> findMetricTags(String appCode, String metricName) {
+        Map<String, List<String>> result = Maps.newLinkedHashMap();
+        MetricTagQuery appMetricTagQuery = MetricTagQuery.builder().appCode(appCode).metricName(metricName).build();
+        metricTagMapper.query(appMetricTagQuery).stream().forEach(metricTag -> {
+            System.out.println(metricTag);
+            List<String> values = result.putIfAbsent(metricTag.getTagName(), Lists.newLinkedList(Lists.newArrayList(metricTag.getTagValue())));
+            if (!CollectionUtils.isEmpty(values)) {
+                values.add(metricTag.getTagValue());
+            }
+        });
+        return result;
+    }
 
 }

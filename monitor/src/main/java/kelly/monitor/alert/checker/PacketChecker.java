@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,6 +17,7 @@ import java.util.stream.Collectors;
  */
 @AllArgsConstructor
 @Slf4j
+@Component
 public class PacketChecker {
 
     @Autowired
@@ -33,7 +35,7 @@ public class PacketChecker {
                 !alertConfig.isStop()
         ).collect(Collectors.toList());
         if (CollectionUtils.isEmpty(enableAlertConfigs)) {
-            // log.info("[PacketChecker] no alert config matched : {}", alertConfigs);
+            log.info("[PacketChecker] no alert config matched : {}", alertConfigs);
             return;
         }
 
@@ -44,7 +46,7 @@ public class PacketChecker {
         //D.抓包是否正常
         List<Packet> enableAlertPackects = packets.stream().filter((packet) -> packet.enableCheckAlert()).collect(Collectors.toList());
         if (CollectionUtils.isEmpty(enableAlertPackects)) {
-            // log.info("[PacketChecker] no enable alert packects matched : {}", packets);
+            log.info("[PacketChecker] no enable alert packects matched : {}", packets);
             return;
         }
         enableAlertConfigs.stream()
